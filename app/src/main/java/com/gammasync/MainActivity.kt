@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.gammasync.infra.GammaAudioEngine
+import com.gammasync.infra.HapticFeedback
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private var isRunning = false
 
     private val audioEngine = GammaAudioEngine()
+    private lateinit var haptics: HapticFeedback
 
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -33,6 +35,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        haptics = HapticFeedback(this)
+
         timerText = findViewById(R.id.timerText)
         startButton = findViewById(R.id.startButton)
         stopButton = findViewById(R.id.stopButton)
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startSession() {
         if (!isRunning) {
+            haptics.heavyClick()
             isRunning = true
             audioEngine.start(amplitude = 0.3)
             handler.post(timerRunnable)
@@ -55,6 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopSession() {
         if (isRunning) {
+            haptics.heavyClick()
             isRunning = false
             audioEngine.stop()
             handler.removeCallbacks(timerRunnable)
@@ -64,6 +70,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resetSession() {
+        haptics.click()
         stopSession()
         elapsedSeconds = 0
         updateTimerDisplay()
