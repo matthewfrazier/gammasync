@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Display
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
@@ -12,13 +13,16 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.gammasync.infra.ExternalDisplayManager
 import com.gammasync.infra.GammaAudioEngine
+import com.gammasync.infra.GammaPresentation
 import com.gammasync.infra.GammaRenderer
 import com.gammasync.infra.HapticFeedback
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener {
 
     companion object {
+        private const val TAG = "MainActivity"
         private const val FADE_DURATION = 200L
         private const val AUTO_HIDE_DELAY = 5000L
     }
@@ -37,6 +41,11 @@ class MainActivity : AppCompatActivity() {
 
     private val audioEngine = GammaAudioEngine()
     private lateinit var haptics: HapticFeedback
+
+    // External display (XREAL) support
+    private lateinit var externalDisplayManager: ExternalDisplayManager
+    private var externalPresentation: GammaPresentation? = null
+    private var hasExternalDisplay = false
 
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -82,7 +91,60 @@ class MainActivity : AppCompatActivity() {
             }
             false
         }
+
+        // Start listening for external displays (XREAL, etc.)
+        externalDisplayManager = ExternalDisplayManager(this)
+        externalDisplayManager.startListening(this)
     }
+
+    // --- External Display Callbacks ---
+
+    override fun onExternalDisplayConnected(display: Display) {
+        Log.i(TAG, "External display connected: ${display.name} @ ${display.refreshRate}Hz")
+        hasExternalDisplay = true
+        haptics.heavyClick()
+
+        // Create presentation for external display
+        externalPresentation = GammaPresentation(this, display).apply {
+            setPhaseProvider { audioEngine.phase }
+            show()
+        }
+
+        // If session is running, start rendering on external display
+        if (isRunning) {
+            externalPresentation?.startRendering()
+            // Stop phone screen flicker (external takes over)
+            gammaRenderer.stop()
+        }
+
+        updateModeIndicator()
+    }
+
+    override fun onExternalDisplayDisconnected() {
+        Log.i(TAG, "External display disconnected")
+        hasExternalDisplay = false
+        haptics.click()
+
+        // Dismiss and cleanup presentation
+        externalPresentation?.dismiss()
+        externalPresentation = null
+
+        // If session is running, resume phone screen flicker
+        if (isRunning) {
+            gammaRenderer.start()
+        }
+
+        updateModeIndicator()
+    }
+
+    private fun updateModeIndicator() {
+        // Could show indicator of which display is active
+        // For now, just log
+        val mode = if (hasExternalDisplay) "XREAL (external)" else "Phone"
+        Log.i(TAG, "Display mode: $mode")
+    }
+
+    // --- Controls Visibility ---
 
     private fun toggleControls() {
         haptics.tick()
@@ -120,12 +182,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // --- Session Control ---
+
     private fun startSession() {
         if (!isRunning) {
             haptics.heavyClick()
             isRunning = true
             audioEngine.start(amplitude = 0.3)
-            gammaRenderer.start()
+
+            // Start rendering on appropriate display
+            if (hasExternalDisplay) {
+                externalPresentation?.startRendering()
+            } else {
+                gammaRenderer.start()
+            }
+
             handler.post(timerRunnable)
             startButton.isEnabled = false
             stopButton.isEnabled = true
@@ -137,7 +208,11 @@ class MainActivity : AppCompatActivity() {
         if (isRunning) {
             haptics.heavyClick()
             isRunning = false
+
+            // Stop rendering on all displays
             gammaRenderer.stop()
+            externalPresentation?.stopRendering()
+
             audioEngine.stop()
             handler.removeCallbacks(timerRunnable)
             handler.removeCallbacks(autoHideRunnable)
@@ -162,12 +237,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Log.i("MainActivity", "Configuration changed: ${newConfig.orientation}")
+        Log.i(TAG, "Configuration changed: ${newConfig.orientation}")
         // SurfaceView handles resize via surfaceChanged callback
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        externalDisplayManager.stopListening()
+        externalPresentation?.dismiss()
         gammaRenderer.stop()
         audioEngine.release()
         handler.removeCallbacks(timerRunnable)
