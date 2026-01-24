@@ -14,6 +14,7 @@ class SignalOscillator(
     private val sampleRate: Int = 48000,
     private val frequency: Double = 40.0
 ) {
+    @Volatile
     private var sampleIndex: Long = 0
     private val samplesPerCycle = sampleRate / frequency
 

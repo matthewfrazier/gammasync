@@ -30,6 +30,9 @@ class GammaAudioEngine(
     @Volatile
     private var isPlaying = false
 
+    @Volatile
+    private var playbackStartTimeNs: Long = 0
+
     // VolumeShaper configurations for smooth transitions
     private val fadeInConfig = VolumeShaper.Configuration.Builder()
         .setDuration(FADE_DURATION_MS)
@@ -53,10 +56,16 @@ class GammaAudioEngine(
 
     /**
      * Current phase (0.0 to 1.0) for video sync.
+     * Uses wall-clock time for smooth continuous updates.
      * Video renderer polls this to determine visual state.
      */
     val phase: Double
-        get() = oscillator.phase
+        get() {
+            if (!isPlaying) return 0.0
+            val elapsedNs = System.nanoTime() - playbackStartTimeNs
+            val elapsedSeconds = elapsedNs / 1_000_000_000.0
+            return (elapsedSeconds * frequency) % 1.0
+        }
 
     /**
      * Whether audio is currently playing.
@@ -98,6 +107,7 @@ class GammaAudioEngine(
             .build()
 
         isPlaying = true
+        playbackStartTimeNs = System.nanoTime()
         oscillator.reset()
         discontinuityCount = 0
         maxBufferGapMs = 0.0
