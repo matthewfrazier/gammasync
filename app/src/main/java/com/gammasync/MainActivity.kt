@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.gammasync.infra.GammaAudioEngine
@@ -15,15 +18,22 @@ import com.gammasync.infra.HapticFeedback
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        private const val FADE_DURATION = 200L
+        private const val AUTO_HIDE_DELAY = 5000L
+    }
+
     private lateinit var timerText: TextView
     private lateinit var startButton: Button
     private lateinit var stopButton: Button
     private lateinit var resetButton: Button
     private lateinit var gammaRenderer: GammaRenderer
+    private lateinit var controlsOverlay: LinearLayout
 
     private val handler = Handler(Looper.getMainLooper())
     private var elapsedSeconds = 0
     private var isRunning = false
+    private var controlsVisible = true
 
     private val audioEngine = GammaAudioEngine()
     private lateinit var haptics: HapticFeedback
@@ -33,6 +43,12 @@ class MainActivity : AppCompatActivity() {
             elapsedSeconds++
             updateTimerDisplay()
             handler.postDelayed(this, 1000)
+        }
+    }
+
+    private val autoHideRunnable = Runnable {
+        if (isRunning) {
+            hideControls()
         }
     }
 
@@ -50,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         stopButton = findViewById(R.id.stopButton)
         resetButton = findViewById(R.id.resetButton)
         gammaRenderer = findViewById(R.id.gammaRenderer)
+        controlsOverlay = findViewById(R.id.controlsOverlay)
 
         // Connect renderer to audio engine phase
         gammaRenderer.setPhaseProvider { audioEngine.phase }
@@ -57,6 +74,50 @@ class MainActivity : AppCompatActivity() {
         startButton.setOnClickListener { startSession() }
         stopButton.setOnClickListener { stopSession() }
         resetButton.setOnClickListener { resetSession() }
+
+        // Tap anywhere to toggle controls
+        findViewById<View>(R.id.rootLayout).setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                toggleControls()
+            }
+            false
+        }
+    }
+
+    private fun toggleControls() {
+        haptics.tick()
+        if (controlsVisible) {
+            hideControls()
+        } else {
+            showControls()
+        }
+    }
+
+    private fun showControls() {
+        controlsVisible = true
+        controlsOverlay.animate()
+            .alpha(1f)
+            .setDuration(FADE_DURATION)
+            .withStartAction { controlsOverlay.visibility = View.VISIBLE }
+            .start()
+        scheduleAutoHide()
+    }
+
+    private fun hideControls() {
+        controlsVisible = false
+        handler.removeCallbacks(autoHideRunnable)
+        controlsOverlay.animate()
+            .alpha(0f)
+            .setDuration(FADE_DURATION)
+            .withEndAction { controlsOverlay.visibility = View.INVISIBLE }
+            .start()
+    }
+
+    private fun scheduleAutoHide() {
+        handler.removeCallbacks(autoHideRunnable)
+        if (isRunning) {
+            handler.postDelayed(autoHideRunnable, AUTO_HIDE_DELAY)
+        }
     }
 
     private fun startSession() {
@@ -68,6 +129,7 @@ class MainActivity : AppCompatActivity() {
             handler.post(timerRunnable)
             startButton.isEnabled = false
             stopButton.isEnabled = true
+            scheduleAutoHide()
         }
     }
 
@@ -78,8 +140,10 @@ class MainActivity : AppCompatActivity() {
             gammaRenderer.stop()
             audioEngine.stop()
             handler.removeCallbacks(timerRunnable)
+            handler.removeCallbacks(autoHideRunnable)
             startButton.isEnabled = true
             stopButton.isEnabled = false
+            showControls()
         }
     }
 
@@ -107,5 +171,6 @@ class MainActivity : AppCompatActivity() {
         gammaRenderer.stop()
         audioEngine.release()
         handler.removeCallbacks(timerRunnable)
+        handler.removeCallbacks(autoHideRunnable)
     }
 }

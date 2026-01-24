@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true">
 
     <!-- Visual flicker background -->
     <com.gammasync.infra.GammaRenderer
@@ -9,68 +12,61 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Controls overlay at bottom -->
+    <!-- Single-line controls at bottom -->
     <LinearLayout
+        android:id="@+id/controlsOverlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp"
-        android:paddingBottom="48dp">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp"
+        android:paddingBottom="32dp">
+
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:minHeight="56dp"
+            android:text="@string/start"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
 
         <TextView
             android:id="@+id/timerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/timer_initial"
-            android:textSize="48sp"
+            android:textSize="32sp"
             android:fontFamily="monospace"
             android:textColor="#FFFFFF"
             android:shadowColor="#000000"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="3"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
 
-        <!-- Horizontal button row - works well in both orientations -->
-        <LinearLayout
+        <Button
+            android:id="@+id/stopButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:minWidth="100dp"
+            android:minHeight="56dp"
+            android:text="@string/stop"
+            android:textSize="16sp"
+            android:enabled="false"
+            android:layout_marginEnd="8dp" />
 
-            <Button
-                android:id="@+id/startButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="120dp"
-                android:minHeight="64dp"
-                android:text="@string/start"
-                android:textSize="18sp"
-                android:layout_marginEnd="12dp" />
-
-            <Button
-                android:id="@+id/stopButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="120dp"
-                android:minHeight="64dp"
-                android:text="@string/stop"
-                android:textSize="18sp"
-                android:enabled="false"
-                android:layout_marginEnd="12dp" />
-
-            <Button
-                android:id="@+id/resetButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="120dp"
-                android:minHeight="64dp"
-                android:text="@string/reset"
-                android:textSize="18sp" />
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:minHeight="56dp"
+            android:text="@string/reset"
+            android:textSize="16sp" />
 
     </LinearLayout>
 
