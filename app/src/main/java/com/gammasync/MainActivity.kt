@@ -3,10 +3,12 @@ package com.gammasync
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.gammasync.infra.GammaAudioEngine
+import com.gammasync.infra.GammaRenderer
 import com.gammasync.infra.HapticFeedback
 
 class MainActivity : AppCompatActivity() {
@@ -15,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startButton: Button
     private lateinit var stopButton: Button
     private lateinit var resetButton: Button
+    private lateinit var gammaRenderer: GammaRenderer
 
     private val handler = Handler(Looper.getMainLooper())
     private var elapsedSeconds = 0
@@ -35,12 +38,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Keep screen on during session
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         haptics = HapticFeedback(this)
 
         timerText = findViewById(R.id.timerText)
         startButton = findViewById(R.id.startButton)
         stopButton = findViewById(R.id.stopButton)
         resetButton = findViewById(R.id.resetButton)
+        gammaRenderer = findViewById(R.id.gammaRenderer)
+
+        // Connect renderer to audio engine phase
+        gammaRenderer.setPhaseProvider { audioEngine.phase }
 
         startButton.setOnClickListener { startSession() }
         stopButton.setOnClickListener { stopSession() }
@@ -52,6 +62,7 @@ class MainActivity : AppCompatActivity() {
             haptics.heavyClick()
             isRunning = true
             audioEngine.start(amplitude = 0.3)
+            gammaRenderer.start()
             handler.post(timerRunnable)
             startButton.isEnabled = false
             stopButton.isEnabled = true
@@ -62,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         if (isRunning) {
             haptics.heavyClick()
             isRunning = false
+            gammaRenderer.stop()
             audioEngine.stop()
             handler.removeCallbacks(timerRunnable)
             startButton.isEnabled = true
@@ -84,6 +96,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        gammaRenderer.stop()
         audioEngine.release()
         handler.removeCallbacks(timerRunnable)
     }
