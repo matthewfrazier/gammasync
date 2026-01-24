@@ -1,4 +1,4 @@
-The following artifact acts as the Master Engineering Record for NeuroSync. It allows for development to proceed with a "Trust but Verify" model: logic is proven mathematically in software, while physical compliance is verified via automated hardware benchmarking.
+!The following artifact acts as the Master Engineering Record for NeuroSync. It allows for development to proceed with a "Trust but Verify" model: logic is proven mathematically in software, while physical compliance is verified via automated hardware benchmarking.
 This blueprint utilizes Native Android (Kotlin) to guarantee the 120Hz timing accuracy that web/hybrid frameworks cannot reliably sustain.
 :::datastore{id="neurosync-engineering-artifact" source="neurosync_blueprint.md" type="text/markdown"}
 NeuroSync: Engineering Master Blueprint

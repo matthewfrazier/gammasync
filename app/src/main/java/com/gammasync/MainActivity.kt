@@ -6,6 +6,7 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.gammasync.infra.GammaAudioEngine
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var elapsedSeconds = 0
     private var isRunning = false
+
+    private val audioEngine = GammaAudioEngine()
 
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -35,31 +38,33 @@ class MainActivity : AppCompatActivity() {
         stopButton = findViewById(R.id.stopButton)
         resetButton = findViewById(R.id.resetButton)
 
-        startButton.setOnClickListener { startTimer() }
-        stopButton.setOnClickListener { stopTimer() }
-        resetButton.setOnClickListener { resetTimer() }
+        startButton.setOnClickListener { startSession() }
+        stopButton.setOnClickListener { stopSession() }
+        resetButton.setOnClickListener { resetSession() }
     }
 
-    private fun startTimer() {
+    private fun startSession() {
         if (!isRunning) {
             isRunning = true
+            audioEngine.start(amplitude = 0.3)
             handler.post(timerRunnable)
             startButton.isEnabled = false
             stopButton.isEnabled = true
         }
     }
 
-    private fun stopTimer() {
+    private fun stopSession() {
         if (isRunning) {
             isRunning = false
+            audioEngine.stop()
             handler.removeCallbacks(timerRunnable)
             startButton.isEnabled = true
             stopButton.isEnabled = false
         }
     }
 
-    private fun resetTimer() {
-        stopTimer()
+    private fun resetSession() {
+        stopSession()
         elapsedSeconds = 0
         updateTimerDisplay()
     }
@@ -72,6 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        audioEngine.release()
         handler.removeCallbacks(timerRunnable)
     }
 }
