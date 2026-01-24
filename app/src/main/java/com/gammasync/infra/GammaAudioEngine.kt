@@ -3,6 +3,7 @@ package com.gammasync.infra
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import android.media.VolumeShaper
 import android.util.Log
 import com.gammasync.domain.SignalOscillator
 import kotlin.math.abs
@@ -10,6 +11,7 @@ import kotlin.math.abs
 /**
  * Audio engine for 40Hz gamma entrainment.
  * Wraps AudioTrack and exposes phase for video synchronization.
+ * Uses VolumeShaper for click-free start/stop transitions.
  */
 class GammaAudioEngine(
     private val sampleRate: Int = 48000,
@@ -17,14 +19,29 @@ class GammaAudioEngine(
 ) {
     companion object {
         private const val TAG = "GammaAudioEngine"
+        private const val FADE_DURATION_MS = 30L  // Imperceptible but click-free
     }
 
     private val oscillator = SignalOscillator(sampleRate, frequency)
     private var audioTrack: AudioTrack? = null
     private var playbackThread: Thread? = null
+    private var volumeShaper: VolumeShaper? = null
 
     @Volatile
     private var isPlaying = false
+
+    // VolumeShaper configurations for smooth transitions
+    private val fadeInConfig = VolumeShaper.Configuration.Builder()
+        .setDuration(FADE_DURATION_MS)
+        .setCurve(floatArrayOf(0f, 1f), floatArrayOf(0f, 1f))
+        .setInterpolatorType(VolumeShaper.Configuration.INTERPOLATOR_TYPE_LINEAR)
+        .build()
+
+    private val fadeOutConfig = VolumeShaper.Configuration.Builder()
+        .setDuration(FADE_DURATION_MS)
+        .setCurve(floatArrayOf(0f, 1f), floatArrayOf(1f, 0f))
+        .setInterpolatorType(VolumeShaper.Configuration.INTERPOLATOR_TYPE_LINEAR)
+        .build()
 
     // Diagnostics
     var discontinuityCount = 0
@@ -48,7 +65,7 @@ class GammaAudioEngine(
         get() = isPlaying
 
     /**
-     * Start audio playback.
+     * Start audio playback with fade-in.
      * @param amplitude Volume from 0.0 to 1.0
      */
     fun start(amplitude: Double = 0.5) {
@@ -84,7 +101,14 @@ class GammaAudioEngine(
         oscillator.reset()
         discontinuityCount = 0
         maxBufferGapMs = 0.0
+
+        // Create VolumeShaper for fade-in
+        volumeShaper = audioTrack?.createVolumeShaper(fadeInConfig)
+
         audioTrack?.play()
+        volumeShaper?.apply(VolumeShaper.Operation.PLAY)  // Start fade-in
+
+        Log.i(TAG, "Starting playback with ${FADE_DURATION_MS}ms fade-in")
 
         playbackThread = Thread {
             val buffer = ShortArray(bufferSize / 2)
@@ -127,15 +151,35 @@ class GammaAudioEngine(
     }
 
     /**
-     * Stop audio playback.
+     * Stop audio playback with fade-out.
      */
     fun stop() {
+        if (!isPlaying) return
+
+        Log.i(TAG, "Stopping playback with ${FADE_DURATION_MS}ms fade-out")
+
+        // Apply fade-out
+        try {
+            volumeShaper?.close()
+            volumeShaper = audioTrack?.createVolumeShaper(fadeOutConfig)
+            volumeShaper?.apply(VolumeShaper.Operation.PLAY)
+
+            // Wait for fade to complete
+            Thread.sleep(FADE_DURATION_MS + 10)
+        } catch (e: Exception) {
+            Log.w(TAG, "VolumeShaper fade-out failed: ${e.message}")
+        }
+
         isPlaying = false
         playbackThread?.join(100)
         playbackThread = null
+
+        audioTrack?.pause()
+        audioTrack?.flush()
         audioTrack?.stop()
         audioTrack?.release()
         audioTrack = null
+        volumeShaper = null
     }
 
     /**
