@@ -9,13 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Controls overlay -->
+    <!-- Controls overlay at bottom -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        android:paddingBottom="48dp">
 
         <TextView
             android:id="@+id/timerText"
@@ -29,12 +31,14 @@
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="3"
-            android:layout_marginBottom="48dp" />
+            android:layout_marginBottom="24dp" />
 
+        <!-- Horizontal button row - works well in both orientations -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/startButton"
@@ -44,7 +48,7 @@
                 android:minHeight="64dp"
                 android:text="@string/start"
                 android:textSize="18sp"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginEnd="12dp" />
 
             <Button
                 android:id="@+id/stopButton"
@@ -54,19 +58,19 @@
                 android:minHeight="64dp"
                 android:text="@string/stop"
                 android:textSize="18sp"
-                android:enabled="false" />
+                android:enabled="false"
+                android:layout_marginEnd="12dp" />
+
+            <Button
+                android:id="@+id/resetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="120dp"
+                android:minHeight="64dp"
+                android:text="@string/reset"
+                android:textSize="18sp" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/resetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="120dp"
-            android:minHeight="64dp"
-            android:text="@string/reset"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp" />
 
     </LinearLayout>
 

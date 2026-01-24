@@ -1,8 +1,10 @@
 package com.gammasync
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
@@ -92,6 +94,12 @@ class MainActivity : AppCompatActivity() {
         val minutes = elapsedSeconds / 60
         val seconds = elapsedSeconds % 60
         timerText.text = String.format("%02d:%02d", minutes, seconds)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Log.i("MainActivity", "Configuration changed: ${newConfig.orientation}")
+        // SurfaceView handles resize via surfaceChanged callback
     }
 
     override fun onDestroy() {

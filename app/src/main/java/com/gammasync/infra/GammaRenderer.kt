@@ -135,6 +135,10 @@ class GammaRenderer @JvmOverloads constructor(
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         Log.i(TAG, "Surface changed: ${width}x${height}")
+        // Redraw at new size if not actively rendering
+        if (!isRendering) {
+            renderFrame(phaseProvider?.invoke() ?: 0.0)
+        }
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
