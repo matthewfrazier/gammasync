@@ -23,8 +23,8 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     companion object {
         private const val TAG = "MainActivity"
-        private const val FADE_DURATION = 200L
-        private const val AUTO_HIDE_DELAY = 5000L
+        private const val FADE_DURATION = 400L      // Smooth fade
+        private const val AUTO_HIDE_DELAY = 4000L   // Hide controls after 4s
     }
 
     private lateinit var timerText: TextView
@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var resetButton: Button
     private lateinit var gammaRenderer: GammaRenderer
     private lateinit var controlsOverlay: LinearLayout
+    private lateinit var powerSaveOverlay: View
 
     private val handler = Handler(Looper.getMainLooper())
     private var elapsedSeconds = 0
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         resetButton = findViewById(R.id.resetButton)
         gammaRenderer = findViewById(R.id.gammaRenderer)
         controlsOverlay = findViewById(R.id.controlsOverlay)
+        powerSaveOverlay = findViewById(R.id.powerSaveOverlay)
 
         // Connect renderer to audio engine phase
         gammaRenderer.setPhaseProvider { audioEngine.phase }
@@ -115,9 +117,10 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             externalPresentation?.startRendering()
             // Stop phone screen flicker (external takes over)
             gammaRenderer.stop()
+            gammaRenderer.visibility = View.GONE
         }
 
-        updateModeIndicator()
+        updateDisplayMode()
     }
 
     override fun onExternalDisplayDisconnected() {
@@ -131,48 +134,86 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         // If session is running, resume phone screen flicker
         if (isRunning) {
+            gammaRenderer.visibility = View.VISIBLE
             gammaRenderer.start()
         }
 
-        updateModeIndicator()
+        updateDisplayMode()
     }
 
-    private fun updateModeIndicator() {
-        // Could show indicator of which display is active
-        // For now, just log
+    private fun updateDisplayMode() {
         val mode = if (hasExternalDisplay) "XREAL (external)" else "Phone"
         Log.i(TAG, "Display mode: $mode")
+
+        // When XREAL connected, hide phone's flicker renderer
+        if (hasExternalDisplay) {
+            gammaRenderer.visibility = View.GONE
+        } else if (!isRunning) {
+            gammaRenderer.visibility = View.VISIBLE
+        }
     }
 
     // --- Controls Visibility ---
 
     private fun toggleControls() {
-        haptics.tick()
         if (controlsVisible) {
-            hideControls()
+            // Only hide if session is running
+            if (isRunning) {
+                haptics.tick()
+                hideControls()
+            }
         } else {
+            // Strong haptic to wake up
+            haptics.heavyClick()
             showControls()
         }
     }
 
     private fun showControls() {
         controlsVisible = true
+        handler.removeCallbacks(autoHideRunnable)
+
+        // Fade out power save overlay
+        powerSaveOverlay.animate()
+            .alpha(0f)
+            .setDuration(FADE_DURATION)
+            .withEndAction { powerSaveOverlay.visibility = View.GONE }
+            .start()
+
+        // Fade in controls
         controlsOverlay.animate()
             .alpha(1f)
             .setDuration(FADE_DURATION)
             .withStartAction { controlsOverlay.visibility = View.VISIBLE }
             .start()
+
+        // If phone-only mode, make sure flicker is visible
+        if (!hasExternalDisplay && isRunning) {
+            gammaRenderer.visibility = View.VISIBLE
+        }
+
         scheduleAutoHide()
     }
 
     private fun hideControls() {
         controlsVisible = false
         handler.removeCallbacks(autoHideRunnable)
+
+        // Fade out controls
         controlsOverlay.animate()
             .alpha(0f)
             .setDuration(FADE_DURATION)
             .withEndAction { controlsOverlay.visibility = View.INVISIBLE }
             .start()
+
+        // When XREAL connected, fade to black for power save
+        if (hasExternalDisplay) {
+            powerSaveOverlay.visibility = View.VISIBLE
+            powerSaveOverlay.animate()
+                .alpha(1f)
+                .setDuration(FADE_DURATION * 2)  // Slower fade to black
+                .start()
+        }
     }
 
     private fun scheduleAutoHide() {
@@ -193,7 +234,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             // Start rendering on appropriate display
             if (hasExternalDisplay) {
                 externalPresentation?.startRendering()
+                gammaRenderer.visibility = View.GONE
             } else {
+                gammaRenderer.visibility = View.VISIBLE
                 gammaRenderer.start()
             }
 
@@ -218,6 +261,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             handler.removeCallbacks(autoHideRunnable)
             startButton.isEnabled = true
             stopButton.isEnabled = false
+
+            // Make sure UI is visible and power save is off
+            gammaRenderer.visibility = View.VISIBLE
+            powerSaveOverlay.visibility = View.GONE
+            powerSaveOverlay.alpha = 0f
             showControls()
         }
     }
