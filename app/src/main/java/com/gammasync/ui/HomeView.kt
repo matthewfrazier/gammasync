@@ -2,11 +2,9 @@ package com.gammasync.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,10 +14,12 @@ import com.gammasync.data.SettingsRepository
 import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfiles
 import com.gammasync.infra.HapticFeedback
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.MaterialColors
 
 /**
  * Home screen with mode selector, duration selector and start button.
- * All controls positioned at bottom for one-handed use.
+ * Uses Material 3 theming for automatic dark/light mode support.
  */
 class HomeView @JvmOverloads constructor(
     context: Context,
@@ -31,11 +31,11 @@ class HomeView @JvmOverloads constructor(
     var onSettingsClicked: (() -> Unit)? = null
 
     // Mode selector buttons
-    private val modeNeuroSyncButton: Button
-    private val modeMemoryButton: Button
-    private val modeSleepButton: Button
-    private val modeMigraineButton: Button
-    private val modeMoodLiftButton: Button
+    private val modeNeuroSyncButton: MaterialButton
+    private val modeMemoryButton: MaterialButton
+    private val modeSleepButton: MaterialButton
+    private val modeMigraineButton: MaterialButton
+    private val modeMoodLiftButton: MaterialButton
     private val modeDescriptionText: TextView
     private val xrealWarningText: TextView
 
@@ -44,11 +44,10 @@ class HomeView @JvmOverloads constructor(
     private val iconMoodLiftGlasses: ImageView
 
     // Duration selector buttons
-    private val duration15Button: Button
-    private val duration30Button: Button
-    private val duration60Button: Button
-    private val startSessionButton: Button
-    private val settingsButton: Button
+    private val duration15Button: MaterialButton
+    private val duration30Button: MaterialButton
+    private val duration60Button: MaterialButton
+    private val startSessionButton: MaterialButton
 
     private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
     private var selectedDuration = 30
@@ -56,14 +55,12 @@ class HomeView @JvmOverloads constructor(
     private var hasExternalDisplay = false
     private val haptics = HapticFeedback(context)
 
-    // Text colors
-    private val selectedTextColor = 0xFF000000.toInt()  // Black on accent
-    private val unselectedTextColor = 0xFF9E9E9E.toInt() // Gray on surface
+    // Accent color for selected state
+    private var accentColor = 0xFF26A69A.toInt()
 
-    // Icon tint colors - accent color comes from settings
-    private var accentColor = ColorScheme.TEAL.accentColor
-    private val iconTintRequired = 0xFFFF5252.toInt()    // Red - required but missing
-    private val iconTintConnected = 0xFF4CAF50.toInt()   // Green - connected
+    // Icon tint colors
+    private val iconTintRequired = 0xFFFF5252.toInt()
+    private val iconTintConnected = 0xFF4CAF50.toInt()
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_home, this, true)
@@ -86,7 +83,6 @@ class HomeView @JvmOverloads constructor(
         duration30Button = findViewById(R.id.duration30Button)
         duration60Button = findViewById(R.id.duration60Button)
         startSessionButton = findViewById(R.id.startSessionButton)
-        settingsButton = findViewById(R.id.settingsButton)
 
         // Mode button clicks
         modeNeuroSyncButton.setOnClickListener { selectMode(TherapyMode.NEUROSYNC) }
@@ -105,7 +101,7 @@ class HomeView @JvmOverloads constructor(
             onStartSession?.invoke(selectedDuration, selectedMode)
         }
 
-        settingsButton.setOnClickListener {
+        findViewById<View>(R.id.settingsButton).setOnClickListener {
             haptics.tick()
             onSettingsClicked?.invoke()
         }
@@ -120,30 +116,18 @@ class HomeView @JvmOverloads constructor(
         selectedDuration = settingsRepository.durationMinutes
         selectedMode = settingsRepository.therapyMode
         accentColor = settingsRepository.colorScheme.accentColor
+        updateAccentColor()
         updateModeSelection()
         updateDurationSelection()
-        updateAccentColors()
     }
 
-    /**
-     * Update UI elements that use the accent color.
-     */
-    private fun updateAccentColors() {
-        // Update start button background tint
+    private fun updateAccentColor() {
+        // Update start button with accent color
         startSessionButton.backgroundTintList = ColorStateList.valueOf(accentColor)
-
-        // Update phone icons with accent color (non-required icons)
-        findViewById<ImageView>(R.id.iconNeuroSyncPhone)?.imageTintList = ColorStateList.valueOf(accentColor)
-        findViewById<ImageView>(R.id.iconMemoryPhone)?.imageTintList = ColorStateList.valueOf(accentColor)
-        findViewById<ImageView>(R.id.iconSleepPhone)?.imageTintList = ColorStateList.valueOf(accentColor)
-        findViewById<ImageView>(R.id.iconSleepHeadphones)?.imageTintList = ColorStateList.valueOf(accentColor)
-        findViewById<ImageView>(R.id.iconMigrainePhone)?.imageTintList = ColorStateList.valueOf(accentColor)
-        findViewById<ImageView>(R.id.iconMemoryGlasses)?.imageTintList = ColorStateList.valueOf(accentColor)
     }
 
     /**
      * Update external display connection status.
-     * This affects whether Mood Lift mode (XREAL-only) is available.
      */
     fun setHasExternalDisplay(connected: Boolean) {
         hasExternalDisplay = connected
@@ -151,11 +135,6 @@ class HomeView @JvmOverloads constructor(
         updateIconColors()
     }
 
-    /**
-     * Update icon colors based on XREAL connection status.
-     * - Green when XREAL connected (hardware available)
-     * - Red when XREAL required but not connected
-     */
     private fun updateIconColors() {
         val glassesColor = if (hasExternalDisplay) iconTintConnected else iconTintRequired
         iconMoodLiftHeadphones.imageTintList = ColorStateList.valueOf(glassesColor)
@@ -187,7 +166,6 @@ class HomeView @JvmOverloads constructor(
     }
 
     private fun updateModeSelection() {
-        // Update button backgrounds
         val modeButtons = mapOf(
             TherapyMode.NEUROSYNC to modeNeuroSyncButton,
             TherapyMode.MEMORY_WRITE to modeMemoryButton,
@@ -196,10 +174,20 @@ class HomeView @JvmOverloads constructor(
             TherapyMode.MOOD_LIFT to modeMoodLiftButton
         )
 
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
         modeButtons.forEach { (mode, button) ->
             val isSelected = mode == selectedMode
-            button.background = createChipBackground(isSelected)
-            button.setTextColor(if (isSelected) selectedTextColor else unselectedTextColor)
+            if (isSelected) {
+                button.backgroundTintList = ColorStateList.valueOf(accentColor)
+                button.setTextColor(0xFFFFFFFF.toInt())
+            } else {
+                // Transparent background with theme-appropriate text color
+                button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+                button.setTextColor(onSurfaceColor)
+            }
         }
 
         // Update description
@@ -215,36 +203,32 @@ class HomeView @JvmOverloads constructor(
     }
 
     private fun updateXrealWarning() {
-        // Show warning if Mood Lift is selected but no XREAL connected
         val showWarning = selectedMode.requiresXreal && !hasExternalDisplay
         xrealWarningText.visibility = if (showWarning) View.VISIBLE else View.GONE
 
-        // Disable start button if XREAL required but not connected
         startSessionButton.isEnabled = !selectedMode.requiresXreal || hasExternalDisplay
         startSessionButton.alpha = if (startSessionButton.isEnabled) 1.0f else 0.5f
     }
 
     private fun updateDurationSelection() {
-        duration15Button.background = createChipBackground(selectedDuration == 15)
-        duration30Button.background = createChipBackground(selectedDuration == 30)
-        duration60Button.background = createChipBackground(selectedDuration == 60)
+        val durationButtons = listOf(
+            15 to duration15Button,
+            30 to duration30Button,
+            60 to duration60Button
+        )
 
-        duration15Button.setTextColor(if (selectedDuration == 15) selectedTextColor else unselectedTextColor)
-        duration30Button.setTextColor(if (selectedDuration == 30) selectedTextColor else unselectedTextColor)
-        duration60Button.setTextColor(if (selectedDuration == 60) selectedTextColor else unselectedTextColor)
-    }
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
 
-    /**
-     * Create a chip background drawable with the current accent color.
-     */
-    private fun createChipBackground(selected: Boolean): GradientDrawable {
-        return GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = 16 * resources.displayMetrics.density
-            if (selected) {
-                setColor(accentColor)
+        durationButtons.forEach { (duration, button) ->
+            val isSelected = duration == selectedDuration
+            if (isSelected) {
+                button.backgroundTintList = ColorStateList.valueOf(accentColor)
+                button.setTextColor(0xFFFFFFFF.toInt())
             } else {
-                setColor(0xFF2A2A2A.toInt()) // Dark gray unselected
+                button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+                button.setTextColor(onSurfaceColor)
             }
         }
     }

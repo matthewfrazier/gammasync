@@ -10,11 +10,11 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.data.SettingsRepository
 import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfile
@@ -29,6 +29,8 @@ import com.gammasync.ui.HomeView
 import com.gammasync.ui.SafetyDisclaimerView
 import com.gammasync.ui.SessionCompleteView
 import com.gammasync.ui.SettingsView
+import com.google.android.material.button.MaterialButton
+import android.content.res.ColorStateList
 
 class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener {
 
@@ -54,11 +56,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     // Therapy screen views
     private lateinit var circularTimer: CircularTimerView
-    private lateinit var pauseButton: Button
+    private lateinit var pauseButton: MaterialButton
     private lateinit var pauseOverlay: View
     private lateinit var pauseDurationText: TextView
-    private lateinit var resumeButton: Button
-    private lateinit var doneButton: Button
+    private lateinit var resumeButton: MaterialButton
+    private lateinit var doneButton: MaterialButton
     private lateinit var phoneVisualRenderer: UniversalVisualRenderer
     private lateinit var therapyControlsContainer: View
     private var controlsVisible = false
@@ -101,6 +103,14 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Apply saved dark/light mode preference before setting content view
+        val prefs = getSharedPreferences("gammasync_settings", MODE_PRIVATE)
+        val isDarkMode = prefs.getBoolean("dark_mode", true)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         setContentView(R.layout.activity_main)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -188,6 +198,10 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         }
         settingsScreen.onColorSchemeChanged = {
             // Refresh home screen with new color scheme (no need to recreate)
+            homeScreen.bindSettings(settings)
+        }
+        settingsScreen.onDarkModeChanged = {
+            // Refresh home screen with new theme
             homeScreen.bindSettings(settings)
         }
     }
@@ -292,6 +306,15 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         remainingSeconds = durationMinutes * 60
 
         Log.i(TAG, "Starting session: ${mode.displayName}, duration=${durationMinutes}min")
+
+        // Apply accent color to therapy screen buttons
+        val accentColor = settings.colorScheme.accentColor
+        resumeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+        doneButton.strokeColor = ColorStateList.valueOf(accentColor)
+        doneButton.setTextColor(accentColor)
+        pauseButton.strokeColor = ColorStateList.valueOf(accentColor)
+        pauseButton.setTextColor(accentColor)
+        circularTimer.setAccentColor(accentColor)
 
         // Initialize timer
         circularTimer.setTotalDuration(remainingSeconds)

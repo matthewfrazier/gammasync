@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settingsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="?attr/colorSurface">
 
     <!-- Back button and title -->
     <LinearLayout
@@ -18,17 +20,18 @@
             android:id="@+id/backButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@android:drawable/ic_menu_revert"
+            android:src="@drawable/ic_arrow_back"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back"
-            android:tint="#FFFFFF" />
+            app:tint="?attr/colorOnSurface" />
 
         <TextView
+            android:id="@+id/settingsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings"
             android:textSize="24sp"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnSurface"
             android:textStyle="bold"
             android:layout_marginStart="16dp" />
 
@@ -36,11 +39,12 @@
 
     <!-- Default Duration -->
     <TextView
+        android:id="@+id/durationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/default_duration"
         android:textSize="16sp"
-        android:textColor="#AAAAAA"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_marginBottom="12dp" />
 
     <LinearLayout
@@ -49,44 +53,48 @@
         android:orientation="horizontal"
         android:layout_marginBottom="32dp">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/settingsDuration15"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:minWidth="80dp"
             android:text="@string/duration_15"
             android:textSize="14sp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/chip_background" />
+            app:cornerRadius="16dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/settingsDuration30"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:minWidth="80dp"
             android:text="@string/duration_30"
             android:textSize="14sp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/chip_background_selected" />
+            app:cornerRadius="16dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/settingsDuration60"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:minWidth="80dp"
             android:text="@string/duration_60"
             android:textSize="14sp"
-            android:background="@drawable/chip_background" />
+            app:cornerRadius="16dp" />
 
     </LinearLayout>
 
     <!-- Color Theme -->
     <TextView
+        android:id="@+id/colorLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/color_theme"
         android:textSize="16sp"
-        android:textColor="#AAAAAA"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_marginBottom="12dp" />
 
     <LinearLayout
@@ -100,41 +108,80 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/chip_background" />
+            android:background="@color/accent_teal" />
 
         <View
             android:id="@+id/colorBlue"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/chip_background" />
+            android:background="@color/accent_blue" />
 
         <View
             android:id="@+id/colorPurple"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/chip_background" />
+            android:background="@color/accent_purple" />
 
         <View
             android:id="@+id/colorGreen"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/chip_background" />
+            android:background="@color/accent_green" />
 
         <View
             android:id="@+id/colorOrange"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/chip_background" />
+            android:background="@color/accent_orange" />
 
         <View
             android:id="@+id/colorRed"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/chip_background" />
+            android:background="@color/accent_red" />
+
+    </LinearLayout>
+
+    <!-- Theme Mode (Dark/Light) -->
+    <TextView
+        android:id="@+id/themeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/theme_mode"
+        android:textSize="16sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="12dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/darkModeButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="100dp"
+            android:text="@string/dark"
+            android:textSize="14sp"
+            android:layout_marginEnd="8dp"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/lightModeButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="100dp"
+            android:text="@string/light"
+            android:textSize="14sp"
+            app:cornerRadius="16dp" />
 
     </LinearLayout>
 

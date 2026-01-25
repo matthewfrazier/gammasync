@@ -19,6 +19,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_RSVP_WPM = "rsvp_wpm"
         private const val KEY_COLOR_SCHEME = "color_scheme"
         private const val KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted"
+        private const val KEY_DARK_MODE = "dark_mode"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
@@ -75,17 +76,20 @@ class SettingsRepository(context: Context) {
     var disclaimerAccepted: Boolean
         get() = prefs.getBoolean(KEY_DISCLAIMER_ACCEPTED, false)
         set(value) = prefs.edit().putBoolean(KEY_DISCLAIMER_ACCEPTED, value).apply()
+
+    var darkMode: Boolean
+        get() = prefs.getBoolean(KEY_DARK_MODE, true)
+        set(value) = prefs.edit().putBoolean(KEY_DARK_MODE, value).apply()
 }
 
 /**
  * Available color schemes for the app UI.
- * Each scheme provides primary accent color.
  */
-enum class ColorScheme(val accentColor: Int, val displayName: String) {
-    TEAL(0xFF26A69A.toInt(), "Teal"),
-    BLUE(0xFF2196F3.toInt(), "Blue"),
-    PURPLE(0xFF9C27B0.toInt(), "Purple"),
-    GREEN(0xFF4CAF50.toInt(), "Green"),
-    ORANGE(0xFFFF9800.toInt(), "Orange"),
-    RED(0xFFF44336.toInt(), "Red")
+enum class ColorScheme(val accentColor: Int) {
+    TEAL(0xFF26A69A.toInt()),
+    BLUE(0xFF42A5F5.toInt()),
+    PURPLE(0xFFAB47BC.toInt()),
+    GREEN(0xFF66BB6A.toInt()),
+    ORANGE(0xFFFFA726.toInt()),
+    RED(0xFFEF5350.toInt())
 }

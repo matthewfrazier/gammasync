@@ -29,7 +29,7 @@ class CircularTimerView @JvmOverloads constructor(
     // Colors
     private val backgroundColor = 0x40000000  // 25% black
     private val trackColor = 0x40FFFFFF       // 25% white
-    private val progressColor = 0xFF26A69A.toInt()  // Teal
+    private var progressColor = 0xFF26A69A.toInt()  // Teal (default)
     private val textColor = 0xFFFFFFFF.toInt()
 
     private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -70,6 +70,12 @@ class CircularTimerView @JvmOverloads constructor(
         } else {
             0f
         }
+        invalidate()
+    }
+
+    fun setAccentColor(color: Int) {
+        progressColor = color
+        progressPaint.color = color
         invalidate()
     }
 

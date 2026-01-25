@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.GammaSync" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Default accent is teal, can be overridden programmatically -->
+        <item name="colorPrimary">@color/accent_teal</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorSecondary">@color/accent_teal</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+    </style>
+
+    <!-- Outlined chip/button style -->
+    <style name="Widget.GammaSync.Chip" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
+    <!-- Selected chip style (filled) -->
+    <style name="Widget.GammaSync.Chip.Selected" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+    </style>
+
+    <!-- Primary action button -->
+    <style name="Widget.GammaSync.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:minHeight">60dp</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+    </style>
+</resources>

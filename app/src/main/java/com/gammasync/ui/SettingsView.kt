@@ -1,20 +1,25 @@
 package com.gammasync.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.R
 import com.gammasync.data.ColorScheme
 import com.gammasync.data.SettingsRepository
 import com.gammasync.infra.HapticFeedback
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.MaterialColors
 
 /**
- * Settings screen for configuring default session duration and color theme.
+ * Settings screen for configuring default session duration, color theme, and dark mode.
+ * Uses Material 3 theming - dark/light mode is handled by AppCompatDelegate.
  */
 class SettingsView @JvmOverloads constructor(
     context: Context,
@@ -24,11 +29,12 @@ class SettingsView @JvmOverloads constructor(
 
     var onBackClicked: (() -> Unit)? = null
     var onColorSchemeChanged: ((ColorScheme) -> Unit)? = null
+    var onDarkModeChanged: ((Boolean) -> Unit)? = null
 
     private val backButton: ImageButton
-    private val duration15Button: Button
-    private val duration30Button: Button
-    private val duration60Button: Button
+    private val duration15Button: MaterialButton
+    private val duration30Button: MaterialButton
+    private val duration60Button: MaterialButton
 
     // Color theme views
     private val colorTeal: View
@@ -38,14 +44,15 @@ class SettingsView @JvmOverloads constructor(
     private val colorOrange: View
     private val colorRed: View
 
+    // Dark mode toggle
+    private val darkModeButton: MaterialButton
+    private val lightModeButton: MaterialButton
+
     private val haptics = HapticFeedback(context)
     private var settings: SettingsRepository? = null
     private var selectedDuration = 30
     private var selectedColorScheme = ColorScheme.TEAL
-
-    // Match HomeView colors
-    private val selectedTextColor = 0xFF000000.toInt()  // Black on accent
-    private val unselectedTextColor = 0xFF9E9E9E.toInt() // Gray
+    private var darkMode = true
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_settings, this, true)
@@ -62,6 +69,14 @@ class SettingsView @JvmOverloads constructor(
         colorGreen = findViewById(R.id.colorGreen)
         colorOrange = findViewById(R.id.colorOrange)
         colorRed = findViewById(R.id.colorRed)
+
+        // Dark mode toggle
+        darkModeButton = findViewById(R.id.darkModeButton)
+        lightModeButton = findViewById(R.id.lightModeButton)
+
+        // Set back button tint to match theme
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        backButton.imageTintList = ColorStateList.valueOf(onSurfaceColor)
 
         backButton.setOnClickListener {
             haptics.tick()
@@ -80,7 +95,10 @@ class SettingsView @JvmOverloads constructor(
         colorOrange.setOnClickListener { selectColorScheme(ColorScheme.ORANGE) }
         colorRed.setOnClickListener { selectColorScheme(ColorScheme.RED) }
 
-        // Set initial colors for chips
+        // Dark mode toggle listeners
+        darkModeButton.setOnClickListener { selectDarkMode(true) }
+        lightModeButton.setOnClickListener { selectDarkMode(false) }
+
         updateColorChips()
     }
 
@@ -88,8 +106,15 @@ class SettingsView @JvmOverloads constructor(
         settings = settingsRepository
         selectedDuration = settingsRepository.durationMinutes
         selectedColorScheme = settingsRepository.colorScheme
+        darkMode = settingsRepository.darkMode
+
+        // Refresh back button tint for current theme
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        backButton.imageTintList = ColorStateList.valueOf(onSurfaceColor)
+
         updateDurationSelection()
         updateColorChips()
+        updateDarkModeSelection()
     }
 
     private fun selectDuration(minutes: Int) {
@@ -100,23 +125,25 @@ class SettingsView @JvmOverloads constructor(
     }
 
     private fun updateDurationSelection() {
-        duration15Button.background = createChipBackground(selectedDuration == 15)
-        duration30Button.background = createChipBackground(selectedDuration == 30)
-        duration60Button.background = createChipBackground(selectedDuration == 60)
+        val accentColor = selectedColorScheme.accentColor
+        val durationButtons = listOf(
+            15 to duration15Button,
+            30 to duration30Button,
+            60 to duration60Button
+        )
 
-        duration15Button.setTextColor(if (selectedDuration == 15) selectedTextColor else unselectedTextColor)
-        duration30Button.setTextColor(if (selectedDuration == 30) selectedTextColor else unselectedTextColor)
-        duration60Button.setTextColor(if (selectedDuration == 60) selectedTextColor else unselectedTextColor)
-    }
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
 
-    private fun createChipBackground(selected: Boolean): GradientDrawable {
-        return GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = 16 * resources.displayMetrics.density
-            if (selected) {
-                setColor(selectedColorScheme.accentColor)
+        durationButtons.forEach { (duration, button) ->
+            val isSelected = duration == selectedDuration
+            if (isSelected) {
+                button.backgroundTintList = ColorStateList.valueOf(accentColor)
+                button.setTextColor(0xFFFFFFFF.toInt())
             } else {
-                setColor(0xFF2A2A2A.toInt())
+                button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+                button.setTextColor(onSurfaceColor)
             }
         }
     }
@@ -128,7 +155,45 @@ class SettingsView @JvmOverloads constructor(
         selectedColorScheme = scheme
         settings?.colorScheme = scheme
         updateColorChips()
+        updateDurationSelection()
+        updateDarkModeSelection()
         onColorSchemeChanged?.invoke(scheme)
+    }
+
+    private fun selectDarkMode(isDark: Boolean) {
+        if (isDark == darkMode) return
+
+        haptics.tick()
+        darkMode = isDark
+        settings?.darkMode = isDark
+
+        // Use AppCompatDelegate to switch the entire app's theme
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        updateDarkModeSelection()
+        onDarkModeChanged?.invoke(isDark)
+    }
+
+    private fun updateDarkModeSelection() {
+        val accentColor = selectedColorScheme.accentColor
+
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
+        if (darkMode) {
+            darkModeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            darkModeButton.setTextColor(0xFFFFFFFF.toInt())
+            lightModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            lightModeButton.setTextColor(onSurfaceColor)
+        } else {
+            lightModeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            lightModeButton.setTextColor(0xFFFFFFFF.toInt())
+            darkModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            darkModeButton.setTextColor(onSurfaceColor)
+        }
     }
 
     private fun updateColorChips() {
@@ -141,14 +206,17 @@ class SettingsView @JvmOverloads constructor(
             ColorScheme.RED to colorRed
         )
 
+        val density = resources.displayMetrics.density
+
         colorViews.forEach { (scheme, view) ->
             val isSelected = scheme == selectedColorScheme
             val drawable = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = 12f * resources.displayMetrics.density
+                cornerRadius = 12f * density
                 setColor(scheme.accentColor)
                 if (isSelected) {
-                    setStroke((3 * resources.displayMetrics.density).toInt(), 0xFFFFFFFF.toInt())
+                    // White border for selected color
+                    setStroke((3 * density).toInt(), 0xFFFFFFFF.toInt())
                 }
             }
             view.background = drawable

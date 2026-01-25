@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/homeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212">
+    android:background="?attr/colorSurface">
 
     <!-- Top section: Title and Mode selector -->
     <LinearLayout
@@ -14,49 +16,57 @@
 
         <!-- App title -->
         <TextView
+            android:id="@+id/appTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/app_name"
             android:textSize="28sp"
-            android:textColor="#FFFFFF"
             android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginBottom="24dp" />
 
         <!-- Mode selector label -->
         <TextView
+            android:id="@+id/modeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/select_mode"
             android:textSize="14sp"
-            android:textColor="#9E9E9E"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginBottom="12dp" />
 
-        <!-- Memory (was NeuroSync) -->
+        <!-- NeuroSync -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start|center_vertical"
+            android:gravity="center_vertical"
             android:layout_marginBottom="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeNeuroSyncButton"
-                android:layout_width="200dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_weight="1"
                 android:text="@string/mode_neurosync"
                 android:textSize="14sp"
                 android:textAllCaps="false"
-                android:textColor="#000000"
-                android:background="@drawable/chip_background_selected" />
+                app:cornerRadius="16dp" />
 
             <ImageView
                 android:id="@+id/iconNeuroSyncPhone"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_phone"
-                android:visibility="visible" />
+                app:tint="?attr/colorPrimary" />
+
+            <!-- Spacer for alignment with modes that have 2 icons -->
+            <View
+                android:layout_width="28dp"
+                android:layout_height="1dp" />
 
         </LinearLayout>
 
@@ -65,34 +75,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start|center_vertical"
+            android:gravity="center_vertical"
             android:layout_marginBottom="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeSleepButton"
-                android:layout_width="200dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_weight="1"
                 android:text="@string/mode_sleep"
                 android:textSize="14sp"
                 android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:background="@drawable/chip_background" />
+                app:cornerRadius="16dp" />
 
             <ImageView
                 android:id="@+id/iconSleepPhone"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_phone"
-                android:visibility="visible" />
+                app:tint="?attr/colorPrimary" />
 
             <ImageView
                 android:id="@+id/iconSleepHeadphones"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="4dp"
                 android:src="@drawable/ic_headphones"
-                android:visibility="visible" />
+                app:tint="?attr/colorPrimary" />
 
         </LinearLayout>
 
@@ -101,26 +112,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start|center_vertical"
+            android:gravity="center_vertical"
             android:layout_marginBottom="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeMigraineButton"
-                android:layout_width="200dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_weight="1"
                 android:text="@string/mode_migraine"
                 android:textSize="14sp"
                 android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:background="@drawable/chip_background" />
+                app:cornerRadius="16dp" />
 
             <ImageView
                 android:id="@+id/iconMigrainePhone"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_phone"
-                android:visibility="visible" />
+                app:tint="?attr/colorPrimary" />
+
+            <!-- Spacer for alignment -->
+            <View
+                android:layout_width="28dp"
+                android:layout_height="1dp" />
 
         </LinearLayout>
 
@@ -129,70 +146,70 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start|center_vertical"
+            android:gravity="center_vertical"
             android:layout_marginBottom="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeMoodLiftButton"
-                android:layout_width="200dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_weight="1"
                 android:text="@string/mode_mood_lift"
                 android:textSize="14sp"
                 android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:background="@drawable/chip_background" />
+                app:cornerRadius="16dp" />
 
             <ImageView
                 android:id="@+id/iconMoodLiftHeadphones"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="12dp"
-                android:src="@drawable/ic_headphones"
-                android:visibility="visible" />
+                android:src="@drawable/ic_headphones" />
 
             <ImageView
                 android:id="@+id/iconMoodLiftGlasses"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="4dp"
-                android:src="@drawable/ic_glasses"
-                android:visibility="visible" />
+                android:src="@drawable/ic_glasses" />
 
         </LinearLayout>
 
-        <!-- Learning (was Memory Write) - will have RSVP file picker -->
+        <!-- Memory Write -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start|center_vertical"
+            android:gravity="center_vertical"
             android:layout_marginBottom="12dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeMemoryButton"
-                android:layout_width="200dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_weight="1"
                 android:text="@string/mode_memory"
                 android:textSize="14sp"
                 android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:background="@drawable/chip_background" />
+                app:cornerRadius="16dp" />
 
             <ImageView
                 android:id="@+id/iconMemoryPhone"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_phone"
-                android:visibility="visible" />
+                app:tint="?attr/colorPrimary" />
 
             <ImageView
                 android:id="@+id/iconMemoryGlasses"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="4dp"
                 android:src="@drawable/ic_glasses"
-                android:visibility="visible" />
+                app:tint="?attr/colorPrimary" />
 
         </LinearLayout>
 
@@ -203,7 +220,7 @@
             android:layout_height="wrap_content"
             android:text="@string/mode_neurosync_description"
             android:textSize="12sp"
-            android:textColor="#757575"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:gravity="start"
             android:minHeight="32dp" />
 
@@ -214,7 +231,7 @@
             android:layout_height="wrap_content"
             android:text="@string/xreal_required_warning"
             android:textSize="12sp"
-            android:textColor="#FF5252"
+            android:textColor="@color/status_required"
             android:gravity="start"
             android:visibility="gone"
             android:layout_marginTop="8dp" />
@@ -233,11 +250,12 @@
 
         <!-- Duration selector -->
         <TextView
+            android:id="@+id/durationLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/select_duration"
             android:textSize="14sp"
-            android:textColor="#9E9E9E"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginBottom="12dp" />
 
         <LinearLayout
@@ -247,66 +265,65 @@
             android:gravity="center"
             android:layout_marginBottom="20dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/duration15Button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@string/duration_15"
                 android:textSize="15sp"
                 android:textAllCaps="false"
-                android:textColor="#9E9E9E"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/chip_background" />
+                app:cornerRadius="16dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/duration30Button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@string/duration_30"
                 android:textSize="15sp"
                 android:textAllCaps="false"
-                android:textColor="#000000"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/chip_background_selected" />
+                app:cornerRadius="16dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/duration60Button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@string/duration_60"
                 android:textSize="15sp"
                 android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:background="@drawable/chip_background" />
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
 
         <!-- Start button -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/startSessionButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/start_session"
             android:textSize="18sp"
             android:textAllCaps="false"
-            android:textColor="#000000"
             android:textStyle="bold"
-            android:background="@drawable/primary_button_background" />
+            app:cornerRadius="16dp" />
 
         <!-- Settings link -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/settingsButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
             android:text="@string/settings"
             android:textSize="14sp"
-            android:textAllCaps="false"
-            android:textColor="#9E9E9E"
-            android:background="?attr/selectableItemBackground" />
+            android:textAllCaps="false" />
 
     </LinearLayout>
 
