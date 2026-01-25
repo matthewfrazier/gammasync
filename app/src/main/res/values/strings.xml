@@ -46,5 +46,6 @@
 
     <!-- Settings -->
     <string name="default_duration">Default Duration</string>
+    <string name="color_theme">Color Theme</string>
     <string name="back">Back</string>
 </resources>

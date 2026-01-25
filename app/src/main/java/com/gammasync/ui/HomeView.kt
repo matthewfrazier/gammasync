@@ -2,6 +2,7 @@ package com.gammasync.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.gammasync.R
+import com.gammasync.data.ColorScheme
 import com.gammasync.data.SettingsRepository
 import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfiles
@@ -54,12 +56,12 @@ class HomeView @JvmOverloads constructor(
     private var hasExternalDisplay = false
     private val haptics = HapticFeedback(context)
 
-    // Material 3 dark theme colors - Teal accent
-    private val selectedTextColor = 0xFF000000.toInt()  // Black on teal (primary)
+    // Text colors
+    private val selectedTextColor = 0xFF000000.toInt()  // Black on accent
     private val unselectedTextColor = 0xFF9E9E9E.toInt() // Gray on surface
 
-    // Icon tint colors
-    private val iconTintSupported = 0xFF26A69A.toInt()   // Teal - supported hardware
+    // Icon tint colors - accent color comes from settings
+    private var accentColor = ColorScheme.TEAL.accentColor
     private val iconTintRequired = 0xFFFF5252.toInt()    // Red - required but missing
     private val iconTintConnected = 0xFF4CAF50.toInt()   // Green - connected
 
@@ -117,8 +119,26 @@ class HomeView @JvmOverloads constructor(
         settings = settingsRepository
         selectedDuration = settingsRepository.durationMinutes
         selectedMode = settingsRepository.therapyMode
+        accentColor = settingsRepository.colorScheme.accentColor
         updateModeSelection()
         updateDurationSelection()
+        updateAccentColors()
+    }
+
+    /**
+     * Update UI elements that use the accent color.
+     */
+    private fun updateAccentColors() {
+        // Update start button background tint
+        startSessionButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+
+        // Update phone icons with accent color (non-required icons)
+        findViewById<ImageView>(R.id.iconNeuroSyncPhone)?.imageTintList = ColorStateList.valueOf(accentColor)
+        findViewById<ImageView>(R.id.iconMemoryPhone)?.imageTintList = ColorStateList.valueOf(accentColor)
+        findViewById<ImageView>(R.id.iconSleepPhone)?.imageTintList = ColorStateList.valueOf(accentColor)
+        findViewById<ImageView>(R.id.iconSleepHeadphones)?.imageTintList = ColorStateList.valueOf(accentColor)
+        findViewById<ImageView>(R.id.iconMigrainePhone)?.imageTintList = ColorStateList.valueOf(accentColor)
+        findViewById<ImageView>(R.id.iconMemoryGlasses)?.imageTintList = ColorStateList.valueOf(accentColor)
     }
 
     /**
@@ -178,10 +198,7 @@ class HomeView @JvmOverloads constructor(
 
         modeButtons.forEach { (mode, button) ->
             val isSelected = mode == selectedMode
-            button.setBackgroundResource(
-                if (isSelected) R.drawable.chip_background_selected
-                else R.drawable.chip_background
-            )
+            button.background = createChipBackground(isSelected)
             button.setTextColor(if (isSelected) selectedTextColor else unselectedTextColor)
         }
 
@@ -208,21 +225,27 @@ class HomeView @JvmOverloads constructor(
     }
 
     private fun updateDurationSelection() {
-        duration15Button.setBackgroundResource(
-            if (selectedDuration == 15) R.drawable.chip_background_selected
-            else R.drawable.chip_background
-        )
-        duration30Button.setBackgroundResource(
-            if (selectedDuration == 30) R.drawable.chip_background_selected
-            else R.drawable.chip_background
-        )
-        duration60Button.setBackgroundResource(
-            if (selectedDuration == 60) R.drawable.chip_background_selected
-            else R.drawable.chip_background
-        )
+        duration15Button.background = createChipBackground(selectedDuration == 15)
+        duration30Button.background = createChipBackground(selectedDuration == 30)
+        duration60Button.background = createChipBackground(selectedDuration == 60)
 
         duration15Button.setTextColor(if (selectedDuration == 15) selectedTextColor else unselectedTextColor)
         duration30Button.setTextColor(if (selectedDuration == 30) selectedTextColor else unselectedTextColor)
         duration60Button.setTextColor(if (selectedDuration == 60) selectedTextColor else unselectedTextColor)
+    }
+
+    /**
+     * Create a chip background drawable with the current accent color.
+     */
+    private fun createChipBackground(selected: Boolean): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 16 * resources.displayMetrics.density
+            if (selected) {
+                setColor(accentColor)
+            } else {
+                setColor(0xFF2A2A2A.toInt()) // Dark gray unselected
+            }
+        }
     }
 }

@@ -117,8 +117,12 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         externalDisplayManager = ExternalDisplayManager(this)
         externalDisplayManager.startListening(this)
 
-        // Always start at disclaimer screen
-        navigateTo(Screen.DISCLAIMER)
+        // Skip disclaimer if already accepted, otherwise show it
+        if (settings.disclaimerAccepted) {
+            navigateTo(Screen.HOME)
+        } else {
+            navigateTo(Screen.DISCLAIMER)
+        }
     }
 
     private fun initViews() {
@@ -150,6 +154,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private fun setupScreens() {
         // Disclaimer screen
         disclaimerScreen.onDisclaimerAccepted = {
+            settings.disclaimerAccepted = true
             navigateTo(Screen.HOME)
         }
 
@@ -180,6 +185,10 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         settingsScreen.onBackClicked = {
             homeScreen.bindSettings(settings)
             navigateTo(Screen.HOME)
+        }
+        settingsScreen.onColorSchemeChanged = {
+            // Refresh home screen with new color scheme (no need to recreate)
+            homeScreen.bindSettings(settings)
         }
     }
 

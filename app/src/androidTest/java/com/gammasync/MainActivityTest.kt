@@ -181,7 +181,7 @@ class MainActivityTest {
     }
 
     @Test
-    fun therapyScreenHasStopButton() {
+    fun therapyScreenHasPauseButton() {
         acceptDisclaimer()
 
         onView(withId(R.id.modeNeuroSyncButton)).perform(click())
@@ -191,22 +191,38 @@ class MainActivityTest {
         onView(withId(R.id.therapyScreen)).perform(click())
         Thread.sleep(300)
 
-        onView(withId(R.id.stopButton)).check(matches(isDisplayed()))
+        onView(withId(R.id.pauseButton)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun stoppingSessionShowsCompleteScreen() {
+    fun pausingSessionShowsPauseOverlay() {
         acceptDisclaimer()
 
         onView(withId(R.id.modeNeuroSyncButton)).perform(click())
         onView(withId(R.id.startSessionButton)).perform(click())
 
-        // Tap to show controls, then stop
+        // Tap to show controls, then pause
         onView(withId(R.id.therapyScreen)).perform(click())
         Thread.sleep(300)
-        onView(withId(R.id.stopButton)).perform(click())
+        onView(withId(R.id.pauseButton)).perform(click())
 
-        onView(withId(R.id.completeScreen)).check(matches(isDisplayed()))
+        onView(withId(R.id.pauseOverlay)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun doneFromPauseGoesToHome() {
+        acceptDisclaimer()
+
+        onView(withId(R.id.modeNeuroSyncButton)).perform(click())
+        onView(withId(R.id.startSessionButton)).perform(click())
+
+        // Tap to show controls, pause, then done
+        onView(withId(R.id.therapyScreen)).perform(click())
+        Thread.sleep(300)
+        onView(withId(R.id.pauseButton)).perform(click())
+        onView(withId(R.id.doneButton)).perform(click())
+
+        onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
     }
 
     // --- Mode Switching Integration Tests ---
@@ -244,24 +260,91 @@ class MainActivityTest {
     fun startSessionWithDifferentModes() {
         acceptDisclaimer()
 
-        // Test NeuroSync
+        // Test NeuroSync - pause and done goes to home
         onView(withId(R.id.modeNeuroSyncButton)).perform(click())
         onView(withId(R.id.startSessionButton)).perform(click())
         Thread.sleep(500)
         onView(withId(R.id.therapyScreen)).perform(click())
         Thread.sleep(300)
-        onView(withId(R.id.stopButton)).perform(click())
+        onView(withId(R.id.pauseButton)).perform(click())
+        onView(withId(R.id.doneButton)).perform(click())
 
-        // Return to home and test Memory Write
-        onView(withId(R.id.startAnotherButton)).perform(click())
+        // Should be back on home, test Memory Write
         onView(withId(R.id.modeMemoryButton)).perform(click())
         onView(withId(R.id.startSessionButton)).perform(click())
         Thread.sleep(500)
         onView(withId(R.id.therapyScreen)).perform(click())
         Thread.sleep(300)
-        onView(withId(R.id.stopButton)).perform(click())
+        onView(withId(R.id.pauseButton)).perform(click())
+        onView(withId(R.id.doneButton)).perform(click())
 
-        // Should reach complete screen
-        onView(withId(R.id.completeScreen)).check(matches(isDisplayed()))
+        // Should be on home screen
+        onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
+    }
+
+    // --- Settings & Color Scheme Tests ---
+
+    @Test
+    fun settingsButtonOpensSettingsScreen() {
+        acceptDisclaimer()
+
+        onView(withId(R.id.settingsButton)).perform(click())
+
+        onView(withId(R.id.settingsScreen)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun changingColorSchemeDoesNotShowDisclaimer() {
+        acceptDisclaimer()
+
+        // Go to settings
+        onView(withId(R.id.settingsButton)).perform(click())
+        Thread.sleep(300)
+
+        // Change color scheme by clicking blue
+        onView(withId(R.id.colorBlue)).perform(click())
+        Thread.sleep(300)
+
+        // Go back to home
+        onView(withId(R.id.backButton)).perform(click())
+        Thread.sleep(300)
+
+        // Should be on home screen, NOT disclaimer
+        onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
+        // Disclaimer should NOT be visible (it's in ViewFlipper but not displayed)
+        onView(withId(R.id.disclaimerScreen)).check(matches(not(isDisplayed())))
+        // The hold-to-agree button should not be visible
+        onView(withId(R.id.holdToAgreeButton)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun changingMultipleColorSchemesNeverShowsDisclaimer() {
+        acceptDisclaimer()
+
+        // Go to settings and change colors multiple times
+        onView(withId(R.id.settingsButton)).perform(click())
+        Thread.sleep(300)
+
+        onView(withId(R.id.colorBlue)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.colorPurple)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.colorGreen)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.colorOrange)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.colorRed)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.colorTeal)).perform(click())
+        Thread.sleep(200)
+
+        // Go back
+        onView(withId(R.id.backButton)).perform(click())
+        Thread.sleep(300)
+
+        // Should still be on home, never shown disclaimer
+        onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
+        onView(withId(R.id.disclaimerScreen)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.holdToAgreeButton)).check(matches(not(isDisplayed())))
     }
 }

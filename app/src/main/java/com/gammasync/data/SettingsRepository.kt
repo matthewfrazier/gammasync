@@ -17,11 +17,14 @@ class SettingsRepository(context: Context) {
         private const val KEY_THERAPY_MODE = "therapy_mode"
         private const val KEY_RSVP_ENABLED = "rsvp_enabled"
         private const val KEY_RSVP_WPM = "rsvp_wpm"
+        private const val KEY_COLOR_SCHEME = "color_scheme"
+        private const val KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
         private const val DEFAULT_MAX_BRIGHTNESS = false
         private const val DEFAULT_RSVP_WPM = 300
+        private const val DEFAULT_COLOR_SCHEME = "TEAL"
     }
 
     private val prefs: SharedPreferences =
@@ -57,4 +60,32 @@ class SettingsRepository(context: Context) {
     var rsvpWpm: Int
         get() = prefs.getInt(KEY_RSVP_WPM, DEFAULT_RSVP_WPM)
         set(value) = prefs.edit().putInt(KEY_RSVP_WPM, value).apply()
+
+    var colorScheme: ColorScheme
+        get() {
+            val schemeName = prefs.getString(KEY_COLOR_SCHEME, DEFAULT_COLOR_SCHEME)
+            return try {
+                ColorScheme.valueOf(schemeName ?: DEFAULT_COLOR_SCHEME)
+            } catch (e: IllegalArgumentException) {
+                ColorScheme.TEAL
+            }
+        }
+        set(value) = prefs.edit().putString(KEY_COLOR_SCHEME, value.name).apply()
+
+    var disclaimerAccepted: Boolean
+        get() = prefs.getBoolean(KEY_DISCLAIMER_ACCEPTED, false)
+        set(value) = prefs.edit().putBoolean(KEY_DISCLAIMER_ACCEPTED, value).apply()
+}
+
+/**
+ * Available color schemes for the app UI.
+ * Each scheme provides primary accent color.
+ */
+enum class ColorScheme(val accentColor: Int, val displayName: String) {
+    TEAL(0xFF26A69A.toInt(), "Teal"),
+    BLUE(0xFF2196F3.toInt(), "Blue"),
+    PURPLE(0xFF9C27B0.toInt(), "Purple"),
+    GREEN(0xFF4CAF50.toInt(), "Green"),
+    ORANGE(0xFFFF9800.toInt(), "Orange"),
+    RED(0xFFF44336.toInt(), "Red")
 }
