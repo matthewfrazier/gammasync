@@ -178,12 +178,15 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         }
 
         if (isRunning) {
-            externalPresentation?.startRendering()
-            // Hide phone UI when external display active
+            externalPresentation?.apply {
+                setTotalDuration(sessionDurationMinutes * 60)
+                setRemainingTime(remainingSeconds)
+                startRendering()
+                if (controlsVisible) showTimer()
+            }
+            // Stop subtle flicker on phone (XREAL shows real flicker)
             subtleFlickerOverlay.stop()
             subtleFlickerOverlay.visibility = View.GONE
-            therapyControlsContainer.visibility = View.GONE
-            controlsVisible = false
         }
 
         Log.i(TAG, "Display mode: XREAL (external)")
@@ -229,11 +232,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         audioEngine.start(amplitude = settings.audioAmplitude.toDouble())
 
         if (hasExternalDisplay) {
-            externalPresentation?.startRendering()
-            // Phone screen stays black when using external display
-            subtleFlickerOverlay.visibility = View.GONE
-            therapyControlsContainer.visibility = View.GONE
-            controlsVisible = false
+            externalPresentation?.apply {
+                setTotalDuration(remainingSeconds)
+                setRemainingTime(remainingSeconds)
+                startRendering()
+            }
+            // Show controls initially (on both phone and XREAL)
+            showTherapyControls()
         } else {
             // Show controls initially on phone
             showTherapyControls()
@@ -287,7 +292,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     }
 
     private fun toggleTherapyControls() {
-        if (!isRunning || hasExternalDisplay) return
+        if (!isRunning) return
 
         if (controlsVisible) {
             hideTherapyControls()
@@ -300,8 +305,15 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private fun showTherapyControls() {
         controlsVisible = true
         therapyControlsContainer.visibility = View.VISIBLE
-        subtleFlickerOverlay.visibility = View.VISIBLE
-        subtleFlickerOverlay.start()
+
+        if (hasExternalDisplay) {
+            // Show timer on XREAL display too
+            externalPresentation?.showTimer()
+        } else {
+            // Show subtle flicker on phone when no external display
+            subtleFlickerOverlay.visibility = View.VISIBLE
+            subtleFlickerOverlay.start()
+        }
     }
 
     private fun hideTherapyControls() {
@@ -309,6 +321,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         therapyControlsContainer.visibility = View.GONE
         subtleFlickerOverlay.stop()
         subtleFlickerOverlay.visibility = View.GONE
+
+        // Hide timer on XREAL display too
+        externalPresentation?.hideTimer()
     }
 
     private fun restoreBrightness() {
@@ -322,6 +337,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private fun updateTimerDisplay() {
         circularTimer.setRemainingTime(remainingSeconds)
+        externalPresentation?.setRemainingTime(remainingSeconds)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

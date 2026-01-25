@@ -2,10 +2,15 @@ package com.gammasync.infra
 
 import android.app.Presentation
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.Display
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import com.gammasync.R
+import com.gammasync.ui.CircularTimerView
 
 /**
  * Full-screen gamma flicker presentation for external displays (XREAL Air glasses).
@@ -19,24 +24,39 @@ class GammaPresentation(
 ) : Presentation(context, display) {
 
     private lateinit var gammaRenderer: GammaRenderer
+    private lateinit var externalTimer: CircularTimerView
     private var phaseProvider: (() -> Double)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Full screen, keep screen on
-        window?.apply {
-            setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN or
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN or
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-            )
-        }
-
         setContentView(R.layout.presentation_gamma)
 
+        // Full screen immersive mode - hide all system UI
+        window?.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                setDecorFitsSystemWindows(false)
+                insetsController?.apply {
+                    hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                )
+            }
+        }
+
         gammaRenderer = findViewById(R.id.externalGammaRenderer)
+        externalTimer = findViewById(R.id.externalTimer)
         phaseProvider?.let { gammaRenderer.setPhaseProvider(it) }
     }
 
@@ -66,6 +86,42 @@ class GammaPresentation(
     fun stopRendering() {
         if (::gammaRenderer.isInitialized) {
             gammaRenderer.stop()
+        }
+    }
+
+    /**
+     * Show the timer overlay on the external display.
+     */
+    fun showTimer() {
+        if (::externalTimer.isInitialized) {
+            externalTimer.visibility = View.VISIBLE
+        }
+    }
+
+    /**
+     * Hide the timer overlay on the external display.
+     */
+    fun hideTimer() {
+        if (::externalTimer.isInitialized) {
+            externalTimer.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Set the total session duration for the timer.
+     */
+    fun setTotalDuration(totalSeconds: Int) {
+        if (::externalTimer.isInitialized) {
+            externalTimer.setTotalDuration(totalSeconds)
+        }
+    }
+
+    /**
+     * Update the remaining time on the timer.
+     */
+    fun setRemainingTime(remainingSeconds: Int) {
+        if (::externalTimer.isInitialized) {
+            externalTimer.setRemainingTime(remainingSeconds)
         }
     }
 
