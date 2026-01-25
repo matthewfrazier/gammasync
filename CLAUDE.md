@@ -49,6 +49,11 @@ GammaSync is an Android application delivering Gamma Entrainment Using Sensory s
 
 ## Build Commands
 
+**IMPORTANT:** This machine has no system Java. Use Android Studio's bundled JBR:
+```bash
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
 ```bash
 # Build and run unit tests
 ./gradlew testDebugUnitTest

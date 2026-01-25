@@ -4,28 +4,26 @@
     android:layout_height="match_parent"
     android:background="#121212">
 
-    <!-- App title at top -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="48dp"
-        android:text="@string/app_name"
-        android:textSize="28sp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold" />
-
-    <!-- All controls at bottom for one-handed use -->
+    <!-- Top section: Title and Mode selector -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_gravity="top"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp"
-        android:paddingBottom="32dp">
+        android:padding="24dp">
 
-        <!-- Mode selector section -->
+        <!-- App title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/app_name"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Mode selector label -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,81 +32,167 @@
             android:textColor="#9E9E9E"
             android:layout_marginBottom="12dp" />
 
-        <!-- Row 1: NeuroSync, Memory, Sleep -->
+        <!-- Memory (was NeuroSync) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
+            android:gravity="start|center_vertical"
             android:layout_marginBottom="8dp">
 
             <Button
                 android:id="@+id/modeNeuroSyncButton"
-                android:layout_width="0dp"
+                android:layout_width="200dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:text="@string/mode_neurosync"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textAllCaps="false"
                 android:textColor="#000000"
-                android:layout_marginEnd="6dp"
                 android:background="@drawable/chip_background_selected" />
 
-            <Button
-                android:id="@+id/modeMemoryButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_memory"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/chip_background" />
-
-            <Button
-                android:id="@+id/modeSleepButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_sleep"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                android:textColor="#9E9E9E"
-                android:background="@drawable/chip_background" />
+            <ImageView
+                android:id="@+id/iconNeuroSyncPhone"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_phone"
+                android:visibility="visible" />
 
         </LinearLayout>
 
-        <!-- Row 2: Migraine, Mood Lift -->
+        <!-- Sleep Ramp -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="12dp">
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/modeSleepButton"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:text="@string/mode_sleep"
+                android:textSize="14sp"
+                android:textAllCaps="false"
+                android:textColor="#9E9E9E"
+                android:background="@drawable/chip_background" />
+
+            <ImageView
+                android:id="@+id/iconSleepPhone"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_phone"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/iconSleepHeadphones"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_headphones"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Migraine Relief -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="8dp">
 
             <Button
                 android:id="@+id/modeMigraineButton"
-                android:layout_width="0dp"
+                android:layout_width="200dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:text="@string/mode_migraine"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textAllCaps="false"
                 android:textColor="#9E9E9E"
-                android:layout_marginEnd="6dp"
                 android:background="@drawable/chip_background" />
+
+            <ImageView
+                android:id="@+id/iconMigrainePhone"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_phone"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Mood Lift -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="8dp">
 
             <Button
                 android:id="@+id/modeMoodLiftButton"
-                android:layout_width="0dp"
+                android:layout_width="200dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:text="@string/mode_mood_lift"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textAllCaps="false"
                 android:textColor="#9E9E9E"
                 android:background="@drawable/chip_background" />
+
+            <ImageView
+                android:id="@+id/iconMoodLiftHeadphones"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_headphones"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/iconMoodLiftGlasses"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_glasses"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Learning (was Memory Write) - will have RSVP file picker -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <Button
+                android:id="@+id/modeMemoryButton"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:text="@string/mode_memory"
+                android:textSize="14sp"
+                android:textAllCaps="false"
+                android:textColor="#9E9E9E"
+                android:background="@drawable/chip_background" />
+
+            <ImageView
+                android:id="@+id/iconMemoryPhone"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_phone"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/iconMemoryGlasses"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_glasses"
+                android:visibility="visible" />
 
         </LinearLayout>
 
@@ -120,8 +204,7 @@
             android:text="@string/mode_neurosync_description"
             android:textSize="12sp"
             android:textColor="#757575"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"
+            android:gravity="start"
             android:minHeight="32dp" />
 
         <!-- XREAL warning (hidden by default) -->
@@ -132,36 +215,21 @@
             android:text="@string/xreal_required_warning"
             android:textSize="12sp"
             android:textColor="#FF5252"
-            android:gravity="center"
+            android:gravity="start"
             android:visibility="gone"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginTop="8dp" />
 
-        <!-- Max brightness toggle -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/surface_background"
-            android:paddingHorizontal="16dp"
-            android:layout_marginBottom="16dp">
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/max_brightness"
-                android:textSize="16sp"
-                android:textColor="#E0E0E0" />
-
-            <Switch
-                android:id="@+id/maxBrightnessSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:thumbTint="#26A69A"
-                android:trackTint="#424242" />
-
-        </LinearLayout>
+    <!-- Bottom section: Duration and controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        android:paddingBottom="32dp">
 
         <!-- Duration selector -->
         <TextView

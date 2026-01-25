@@ -4,6 +4,9 @@
     <string name="timer_initial">00:00</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="done">Done</string>
     <string name="reset">Reset</string>
 
     <!-- Safety Disclaimer -->
@@ -14,12 +17,12 @@
 
     <!-- Home Screen - Mode Selection -->
     <string name="select_mode">Therapy Mode</string>
-    <string name="mode_neurosync">NeuroSync</string>
-    <string name="mode_memory">Memory</string>
+    <string name="mode_neurosync">Memory</string>
+    <string name="mode_memory">Learning</string>
     <string name="mode_sleep">Sleep</string>
     <string name="mode_migraine">Migraine</string>
     <string name="mode_mood_lift">Mood Lift</string>
-    <string name="mode_neurosync_description">40Hz gamma for cognitive clarity</string>
+    <string name="mode_neurosync_description">40Hz gamma + pink noise for memory and cellular cleanup</string>
     <string name="mode_memory_description">Theta-gamma coupling for learning</string>
     <string name="mode_sleep_description">8Hz\u21921Hz ramp for sleep</string>
     <string name="mode_migraine_description">Static green for pain relief</string>

@@ -1,12 +1,13 @@
 package com.gammasync.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.Switch
+import android.widget.ImageView
 import android.widget.TextView
 import com.gammasync.R
 import com.gammasync.data.SettingsRepository
@@ -26,7 +27,6 @@ class HomeView @JvmOverloads constructor(
 
     var onStartSession: ((durationMinutes: Int, mode: TherapyMode) -> Unit)? = null
     var onSettingsClicked: (() -> Unit)? = null
-    var onMaxBrightnessChanged: ((enabled: Boolean) -> Unit)? = null
 
     // Mode selector buttons
     private val modeNeuroSyncButton: Button
@@ -37,13 +37,16 @@ class HomeView @JvmOverloads constructor(
     private val modeDescriptionText: TextView
     private val xrealWarningText: TextView
 
+    // Hardware requirement icons
+    private val iconMoodLiftHeadphones: ImageView
+    private val iconMoodLiftGlasses: ImageView
+
     // Duration selector buttons
     private val duration15Button: Button
     private val duration30Button: Button
     private val duration60Button: Button
     private val startSessionButton: Button
     private val settingsButton: Button
-    private val maxBrightnessSwitch: Switch
 
     private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
     private var selectedDuration = 30
@@ -54,6 +57,11 @@ class HomeView @JvmOverloads constructor(
     // Material 3 dark theme colors - Teal accent
     private val selectedTextColor = 0xFF000000.toInt()  // Black on teal (primary)
     private val unselectedTextColor = 0xFF9E9E9E.toInt() // Gray on surface
+
+    // Icon tint colors
+    private val iconTintSupported = 0xFF26A69A.toInt()   // Teal - supported hardware
+    private val iconTintRequired = 0xFFFF5252.toInt()    // Red - required but missing
+    private val iconTintConnected = 0xFF4CAF50.toInt()   // Green - connected
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_home, this, true)
@@ -67,13 +75,16 @@ class HomeView @JvmOverloads constructor(
         modeDescriptionText = findViewById(R.id.modeDescriptionText)
         xrealWarningText = findViewById(R.id.xrealWarningText)
 
+        // Hardware requirement icons for Mood Lift
+        iconMoodLiftHeadphones = findViewById(R.id.iconMoodLiftHeadphones)
+        iconMoodLiftGlasses = findViewById(R.id.iconMoodLiftGlasses)
+
         // Duration selector
         duration15Button = findViewById(R.id.duration15Button)
         duration30Button = findViewById(R.id.duration30Button)
         duration60Button = findViewById(R.id.duration60Button)
         startSessionButton = findViewById(R.id.startSessionButton)
         settingsButton = findViewById(R.id.settingsButton)
-        maxBrightnessSwitch = findViewById(R.id.maxBrightnessSwitch)
 
         // Mode button clicks
         modeNeuroSyncButton.setOnClickListener { selectMode(TherapyMode.NEUROSYNC) }
@@ -97,14 +108,9 @@ class HomeView @JvmOverloads constructor(
             onSettingsClicked?.invoke()
         }
 
-        maxBrightnessSwitch.setOnCheckedChangeListener { _, isChecked ->
-            haptics.tick()
-            settings?.maxBrightness = isChecked
-            onMaxBrightnessChanged?.invoke(isChecked)
-        }
-
         updateModeSelection()
         updateDurationSelection()
+        updateIconColors()
     }
 
     fun bindSettings(settingsRepository: SettingsRepository) {
@@ -113,7 +119,6 @@ class HomeView @JvmOverloads constructor(
         selectedMode = settingsRepository.therapyMode
         updateModeSelection()
         updateDurationSelection()
-        maxBrightnessSwitch.isChecked = settingsRepository.maxBrightness
     }
 
     /**
@@ -123,6 +128,18 @@ class HomeView @JvmOverloads constructor(
     fun setHasExternalDisplay(connected: Boolean) {
         hasExternalDisplay = connected
         updateXrealWarning()
+        updateIconColors()
+    }
+
+    /**
+     * Update icon colors based on XREAL connection status.
+     * - Green when XREAL connected (hardware available)
+     * - Red when XREAL required but not connected
+     */
+    private fun updateIconColors() {
+        val glassesColor = if (hasExternalDisplay) iconTintConnected else iconTintRequired
+        iconMoodLiftHeadphones.imageTintList = ColorStateList.valueOf(glassesColor)
+        iconMoodLiftGlasses.imageTintList = ColorStateList.valueOf(glassesColor)
     }
 
     fun setSelectedDuration(minutes: Int) {

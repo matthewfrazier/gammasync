@@ -13,20 +13,21 @@ enum class TherapyMode(
     val requiresXreal: Boolean = false
 ) {
     /**
-     * NeuroSync: 40Hz gamma entrainment for cognitive enhancement.
+     * Memory: 40Hz gamma entrainment for memory and cellular cleanup.
      * Research basis: MIT GENUS study (Tsai et al., 2019)
      */
     NEUROSYNC(
-        displayName = "NeuroSync",
-        description = "40Hz gamma for cognitive clarity"
+        displayName = "Memory",
+        description = "40Hz gamma + pink noise for memory and cellular cleanup"
     ),
 
     /**
-     * Memory Write: Theta-gamma coupling for memory consolidation.
+     * Learning: Theta-gamma coupling for memory consolidation.
      * Research basis: Hippocampal memory encoding studies
+     * Will support RSVP file display in future.
      */
     MEMORY_WRITE(
-        displayName = "Memory Write",
+        displayName = "Learning",
         description = "Theta-gamma coupling for learning"
     ),
 

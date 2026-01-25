@@ -46,8 +46,12 @@ class GammaPresentation(
         setContentView(R.layout.presentation_gamma)
 
         // Full screen immersive mode - hide all system UI
+        // Keep screen on and show over lock screen for uninterrupted therapy
         window?.apply {
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+            addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
+            addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 setDecorFitsSystemWindows(false)

@@ -7,9 +7,12 @@ import android.os.Looper
 import android.util.Log
 import android.view.Display
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
 import com.gammasync.data.SettingsRepository
@@ -20,8 +23,8 @@ import com.gammasync.infra.ExternalDisplayManager
 import com.gammasync.infra.GammaPresentation
 import com.gammasync.infra.HapticFeedback
 import com.gammasync.infra.UniversalAudioEngine
+import com.gammasync.infra.UniversalVisualRenderer
 import com.gammasync.ui.CircularTimerView
-import com.gammasync.ui.SubtleFlickerOverlay
 import com.gammasync.ui.HomeView
 import com.gammasync.ui.SafetyDisclaimerView
 import com.gammasync.ui.SessionCompleteView
@@ -51,10 +54,19 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     // Therapy screen views
     private lateinit var circularTimer: CircularTimerView
-    private lateinit var stopButton: Button
-    private lateinit var subtleFlickerOverlay: SubtleFlickerOverlay
+    private lateinit var pauseButton: Button
+    private lateinit var pauseOverlay: View
+    private lateinit var pauseDurationText: TextView
+    private lateinit var resumeButton: Button
+    private lateinit var doneButton: Button
+    private lateinit var phoneVisualRenderer: UniversalVisualRenderer
     private lateinit var therapyControlsContainer: View
     private var controlsVisible = false
+    private var isPaused = false
+
+    // Auto-hide timer controls
+    private val autoHideRunnable = Runnable { hideTherapyControls() }
+    private val autoHideDelayMs = 3000L
 
     private val handler = Handler(Looper.getMainLooper())
     private var remainingSeconds = 0
@@ -92,6 +104,8 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         setContentView(R.layout.activity_main)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
 
         haptics = HapticFeedback(this)
         settings = SettingsRepository(this)
@@ -117,12 +131,17 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         // Therapy screen views
         circularTimer = findViewById(R.id.circularTimer)
-        stopButton = findViewById(R.id.stopButton)
-        subtleFlickerOverlay = findViewById(R.id.subtleFlickerOverlay)
+        pauseButton = findViewById(R.id.pauseButton)
+        pauseOverlay = findViewById(R.id.pauseOverlay)
+        pauseDurationText = findViewById(R.id.pauseDurationText)
+        resumeButton = findViewById(R.id.resumeButton)
+        doneButton = findViewById(R.id.doneButton)
+        phoneVisualRenderer = findViewById(R.id.phoneVisualRenderer)
         therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
 
-        // Connect subtle flicker overlay to audio engine phase
-        subtleFlickerOverlay.setPhaseProvider { audioEngine.phase }
+        // Connect phone visual renderer to audio engine phase
+        phoneVisualRenderer.setPhaseProvider { audioEngine.phase }
+        phoneVisualRenderer.setSecondaryPhaseProvider { audioEngine.secondaryPhase }
 
         // Tap therapy screen to toggle controls visibility
         therapyScreen.setOnClickListener { toggleTherapyControls() }
@@ -142,14 +161,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         homeScreen.onSettingsClicked = {
             navigateTo(Screen.SETTINGS)
         }
-        homeScreen.onMaxBrightnessChanged = { enabled ->
-            window.attributes = window.attributes.apply {
-                screenBrightness = if (enabled) 1f else -1f
-            }
-        }
 
-        // Therapy screen - stop button
-        stopButton.setOnClickListener { stopSession() }
+        // Therapy screen - pause/resume/done buttons
+        pauseButton.setOnClickListener { pauseSession() }
+        resumeButton.setOnClickListener { resumeSession() }
+        doneButton.setOnClickListener { stopSession() }
 
         // Complete screen
         completeScreen.onStartAnother = {
@@ -169,7 +185,43 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private fun navigateTo(screen: Screen) {
         viewFlipper.displayedChild = screen.ordinal
+
+        // Enter immersive mode for therapy, exit for other screens
+        if (screen == Screen.THERAPY) {
+            enterImmersiveMode()
+        } else {
+            exitImmersiveMode()
+        }
+
         Log.i(TAG, "Navigated to: $screen")
+    }
+
+    private fun enterImmersiveMode() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.apply {
+                hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            )
+        }
+    }
+
+    private fun exitImmersiveMode() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        }
     }
 
     // --- External Display Callbacks ---
@@ -194,9 +246,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
                 startRendering()
                 if (controlsVisible) showTimer()
             }
-            // Stop subtle flicker on phone (XREAL shows real flicker)
-            subtleFlickerOverlay.stop()
-            subtleFlickerOverlay.visibility = View.GONE
+            // Stop phone renderer (XREAL shows the therapy visual now)
+            phoneVisualRenderer.stop()
+            phoneVisualRenderer.visibility = View.GONE
         }
 
         Log.i(TAG, "Display mode: XREAL (external), profile: ${currentProfile.mode.displayName}")
@@ -211,8 +263,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         externalPresentation?.dismiss()
         externalPresentation = null
 
-        // Restore phone UI if session running
-        if (isRunning) {
+        // Restore phone visual renderer if session running
+        if (isRunning && !isPaused) {
+            phoneVisualRenderer.configure(currentProfile)
+            phoneVisualRenderer.visibility = View.VISIBLE
+            phoneVisualRenderer.start()
             showTherapyControls()
         }
 
@@ -263,54 +318,105 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
                 setRemainingTime(remainingSeconds)
                 startRendering()
             }
-            // Show controls initially (on both phone and XREAL)
-            showTherapyControls()
+            // Phone shows controls only when XREAL connected
+            phoneVisualRenderer.visibility = View.GONE
         } else {
-            // Show controls initially on phone
-            showTherapyControls()
+            // Show full therapy visual on phone when no external display
+            phoneVisualRenderer.configure(currentProfile)
+            phoneVisualRenderer.visibility = View.VISIBLE
+            phoneVisualRenderer.start()
         }
+
+        // Show controls initially
+        showTherapyControls()
 
         handler.post(timerRunnable)
     }
 
-    private fun stopSession() {
-        if (isRunning) {
+    private fun pauseSession() {
+        if (isRunning && !isPaused) {
             haptics.heavyClick()
-            isRunning = false
+            isPaused = true
 
-            subtleFlickerOverlay.stop()
-            externalPresentation?.stopRendering()
-
+            // Stop audio and rendering but keep timer paused
             audioEngine.stop()
+            phoneVisualRenderer.stop()
+            externalPresentation?.stopRendering()
             handler.removeCallbacks(timerRunnable)
+            handler.removeCallbacks(autoHideRunnable)
 
-            restoreBrightness()
-
-            subtleFlickerOverlay.visibility = View.GONE
+            // Show pause overlay with session duration
+            pauseDurationText.text = "$sessionDurationMinutes min session"
+            pauseOverlay.visibility = View.VISIBLE
             therapyControlsContainer.visibility = View.GONE
-            controlsVisible = false
-
-            // Show complete screen with actual duration
-            val completedMinutes = sessionDurationMinutes - (remainingSeconds / 60)
-            completeScreen.setSessionDuration(if (completedMinutes > 0) completedMinutes else 1)
-            navigateTo(Screen.COMPLETE)
         }
+    }
+
+    private fun resumeSession() {
+        if (isRunning && isPaused) {
+            haptics.heavyClick()
+            isPaused = false
+
+            // Hide pause overlay
+            pauseOverlay.visibility = View.GONE
+
+            // Restart audio and rendering
+            audioEngine.start(currentProfile, amplitude = settings.audioAmplitude.toDouble())
+
+            if (hasExternalDisplay) {
+                externalPresentation?.startRendering()
+            } else {
+                phoneVisualRenderer.start()
+            }
+
+            // Resume timer
+            handler.post(timerRunnable)
+
+            // Show controls briefly then auto-hide
+            showTherapyControls()
+        }
+    }
+
+    private fun stopSession() {
+        haptics.heavyClick()
+        isRunning = false
+        isPaused = false
+
+        phoneVisualRenderer.stop()
+        externalPresentation?.stopRendering()
+
+        audioEngine.stop()
+        handler.removeCallbacks(timerRunnable)
+        handler.removeCallbacks(autoHideRunnable)
+
+        restoreBrightness()
+
+        phoneVisualRenderer.visibility = View.GONE
+        therapyControlsContainer.visibility = View.GONE
+        pauseOverlay.visibility = View.GONE
+        controlsVisible = false
+
+        // Go straight to home menu
+        navigateTo(Screen.HOME)
     }
 
     private fun onSessionTimerComplete() {
         haptics.heavyClick()
         isRunning = false
+        isPaused = false
 
-        subtleFlickerOverlay.stop()
+        phoneVisualRenderer.stop()
         externalPresentation?.stopRendering()
 
         audioEngine.stop()
         handler.removeCallbacks(timerRunnable)
+        handler.removeCallbacks(autoHideRunnable)
 
         restoreBrightness()
 
-        subtleFlickerOverlay.visibility = View.GONE
+        phoneVisualRenderer.visibility = View.GONE
         therapyControlsContainer.visibility = View.GONE
+        pauseOverlay.visibility = View.GONE
         controlsVisible = false
 
         completeScreen.setSessionDuration(sessionDurationMinutes)
@@ -318,7 +424,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     }
 
     private fun toggleTherapyControls() {
-        if (!isRunning) return
+        if (!isRunning || isPaused) return
 
         if (controlsVisible) {
             hideTherapyControls()
@@ -335,21 +441,16 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         if (hasExternalDisplay) {
             // Show timer on XREAL display too
             externalPresentation?.showTimer()
-        } else {
-            // Show subtle flicker on phone when no external display
-            // But only if the mode has visual flicker
-            if (currentProfile.hasVisualFlicker) {
-                subtleFlickerOverlay.visibility = View.VISIBLE
-                subtleFlickerOverlay.start()
-            }
         }
+
+        // Schedule auto-hide after delay
+        handler.removeCallbacks(autoHideRunnable)
+        handler.postDelayed(autoHideRunnable, autoHideDelayMs)
     }
 
     private fun hideTherapyControls() {
         controlsVisible = false
         therapyControlsContainer.visibility = View.GONE
-        subtleFlickerOverlay.stop()
-        subtleFlickerOverlay.visibility = View.GONE
 
         // Hide timer on XREAL display too
         externalPresentation?.hideTimer()
@@ -378,8 +479,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         super.onDestroy()
         externalDisplayManager.stopListening()
         externalPresentation?.dismiss()
-        subtleFlickerOverlay.stop()
+        phoneVisualRenderer.stop()
         audioEngine.release()
         handler.removeCallbacks(timerRunnable)
+        handler.removeCallbacks(autoHideRunnable)
     }
 }
