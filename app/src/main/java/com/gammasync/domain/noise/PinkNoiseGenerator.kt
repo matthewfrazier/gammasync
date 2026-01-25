@@ -27,7 +27,9 @@ class PinkNoiseGenerator(
     private var runningSum = octaveValues.sum()
 
     // Normalization factor to keep output in -1.0 to 1.0 range
-    private val normalizationFactor = 1.0 / numOctaves
+    // Factor of 8 balances variance preservation with amplitude bounds
+    // (16 octaves with mean 0, sum rarely exceeds ±8 in practice)
+    private val normalizationFactor = 1.0 / 8.0
 
     /**
      * Generate the next pink noise sample.
@@ -51,8 +53,8 @@ class PinkNoiseGenerator(
 
         counter++
 
-        // Return normalized sample
-        return runningSum * normalizationFactor
+        // Return normalized and clamped sample
+        return (runningSum * normalizationFactor).coerceIn(-1.0, 1.0)
     }
 
     /**

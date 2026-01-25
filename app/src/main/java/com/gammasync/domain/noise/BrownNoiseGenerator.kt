@@ -24,8 +24,8 @@ class BrownNoiseGenerator(
     private val leakFactor = 0.02
 
     // Step size for the random walk
-    // Larger steps = more variance, but needs more normalization
-    private val stepSize = 0.2
+    // Smaller steps = smoother output (characteristic of brown noise)
+    private val stepSize = 0.05
 
     // Soft clipping threshold
     private val clipThreshold = 0.95

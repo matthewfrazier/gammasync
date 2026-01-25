@@ -1,13 +1,14 @@
 package com.gammasync.domain.therapy
 
-import android.graphics.Color
-
 /**
  * Visual stimulus configuration.
+ *
+ * Note: Uses raw ARGB integers to keep domain layer free of Android dependencies.
+ * Format: 0xAARRGGBB (fully opaque = 0xFF prefix)
  */
 data class VisualConfig(
     /**
-     * Primary color for visual stimulus.
+     * Primary color for visual stimulus (ARGB format).
      * For SINE mode: warm color endpoint.
      * For STATIC mode: the displayed color.
      * For STROBE mode: on-state color.
@@ -15,11 +16,11 @@ data class VisualConfig(
     val primaryColor: Int,
 
     /**
-     * Secondary color for visual stimulus.
+     * Secondary color for visual stimulus (ARGB format).
      * For SINE mode: cool color endpoint.
      * For STROBE mode: off-state color (typically black).
      */
-    val secondaryColor: Int = Color.BLACK,
+    val secondaryColor: Int = COLOR_BLACK,
 
     /**
      * Maximum brightness in nits.
@@ -35,26 +36,33 @@ data class VisualConfig(
     val luminanceNoise: Boolean = false
 ) {
     companion object {
+        /** Black color constant */
+        const val COLOR_BLACK = 0xFF000000.toInt()
+
         /**
          * Default isoluminant warm color (2700K incandescent).
+         * RGB(255, 166, 80) = 0xFFA650
          */
-        val WARM_2700K = Color.rgb(255, 166, 80)
+        const val WARM_2700K = 0xFFFFA650.toInt()
 
         /**
          * Default isoluminant cool color (6500K daylight).
+         * RGB(220, 220, 255) = 0xDCDCFF
          */
-        val COOL_6500K = Color.rgb(220, 220, 255)
+        const val COOL_6500K = 0xFFDCDCFF.toInt()
 
         /**
          * Migraine green (525nm).
          * Low-saturation green that has been shown to reduce migraine symptoms.
+         * RGB(74, 139, 91) = 0x4A8B5B
          */
-        val MIGRAINE_GREEN = Color.rgb(74, 139, 91)
+        const val MIGRAINE_GREEN = 0xFF4A8B5B.toInt()
 
         /**
          * Sleep red for low-light visibility.
+         * RGB(139, 50, 50) = 0x8B3232
          */
-        val SLEEP_RED = Color.rgb(139, 50, 50)
+        const val SLEEP_RED = 0xFF8B3232.toInt()
 
         /**
          * Default isoluminant configuration (warm ↔ cool).
@@ -78,7 +86,7 @@ data class VisualConfig(
          */
         val SLEEP = VisualConfig(
             primaryColor = SLEEP_RED,
-            secondaryColor = Color.BLACK,
+            secondaryColor = COLOR_BLACK,
             luminanceNoise = true
         )
     }
