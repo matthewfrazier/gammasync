@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- APP NAME: Change this to rename the app. This is the only place the display name is defined. -->
     <string name="app_name">GammaSync</string>
     <string name="timer_initial">00:00</string>
     <string name="start">Start</string>
