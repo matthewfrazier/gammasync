@@ -13,10 +13,13 @@ import android.widget.FrameLayout
 import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
 import com.gammasync.data.SettingsRepository
+import com.gammasync.domain.therapy.TherapyMode
+import com.gammasync.domain.therapy.TherapyProfile
+import com.gammasync.domain.therapy.TherapyProfiles
 import com.gammasync.infra.ExternalDisplayManager
-import com.gammasync.infra.GammaAudioEngine
 import com.gammasync.infra.GammaPresentation
 import com.gammasync.infra.HapticFeedback
+import com.gammasync.infra.UniversalAudioEngine
 import com.gammasync.ui.CircularTimerView
 import com.gammasync.ui.SubtleFlickerOverlay
 import com.gammasync.ui.HomeView
@@ -59,9 +62,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private var isRunning = false
     private var savedBrightness = -1f
 
-    private val audioEngine = GammaAudioEngine()
+    // Universal audio engine (replaces GammaAudioEngine)
+    private val audioEngine = UniversalAudioEngine()
     private lateinit var haptics: HapticFeedback
     private lateinit var settings: SettingsRepository
+
+    // Current therapy session
+    private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
 
     // External display (XREAL) support
     private lateinit var externalDisplayManager: ExternalDisplayManager
@@ -129,8 +136,8 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         // Home screen
         homeScreen.bindSettings(settings)
-        homeScreen.onStartSession = { durationMinutes ->
-            startSession(durationMinutes)
+        homeScreen.onStartSession = { durationMinutes, mode ->
+            startSession(durationMinutes, mode)
         }
         homeScreen.onSettingsClicked = {
             navigateTo(Screen.SETTINGS)
@@ -170,6 +177,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     override fun onExternalDisplayConnected(display: Display) {
         Log.i(TAG, "External display connected: ${display.name} @ ${display.refreshRate}Hz")
         hasExternalDisplay = true
+        homeScreen.setHasExternalDisplay(true)
         haptics.heavyClick()
 
         externalPresentation = GammaPresentation(this, display).apply {
@@ -195,6 +203,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     override fun onExternalDisplayDisconnected() {
         Log.i(TAG, "External display disconnected")
         hasExternalDisplay = false
+        homeScreen.setHasExternalDisplay(false)
         haptics.click()
 
         externalPresentation?.dismiss()
@@ -210,9 +219,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     // --- Session Control ---
 
-    private fun startSession(durationMinutes: Int) {
+    private fun startSession(durationMinutes: Int, mode: TherapyMode) {
+        // Get the therapy profile for the selected mode
+        currentProfile = TherapyProfiles.forMode(mode)
         sessionDurationMinutes = durationMinutes
         remainingSeconds = durationMinutes * 60
+
+        Log.i(TAG, "Starting session: ${mode.displayName}, duration=${durationMinutes}min")
 
         // Initialize timer
         circularTimer.setTotalDuration(remainingSeconds)
@@ -220,16 +233,26 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         navigateTo(Screen.THERAPY)
 
-        // Apply max brightness if enabled
-        if (settings.maxBrightness) {
+        // Apply max brightness if enabled (or if profile requires it)
+        val needsMaxBrightness = settings.maxBrightness ||
+            currentProfile.visualConfig.maxBrightnessNits < Float.MAX_VALUE
+        if (needsMaxBrightness) {
             savedBrightness = window.attributes.screenBrightness
             window.attributes = window.attributes.apply {
-                screenBrightness = 1f
+                // For migraine mode, use low brightness
+                screenBrightness = if (currentProfile.visualConfig.maxBrightnessNits < Float.MAX_VALUE) {
+                    // Map nits to brightness (rough approximation: 20 nits ~ 0.05)
+                    (currentProfile.visualConfig.maxBrightnessNits / 400f).coerceIn(0.01f, 1f)
+                } else {
+                    1f
+                }
             }
         }
 
         isRunning = true
-        audioEngine.start(amplitude = settings.audioAmplitude.toDouble())
+
+        // Start audio with the selected profile
+        audioEngine.start(currentProfile, amplitude = settings.audioAmplitude.toDouble())
 
         if (hasExternalDisplay) {
             externalPresentation?.apply {
@@ -311,8 +334,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             externalPresentation?.showTimer()
         } else {
             // Show subtle flicker on phone when no external display
-            subtleFlickerOverlay.visibility = View.VISIBLE
-            subtleFlickerOverlay.start()
+            // But only if the mode has visual flicker
+            if (currentProfile.hasVisualFlicker) {
+                subtleFlickerOverlay.visibility = View.VISIBLE
+                subtleFlickerOverlay.start()
+            }
         }
     }
 

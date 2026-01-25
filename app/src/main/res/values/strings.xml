@@ -12,7 +12,21 @@
     <string name="disclaimer_instruction">Hold button to acknowledge</string>
     <string name="hold_to_agree">Hold to Agree</string>
 
-    <!-- Home Screen -->
+    <!-- Home Screen - Mode Selection -->
+    <string name="select_mode">Therapy Mode</string>
+    <string name="mode_neurosync">NeuroSync</string>
+    <string name="mode_memory">Memory</string>
+    <string name="mode_sleep">Sleep</string>
+    <string name="mode_migraine">Migraine</string>
+    <string name="mode_mood_lift">Mood Lift</string>
+    <string name="mode_neurosync_description">40Hz gamma for cognitive clarity</string>
+    <string name="mode_memory_description">Theta-gamma coupling for learning</string>
+    <string name="mode_sleep_description">8Hz\u21921Hz ramp for sleep</string>
+    <string name="mode_migraine_description">Static green for pain relief</string>
+    <string name="mode_mood_lift_description">Split-field for mood enhancement</string>
+    <string name="xreal_required_warning">Requires XREAL glasses</string>
+
+    <!-- Home Screen - Duration -->
     <string name="select_duration">Duration</string>
     <string name="duration_15">15 min</string>
     <string name="duration_30">30 min</string>
