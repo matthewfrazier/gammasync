@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+
+  <!-- Left circle (hemisphere abstraction) -->
+  <circle cx="180" cy="256" r="100" fill="none" stroke="#26A69A" stroke-width="12"/>
+
+  <!-- Right circle (hemisphere abstraction) -->
+  <circle cx="332" cy="256" r="100" fill="none" stroke="#26A69A" stroke-width="12"/>
+
+  <!-- Overlap region fill -->
+  <clipPath id="leftClip">
+    <circle cx="180" cy="256" r="94"/>
+  </clipPath>
+  <circle cx="332" cy="256" r="94" fill="#26A69A" opacity="0.3" clip-path="url(#leftClip)"/>
+
+  <!-- Wave phase 1 - horizontal through both -->
+  <path d="M80 256
+           C130 200, 180 200, 256 256
+           C332 312, 382 312, 432 256"
+        stroke="#4DB6AC" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- Wave phase 2 - shifted 180 degrees -->
+  <path d="M80 256
+           C130 312, 180 312, 256 256
+           C332 200, 382 200, 432 256"
+        stroke="#80CBC4" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Center sync point -->
+  <circle cx="256" cy="256" r="16" fill="#E0F2F1"/>
+</svg>

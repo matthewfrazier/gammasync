@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+
+  <!-- Left hemisphere - simplified brain shape -->
+  <path d="M160 160
+           Q120 180, 110 220
+           Q100 260, 110 300
+           Q120 340, 160 360
+           Q180 365, 200 360
+           L200 256
+           L200 160
+           Q180 155, 160 160Z"
+        fill="#26A69A" opacity="0.9"/>
+
+  <!-- Right hemisphere - simplified brain shape -->
+  <path d="M352 160
+           Q392 180, 402 220
+           Q412 260, 402 300
+           Q392 340, 352 360
+           Q332 365, 312 360
+           L312 256
+           L312 160
+           Q332 155, 352 160Z"
+        fill="#26A69A" opacity="0.9"/>
+
+  <!-- Sine wave phase 1 (through center, peak up) -->
+  <path d="M140 256
+           Q180 200, 220 256
+           Q260 312, 300 256
+           Q340 200, 380 256"
+        stroke="#4DB6AC" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- Sine wave phase 2 (offset, peak down) - represents 40Hz sync -->
+  <path d="M140 276
+           Q180 332, 220 276
+           Q260 220, 300 276
+           Q340 332, 380 276"
+        stroke="#80CBC4" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Center connection point -->
+  <circle cx="256" cy="256" r="12" fill="#E0F2F1"/>
+</svg>

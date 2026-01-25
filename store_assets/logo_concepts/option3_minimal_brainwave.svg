@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+
+  <!-- Unified brain shape outline -->
+  <path d="M256 120
+           C180 120, 120 180, 120 256
+           C120 332, 180 392, 256 392
+           C332 392, 392 332, 392 256
+           C392 180, 332 120, 256 120Z"
+        fill="none" stroke="#26A69A" stroke-width="10"/>
+
+  <!-- Center dividing line (corpus callosum abstraction) -->
+  <line x1="256" y1="140" x2="256" y2="372" stroke="#26A69A" stroke-width="4" opacity="0.5"/>
+
+  <!-- Brain folds - left -->
+  <path d="M170 200 Q190 220, 170 240" stroke="#26A69A" stroke-width="4" fill="none"/>
+  <path d="M160 260 Q180 280, 160 300" stroke="#26A69A" stroke-width="4" fill="none"/>
+
+  <!-- Brain folds - right -->
+  <path d="M342 200 Q322 220, 342 240" stroke="#26A69A" stroke-width="4" fill="none"/>
+  <path d="M352 260 Q332 280, 352 300" stroke="#26A69A" stroke-width="4" fill="none"/>
+
+  <!-- Gamma wave - phase 1 (prominent) -->
+  <path d="M140 340
+           Q180 300, 220 340
+           Q260 380, 300 340
+           Q340 300, 380 340"
+        stroke="#4DB6AC" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+  <!-- Gamma wave - phase 2 (subtle, offset) -->
+  <path d="M140 360
+           Q180 400, 220 360
+           Q260 320, 300 360
+           Q340 400, 380 360"
+        stroke="#80CBC4" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.5"/>
+</svg>
