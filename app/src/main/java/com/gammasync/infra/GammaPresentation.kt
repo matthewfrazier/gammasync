@@ -12,22 +12,33 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import com.gammasync.R
+import com.gammasync.domain.therapy.TherapyProfile
+import com.gammasync.domain.therapy.TherapyProfiles
 import com.gammasync.ui.CircularTimerView
 
 /**
- * Full-screen gamma flicker presentation for external displays (XREAL Air glasses).
+ * Full-screen visual presentation for external displays (XREAL Air glasses).
  *
- * Renders synchronized 40Hz visual stimulus on connected AR glasses
+ * Renders synchronized visual stimulus on connected AR glasses
  * while the phone displays the control UI.
+ *
+ * Supports all therapy visual modes:
+ * - SINE: Smooth warm↔cool interpolation
+ * - STROBE: Sharp on/off transitions
+ * - STATIC: Single color, no animation
+ * - SPLIT: Left/right eye independent (3840x1080 on XREAL)
  */
 class GammaPresentation(
     context: Context,
     display: Display
 ) : Presentation(context, display) {
 
-    private lateinit var gammaRenderer: GammaRenderer
+    private lateinit var visualRenderer: UniversalVisualRenderer
     private lateinit var externalTimer: CircularTimerView
+
     private var phaseProvider: (() -> Double)? = null
+    private var secondaryPhaseProvider: (() -> Double)? = null
+    private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,9 +68,15 @@ class GammaPresentation(
             }
         }
 
-        gammaRenderer = findViewById(R.id.externalGammaRenderer)
+        visualRenderer = findViewById(R.id.externalGammaRenderer)
         externalTimer = findViewById(R.id.externalTimer)
-        phaseProvider?.let { gammaRenderer.setPhaseProvider(it) }
+
+        // Configure renderer with current profile
+        visualRenderer.configure(currentProfile)
+
+        // Set phase providers
+        phaseProvider?.let { visualRenderer.setPhaseProvider(it) }
+        secondaryPhaseProvider?.let { visualRenderer.setSecondaryPhaseProvider(it) }
 
         // Size timer to 50% of display for legibility
         val metrics = DisplayMetrics()
@@ -71,22 +88,44 @@ class GammaPresentation(
     }
 
     /**
-     * Set the phase provider for synchronized rendering.
-     * Must be called before show() or after onCreate().
+     * Configure the renderer with a therapy profile.
+     * Must be called before startRendering() for non-default modes.
      */
-    fun setPhaseProvider(provider: () -> Double) {
-        phaseProvider = provider
-        if (::gammaRenderer.isInitialized) {
-            gammaRenderer.setPhaseProvider(provider)
+    fun configure(profile: TherapyProfile) {
+        currentProfile = profile
+        if (::visualRenderer.isInitialized) {
+            visualRenderer.configure(profile)
         }
     }
 
     /**
-     * Start rendering the gamma flicker.
+     * Set the primary phase provider for synchronized rendering.
+     * Must be called before show() or after onCreate().
+     */
+    fun setPhaseProvider(provider: () -> Double) {
+        phaseProvider = provider
+        if (::visualRenderer.isInitialized) {
+            visualRenderer.setPhaseProvider(provider)
+        }
+    }
+
+    /**
+     * Set the secondary phase provider for split/dual modes.
+     * Required for Mood Lift (split-field) mode.
+     */
+    fun setSecondaryPhaseProvider(provider: () -> Double) {
+        secondaryPhaseProvider = provider
+        if (::visualRenderer.isInitialized) {
+            visualRenderer.setSecondaryPhaseProvider(provider)
+        }
+    }
+
+    /**
+     * Start rendering the visual stimulus.
      */
     fun startRendering() {
-        if (::gammaRenderer.isInitialized) {
-            gammaRenderer.start()
+        if (::visualRenderer.isInitialized) {
+            visualRenderer.start()
         }
     }
 
@@ -94,8 +133,8 @@ class GammaPresentation(
      * Stop rendering.
      */
     fun stopRendering() {
-        if (::gammaRenderer.isInitialized) {
-            gammaRenderer.stop()
+        if (::visualRenderer.isInitialized) {
+            visualRenderer.stop()
         }
     }
 

@@ -181,7 +181,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         haptics.heavyClick()
 
         externalPresentation = GammaPresentation(this, display).apply {
+            configure(currentProfile)
             setPhaseProvider { audioEngine.phase }
+            setSecondaryPhaseProvider { audioEngine.secondaryPhase }
             show()
         }
 
@@ -197,7 +199,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             subtleFlickerOverlay.visibility = View.GONE
         }
 
-        Log.i(TAG, "Display mode: XREAL (external)")
+        Log.i(TAG, "Display mode: XREAL (external), profile: ${currentProfile.mode.displayName}")
     }
 
     override fun onExternalDisplayDisconnected() {
@@ -256,6 +258,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         if (hasExternalDisplay) {
             externalPresentation?.apply {
+                configure(currentProfile)
                 setTotalDuration(remainingSeconds)
                 setRemainingTime(remainingSeconds)
                 startRendering()

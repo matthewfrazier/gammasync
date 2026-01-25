@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- Full-screen gamma flicker for external display -->
-    <com.gammasync.infra.GammaRenderer
+    <!-- Full-screen visual renderer for external display -->
+    <com.gammasync.infra.UniversalVisualRenderer
         android:id="@+id/externalGammaRenderer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
