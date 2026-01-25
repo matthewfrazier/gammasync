@@ -6,13 +6,13 @@ import android.media.AudioTrack
 import android.media.VolumeShaper
 import android.util.Log
 import com.gammasync.domain.UniversalOscillator
-import com.gammasync.domain.therapy.AudioMode
-import com.gammasync.domain.therapy.NoiseType
-import com.gammasync.domain.therapy.TherapyProfile
+import com.gammasync.domain.entrainment.AudioMode
+import com.gammasync.domain.entrainment.NoiseType
+import com.gammasync.domain.entrainment.EntrainmentProfile
 import kotlin.math.abs
 
 /**
- * Universal audio engine supporting multiple therapy profiles.
+ * Universal audio engine supporting multiple entrainment profiles.
  *
  * Extends the capabilities of GammaAudioEngine with:
  * - Stereo AudioTrack support (for binaural beats)
@@ -40,7 +40,7 @@ class UniversalAudioEngine(
     private var volumeShaper: VolumeShaper? = null
 
     // Current profile
-    private var currentProfile: TherapyProfile? = null
+    private var currentProfile: EntrainmentProfile? = null
 
     @Volatile
     private var isPlaying = false
@@ -134,7 +134,7 @@ class UniversalAudioEngine(
      * @param profile The therapy profile configuration
      * @param amplitude Volume from 0.0 to 1.0
      */
-    fun start(profile: TherapyProfile, amplitude: Double = 0.5) {
+    fun start(profile: EntrainmentProfile, amplitude: Double = 0.5) {
         if (isPlaying) return
 
         currentProfile = profile
@@ -237,10 +237,10 @@ class UniversalAudioEngine(
      */
     fun start(amplitude: Double = 0.5) {
         // Use default NeuroSync profile
-        start(com.gammasync.domain.therapy.TherapyProfiles.NEUROSYNC, amplitude)
+        start(com.gammasync.domain.entrainment.EntrainmentProfiles.NEUROSYNC, amplitude)
     }
 
-    private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double) {
+    private fun fillBuffer(buffer: ShortArray, profile: EntrainmentProfile, amplitude: Double) {
         val noiseType = profile.noiseType
         val noiseAmplitude = DEFAULT_NOISE_AMPLITUDE
 

@@ -16,9 +16,9 @@ import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.data.SettingsRepository
-import com.gammasync.domain.therapy.TherapyMode
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.TherapyProfiles
+import com.gammasync.domain.entrainment.EntrainmentMode
+import com.gammasync.domain.entrainment.EntrainmentProfile
+import com.gammasync.domain.entrainment.EntrainmentProfiles
 import com.gammasync.infra.ExternalDisplayManager
 import com.gammasync.infra.GammaPresentation
 import com.gammasync.infra.HapticFeedback
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var resumeButton: MaterialButton
     private lateinit var doneButton: MaterialButton
     private lateinit var phoneVisualRenderer: UniversalVisualRenderer
-    private lateinit var therapyControlsContainer: View
+    private lateinit var entrainmentControlsContainer: View
     private var controlsVisible = false
     private var isPaused = false
 
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var settings: SettingsRepository
 
     // Current therapy session
-    private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
+    private var currentProfile: EntrainmentProfile = EntrainmentProfiles.NEUROSYNC
 
     // External display (XREAL) support
     private lateinit var externalDisplayManager: ExternalDisplayManager
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         resumeButton = findViewById(R.id.resumeButton)
         doneButton = findViewById(R.id.doneButton)
         phoneVisualRenderer = findViewById(R.id.phoneVisualRenderer)
-        therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
+        entrainmentControlsContainer = findViewById(R.id.entrainmentControlsContainer)
 
         // Connect phone visual renderer to audio engine phase
         phoneVisualRenderer.setPhaseProvider { audioEngine.phase }
@@ -299,9 +299,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     // --- Session Control ---
 
-    private fun startSession(durationMinutes: Int, mode: TherapyMode) {
+    private fun startSession(durationMinutes: Int, mode: EntrainmentMode) {
         // Get the therapy profile for the selected mode
-        currentProfile = TherapyProfiles.forMode(mode)
+        currentProfile = EntrainmentProfiles.forMode(mode)
         sessionDurationMinutes = durationMinutes
         remainingSeconds = durationMinutes * 60
 
@@ -380,7 +380,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             // Show pause overlay with session duration
             pauseDurationText.text = "$sessionDurationMinutes min session"
             pauseOverlay.visibility = View.VISIBLE
-            therapyControlsContainer.visibility = View.GONE
+            entrainmentControlsContainer.visibility = View.GONE
         }
     }
 
@@ -424,7 +424,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         restoreBrightness()
 
         phoneVisualRenderer.visibility = View.GONE
-        therapyControlsContainer.visibility = View.GONE
+        entrainmentControlsContainer.visibility = View.GONE
         pauseOverlay.visibility = View.GONE
         controlsVisible = false
 
@@ -447,7 +447,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         restoreBrightness()
 
         phoneVisualRenderer.visibility = View.GONE
-        therapyControlsContainer.visibility = View.GONE
+        entrainmentControlsContainer.visibility = View.GONE
         pauseOverlay.visibility = View.GONE
         controlsVisible = false
 
@@ -468,7 +468,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private fun showTherapyControls() {
         controlsVisible = true
-        therapyControlsContainer.visibility = View.VISIBLE
+        entrainmentControlsContainer.visibility = View.VISIBLE
 
         if (hasExternalDisplay) {
             // Show timer on XREAL display too
@@ -482,7 +482,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private fun hideTherapyControls() {
         controlsVisible = false
-        therapyControlsContainer.visibility = View.GONE
+        entrainmentControlsContainer.visibility = View.GONE
 
         // Hide timer on XREAL display too
         externalPresentation?.hideTimer()

@@ -1,7 +1,7 @@
 package com.gammasync.domain
 
-import com.gammasync.domain.therapy.FrequencyConfig
-import com.gammasync.domain.therapy.NoiseType
+import com.gammasync.domain.entrainment.FrequencyConfig
+import com.gammasync.domain.entrainment.NoiseType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

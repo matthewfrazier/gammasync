@@ -11,8 +11,8 @@ import android.widget.TextView
 import com.gammasync.R
 import com.gammasync.data.ColorScheme
 import com.gammasync.data.SettingsRepository
-import com.gammasync.domain.therapy.TherapyMode
-import com.gammasync.domain.therapy.TherapyProfiles
+import com.gammasync.domain.entrainment.EntrainmentMode
+import com.gammasync.domain.entrainment.EntrainmentProfiles
 import com.gammasync.infra.HapticFeedback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
@@ -27,7 +27,7 @@ class HomeView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var onStartSession: ((durationMinutes: Int, mode: TherapyMode) -> Unit)? = null
+    var onStartSession: ((durationMinutes: Int, mode: EntrainmentMode) -> Unit)? = null
     var onSettingsClicked: (() -> Unit)? = null
 
     // Mode selector buttons
@@ -49,7 +49,7 @@ class HomeView @JvmOverloads constructor(
     private val duration60Button: MaterialButton
     private val startSessionButton: MaterialButton
 
-    private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
+    private var selectedMode: EntrainmentMode = EntrainmentMode.NEUROSYNC
     private var selectedDuration = 30
     private var settings: SettingsRepository? = null
     private var hasExternalDisplay = false
@@ -85,11 +85,11 @@ class HomeView @JvmOverloads constructor(
         startSessionButton = findViewById(R.id.startSessionButton)
 
         // Mode button clicks
-        modeNeuroSyncButton.setOnClickListener { selectMode(TherapyMode.NEUROSYNC) }
-        modeMemoryButton.setOnClickListener { selectMode(TherapyMode.MEMORY_WRITE) }
-        modeSleepButton.setOnClickListener { selectMode(TherapyMode.SLEEP_RAMP) }
-        modeMigraineButton.setOnClickListener { selectMode(TherapyMode.MIGRAINE) }
-        modeMoodLiftButton.setOnClickListener { selectMode(TherapyMode.MOOD_LIFT) }
+        modeNeuroSyncButton.setOnClickListener { selectMode(EntrainmentMode.NEUROSYNC) }
+        modeMemoryButton.setOnClickListener { selectMode(EntrainmentMode.MEMORY_WRITE) }
+        modeSleepButton.setOnClickListener { selectMode(EntrainmentMode.SLEEP_RAMP) }
+        modeMigraineButton.setOnClickListener { selectMode(EntrainmentMode.MIGRAINE) }
+        modeMoodLiftButton.setOnClickListener { selectMode(EntrainmentMode.MOOD_LIFT) }
 
         // Duration button clicks
         duration15Button.setOnClickListener { selectDuration(15) }
@@ -146,13 +146,13 @@ class HomeView @JvmOverloads constructor(
         updateDurationSelection()
     }
 
-    private fun selectMode(mode: TherapyMode) {
+    private fun selectMode(mode: EntrainmentMode) {
         haptics.tick()
         selectedMode = mode
         settings?.therapyMode = mode
 
         // Update duration to mode default
-        val profile = TherapyProfiles.forMode(mode)
+        val profile = EntrainmentProfiles.forMode(mode)
         selectedDuration = profile.defaultDurationMinutes
 
         updateModeSelection()
@@ -167,11 +167,11 @@ class HomeView @JvmOverloads constructor(
 
     private fun updateModeSelection() {
         val modeButtons = mapOf(
-            TherapyMode.NEUROSYNC to modeNeuroSyncButton,
-            TherapyMode.MEMORY_WRITE to modeMemoryButton,
-            TherapyMode.SLEEP_RAMP to modeSleepButton,
-            TherapyMode.MIGRAINE to modeMigraineButton,
-            TherapyMode.MOOD_LIFT to modeMoodLiftButton
+            EntrainmentMode.NEUROSYNC to modeNeuroSyncButton,
+            EntrainmentMode.MEMORY_WRITE to modeMemoryButton,
+            EntrainmentMode.SLEEP_RAMP to modeSleepButton,
+            EntrainmentMode.MIGRAINE to modeMigraineButton,
+            EntrainmentMode.MOOD_LIFT to modeMoodLiftButton
         )
 
         // Get theme-aware colors for unselected state
@@ -192,11 +192,11 @@ class HomeView @JvmOverloads constructor(
 
         // Update description
         modeDescriptionText.text = when (selectedMode) {
-            TherapyMode.NEUROSYNC -> context.getString(R.string.mode_neurosync_description)
-            TherapyMode.MEMORY_WRITE -> context.getString(R.string.mode_memory_description)
-            TherapyMode.SLEEP_RAMP -> context.getString(R.string.mode_sleep_description)
-            TherapyMode.MIGRAINE -> context.getString(R.string.mode_migraine_description)
-            TherapyMode.MOOD_LIFT -> context.getString(R.string.mode_mood_lift_description)
+            EntrainmentMode.NEUROSYNC -> context.getString(R.string.mode_neurosync_description)
+            EntrainmentMode.MEMORY_WRITE -> context.getString(R.string.mode_memory_description)
+            EntrainmentMode.SLEEP_RAMP -> context.getString(R.string.mode_sleep_description)
+            EntrainmentMode.MIGRAINE -> context.getString(R.string.mode_migraine_description)
+            EntrainmentMode.MOOD_LIFT -> context.getString(R.string.mode_mood_lift_description)
         }
 
         updateXrealWarning()

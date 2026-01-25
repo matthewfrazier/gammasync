@@ -12,8 +12,8 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import com.gammasync.R
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.TherapyProfiles
+import com.gammasync.domain.entrainment.EntrainmentProfile
+import com.gammasync.domain.entrainment.EntrainmentProfiles
 import com.gammasync.ui.CircularTimerView
 
 /**
@@ -22,7 +22,7 @@ import com.gammasync.ui.CircularTimerView
  * Renders synchronized visual stimulus on connected AR glasses
  * while the phone displays the control UI.
  *
- * Supports all therapy visual modes:
+ * Supports all entrainment visual modes:
  * - SINE: Smooth warm↔cool interpolation
  * - STROBE: Sharp on/off transitions
  * - STATIC: Single color, no animation
@@ -38,7 +38,7 @@ class GammaPresentation(
 
     private var phaseProvider: (() -> Double)? = null
     private var secondaryPhaseProvider: (() -> Double)? = null
-    private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
+    private var currentProfile: EntrainmentProfile = EntrainmentProfiles.NEUROSYNC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +95,7 @@ class GammaPresentation(
      * Configure the renderer with a therapy profile.
      * Must be called before startRendering() for non-default modes.
      */
-    fun configure(profile: TherapyProfile) {
+    fun configure(profile: EntrainmentProfile) {
         currentProfile = profile
         if (::visualRenderer.isInitialized) {
             visualRenderer.configure(profile)

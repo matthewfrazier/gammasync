@@ -11,22 +11,22 @@
 
     <!-- Safety Disclaimer -->
     <string name="disclaimer_title">Photosensitivity Warning</string>
-    <string name="disclaimer_body">This app produces flashing lights at 40Hz which may trigger seizures in people with photosensitive epilepsy.\n\nDo NOT use this app if you or anyone in your family has a history of epilepsy or seizures.\n\nIf you experience dizziness, altered vision, eye or muscle twitching, loss of awareness, disorientation, or any involuntary movement, STOP IMMEDIATELY and consult a physician.</string>
+    <string name="disclaimer_body">This app produces flashing lights at 40Hz which may trigger seizures in people with photosensitive epilepsy.\n\nDo NOT use this app if you or anyone in your family has a history of epilepsy or seizures.\n\nIf you experience dizziness, altered vision, eye or muscle twitching, loss of awareness, disorientation, or any involuntary movement, STOP IMMEDIATELY and discontinue use.</string>
     <string name="disclaimer_instruction">Hold button to acknowledge</string>
     <string name="hold_to_agree">Hold to Agree</string>
 
     <!-- Home Screen - Mode Selection -->
-    <string name="select_mode">Therapy Mode</string>
+    <string name="select_mode">Entrainment Mode</string>
     <string name="mode_neurosync">Memory</string>
     <string name="mode_memory">Learning</string>
     <string name="mode_sleep">Sleep</string>
-    <string name="mode_migraine">Migraine</string>
-    <string name="mode_mood_lift">Mood Lift</string>
+    <string name="mode_focus_relief">Focus Relief</string>
+    <string name="mode_mood_enhancement">Mood Enhancement</string>
     <string name="mode_neurosync_description">40Hz gamma + pink noise for memory and cellular cleanup</string>
     <string name="mode_memory_description">Theta-gamma coupling for learning</string>
     <string name="mode_sleep_description">8Hz\u21921Hz ramp for sleep</string>
-    <string name="mode_migraine_description">Static green for pain relief</string>
-    <string name="mode_mood_lift_description">Split-field for mood enhancement</string>
+    <string name="mode_focus_relief_description">Static green for enhanced focus</string>
+    <string name="mode_mood_enhancement_description">Split-field for mood enhancement</string>
     <string name="xreal_required_warning">Requires XREAL glasses</string>
 
     <!-- Home Screen - Duration -->

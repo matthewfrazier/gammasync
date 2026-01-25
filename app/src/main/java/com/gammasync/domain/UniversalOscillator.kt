@@ -2,8 +2,8 @@ package com.gammasync.domain
 
 import com.gammasync.domain.noise.BrownNoiseGenerator
 import com.gammasync.domain.noise.PinkNoiseGenerator
-import com.gammasync.domain.therapy.FrequencyConfig
-import com.gammasync.domain.therapy.NoiseType
+import com.gammasync.domain.entrainment.FrequencyConfig
+import com.gammasync.domain.entrainment.NoiseType
 import kotlin.math.PI
 import kotlin.math.sin
 

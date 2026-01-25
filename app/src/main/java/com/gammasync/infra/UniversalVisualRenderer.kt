@@ -13,13 +13,13 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.gammasync.domain.ColorTemperature
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.VisualConfig
-import com.gammasync.domain.therapy.VisualMode
+import com.gammasync.domain.entrainment.EntrainmentProfile
+import com.gammasync.domain.entrainment.VisualConfig
+import com.gammasync.domain.entrainment.VisualMode
 import kotlin.random.Random
 
 /**
- * Universal visual renderer supporting multiple therapy visual modes.
+ * Universal visual renderer supporting multiple entrainment visual modes.
  *
  * Extends GammaRenderer capabilities with:
  * - SINE: Smooth warm↔cool interpolation (original behavior)
@@ -70,7 +70,7 @@ class UniversalVisualRenderer @JvmOverloads constructor(
     /**
      * Configure the renderer with a therapy profile.
      */
-    fun configure(profile: TherapyProfile) {
+    fun configure(profile: EntrainmentProfile) {
         visualMode = profile.visualMode
         visualConfig = profile.visualConfig
         luminanceNoiseEnabled = profile.visualConfig.luminanceNoise
