@@ -6,42 +6,62 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Display
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.FrameLayout
+import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
+import com.gammasync.data.SettingsRepository
 import com.gammasync.infra.ExternalDisplayManager
 import com.gammasync.infra.GammaAudioEngine
 import com.gammasync.infra.GammaPresentation
-import com.gammasync.infra.GammaRenderer
 import com.gammasync.infra.HapticFeedback
+import com.gammasync.ui.CircularTimerView
+import com.gammasync.ui.SubtleFlickerOverlay
+import com.gammasync.ui.HomeView
+import com.gammasync.ui.SafetyDisclaimerView
+import com.gammasync.ui.SessionCompleteView
+import com.gammasync.ui.SettingsView
 
 class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener {
 
     companion object {
         private const val TAG = "MainActivity"
-        private const val FADE_DURATION = 400L      // Smooth fade
-        private const val AUTO_HIDE_DELAY = 4000L   // Hide controls after 4s
     }
 
-    private lateinit var timerText: TextView
-    private lateinit var startButton: Button
+    enum class Screen {
+        DISCLAIMER,  // 0
+        HOME,        // 1
+        THERAPY,     // 2
+        COMPLETE,    // 3
+        SETTINGS     // 4
+    }
+
+    // Views
+    private lateinit var viewFlipper: ViewFlipper
+    private lateinit var disclaimerScreen: SafetyDisclaimerView
+    private lateinit var homeScreen: HomeView
+    private lateinit var therapyScreen: FrameLayout
+    private lateinit var completeScreen: SessionCompleteView
+    private lateinit var settingsScreen: SettingsView
+
+    // Therapy screen views
+    private lateinit var circularTimer: CircularTimerView
     private lateinit var stopButton: Button
-    private lateinit var resetButton: Button
-    private lateinit var gammaRenderer: GammaRenderer
-    private lateinit var controlsOverlay: LinearLayout
-    private lateinit var powerSaveOverlay: View
+    private lateinit var subtleFlickerOverlay: SubtleFlickerOverlay
+    private lateinit var therapyControlsContainer: View
+    private var controlsVisible = false
 
     private val handler = Handler(Looper.getMainLooper())
-    private var elapsedSeconds = 0
+    private var remainingSeconds = 0
+    private var sessionDurationMinutes = 30
     private var isRunning = false
-    private var controlsVisible = true
+    private var savedBrightness = -1f
 
     private val audioEngine = GammaAudioEngine()
     private lateinit var haptics: HapticFeedback
+    private lateinit var settings: SettingsRepository
 
     // External display (XREAL) support
     private lateinit var externalDisplayManager: ExternalDisplayManager
@@ -50,15 +70,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private val timerRunnable = object : Runnable {
         override fun run() {
-            elapsedSeconds++
+            remainingSeconds--
             updateTimerDisplay()
-            handler.postDelayed(this, 1000)
-        }
-    }
-
-    private val autoHideRunnable = Runnable {
-        if (isRunning) {
-            hideControls()
+            if (remainingSeconds <= 0) {
+                onSessionTimerComplete()
+            } else {
+                handler.postDelayed(this, 1000)
+            }
         }
     }
 
@@ -66,37 +84,85 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Keep screen on during session
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         haptics = HapticFeedback(this)
+        settings = SettingsRepository(this)
 
-        timerText = findViewById(R.id.timerText)
-        startButton = findViewById(R.id.startButton)
-        stopButton = findViewById(R.id.stopButton)
-        resetButton = findViewById(R.id.resetButton)
-        gammaRenderer = findViewById(R.id.gammaRenderer)
-        controlsOverlay = findViewById(R.id.controlsOverlay)
-        powerSaveOverlay = findViewById(R.id.powerSaveOverlay)
-
-        // Connect renderer to audio engine phase
-        gammaRenderer.setPhaseProvider { audioEngine.phase }
-
-        startButton.setOnClickListener { startSession() }
-        stopButton.setOnClickListener { stopSession() }
-        resetButton.setOnClickListener { resetSession() }
-
-        // Tap anywhere to toggle controls
-        findViewById<View>(R.id.rootLayout).setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                toggleControls()
-            }
-            false
-        }
+        initViews()
+        setupScreens()
 
         // Start listening for external displays (XREAL, etc.)
         externalDisplayManager = ExternalDisplayManager(this)
         externalDisplayManager.startListening(this)
+
+        // Always start at disclaimer screen
+        navigateTo(Screen.DISCLAIMER)
+    }
+
+    private fun initViews() {
+        viewFlipper = findViewById(R.id.viewFlipper)
+        disclaimerScreen = findViewById(R.id.disclaimerScreen)
+        homeScreen = findViewById(R.id.homeScreen)
+        therapyScreen = findViewById(R.id.therapyScreen)
+        completeScreen = findViewById(R.id.completeScreen)
+        settingsScreen = findViewById(R.id.settingsScreen)
+
+        // Therapy screen views
+        circularTimer = findViewById(R.id.circularTimer)
+        stopButton = findViewById(R.id.stopButton)
+        subtleFlickerOverlay = findViewById(R.id.subtleFlickerOverlay)
+        therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
+
+        // Connect subtle flicker overlay to audio engine phase
+        subtleFlickerOverlay.setPhaseProvider { audioEngine.phase }
+
+        // Tap therapy screen to toggle controls visibility
+        therapyScreen.setOnClickListener { toggleTherapyControls() }
+    }
+
+    private fun setupScreens() {
+        // Disclaimer screen
+        disclaimerScreen.onDisclaimerAccepted = {
+            navigateTo(Screen.HOME)
+        }
+
+        // Home screen
+        homeScreen.bindSettings(settings)
+        homeScreen.onStartSession = { durationMinutes ->
+            startSession(durationMinutes)
+        }
+        homeScreen.onSettingsClicked = {
+            navigateTo(Screen.SETTINGS)
+        }
+        homeScreen.onMaxBrightnessChanged = { enabled ->
+            window.attributes = window.attributes.apply {
+                screenBrightness = if (enabled) 1f else -1f
+            }
+        }
+
+        // Therapy screen - stop button
+        stopButton.setOnClickListener { stopSession() }
+
+        // Complete screen
+        completeScreen.onStartAnother = {
+            navigateTo(Screen.HOME)
+        }
+        completeScreen.onExit = {
+            finish()
+        }
+
+        // Settings screen
+        settingsScreen.bindSettings(settings)
+        settingsScreen.onBackClicked = {
+            homeScreen.bindSettings(settings)
+            navigateTo(Screen.HOME)
+        }
+    }
+
+    private fun navigateTo(screen: Screen) {
+        viewFlipper.displayedChild = screen.ordinal
+        Log.i(TAG, "Navigated to: $screen")
     }
 
     // --- External Display Callbacks ---
@@ -106,21 +172,21 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         hasExternalDisplay = true
         haptics.heavyClick()
 
-        // Create presentation for external display
         externalPresentation = GammaPresentation(this, display).apply {
             setPhaseProvider { audioEngine.phase }
             show()
         }
 
-        // If session is running, start rendering on external display
         if (isRunning) {
             externalPresentation?.startRendering()
-            // Stop phone screen flicker (external takes over)
-            gammaRenderer.stop()
-            gammaRenderer.visibility = View.GONE
+            // Hide phone UI when external display active
+            subtleFlickerOverlay.stop()
+            subtleFlickerOverlay.visibility = View.GONE
+            therapyControlsContainer.visibility = View.GONE
+            controlsVisible = false
         }
 
-        updateDisplayMode()
+        Log.i(TAG, "Display mode: XREAL (external)")
     }
 
     override fun onExternalDisplayDisconnected() {
@@ -128,123 +194,52 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         hasExternalDisplay = false
         haptics.click()
 
-        // Dismiss and cleanup presentation
         externalPresentation?.dismiss()
         externalPresentation = null
 
-        // If session is running, resume phone screen flicker
+        // Restore phone UI if session running
         if (isRunning) {
-            gammaRenderer.visibility = View.VISIBLE
-            gammaRenderer.start()
+            showTherapyControls()
         }
 
-        updateDisplayMode()
-    }
-
-    private fun updateDisplayMode() {
-        val mode = if (hasExternalDisplay) "XREAL (external)" else "Phone"
-        Log.i(TAG, "Display mode: $mode")
-
-        // When XREAL connected, hide phone's flicker renderer
-        if (hasExternalDisplay) {
-            gammaRenderer.visibility = View.GONE
-        } else if (!isRunning) {
-            gammaRenderer.visibility = View.VISIBLE
-        }
-    }
-
-    // --- Controls Visibility ---
-
-    private fun toggleControls() {
-        if (controlsVisible) {
-            // Only hide if session is running
-            if (isRunning) {
-                haptics.tick()
-                hideControls()
-            }
-        } else {
-            // Strong haptic to wake up
-            haptics.heavyClick()
-            showControls()
-        }
-    }
-
-    private fun showControls() {
-        controlsVisible = true
-        handler.removeCallbacks(autoHideRunnable)
-
-        // Fade out power save overlay
-        powerSaveOverlay.animate()
-            .alpha(0f)
-            .setDuration(FADE_DURATION)
-            .withEndAction { powerSaveOverlay.visibility = View.GONE }
-            .start()
-
-        // Fade in controls
-        controlsOverlay.animate()
-            .alpha(1f)
-            .setDuration(FADE_DURATION)
-            .withStartAction { controlsOverlay.visibility = View.VISIBLE }
-            .start()
-
-        // If phone-only mode, make sure flicker is visible
-        if (!hasExternalDisplay && isRunning) {
-            gammaRenderer.visibility = View.VISIBLE
-        }
-
-        scheduleAutoHide()
-    }
-
-    private fun hideControls() {
-        controlsVisible = false
-        handler.removeCallbacks(autoHideRunnable)
-
-        // Fade out controls
-        controlsOverlay.animate()
-            .alpha(0f)
-            .setDuration(FADE_DURATION)
-            .withEndAction { controlsOverlay.visibility = View.INVISIBLE }
-            .start()
-
-        // When XREAL connected, fade to black for power save
-        if (hasExternalDisplay) {
-            powerSaveOverlay.visibility = View.VISIBLE
-            powerSaveOverlay.animate()
-                .alpha(1f)
-                .setDuration(FADE_DURATION * 2)  // Slower fade to black
-                .start()
-        }
-    }
-
-    private fun scheduleAutoHide() {
-        handler.removeCallbacks(autoHideRunnable)
-        if (isRunning) {
-            handler.postDelayed(autoHideRunnable, AUTO_HIDE_DELAY)
-        }
+        Log.i(TAG, "Display mode: Phone")
     }
 
     // --- Session Control ---
 
-    private fun startSession() {
-        if (!isRunning) {
-            haptics.heavyClick()
-            isRunning = true
-            audioEngine.start(amplitude = 0.3)
+    private fun startSession(durationMinutes: Int) {
+        sessionDurationMinutes = durationMinutes
+        remainingSeconds = durationMinutes * 60
 
-            // Start rendering on appropriate display
-            if (hasExternalDisplay) {
-                externalPresentation?.startRendering()
-                gammaRenderer.visibility = View.GONE
-            } else {
-                gammaRenderer.visibility = View.VISIBLE
-                gammaRenderer.start()
+        // Initialize timer
+        circularTimer.setTotalDuration(remainingSeconds)
+        updateTimerDisplay()
+
+        navigateTo(Screen.THERAPY)
+
+        // Apply max brightness if enabled
+        if (settings.maxBrightness) {
+            savedBrightness = window.attributes.screenBrightness
+            window.attributes = window.attributes.apply {
+                screenBrightness = 1f
             }
-
-            handler.post(timerRunnable)
-            startButton.isEnabled = false
-            stopButton.isEnabled = true
-            scheduleAutoHide()
         }
+
+        isRunning = true
+        audioEngine.start(amplitude = settings.audioAmplitude.toDouble())
+
+        if (hasExternalDisplay) {
+            externalPresentation?.startRendering()
+            // Phone screen stays black when using external display
+            subtleFlickerOverlay.visibility = View.GONE
+            therapyControlsContainer.visibility = View.GONE
+            controlsVisible = false
+        } else {
+            // Show controls initially on phone
+            showTherapyControls()
+        }
+
+        handler.post(timerRunnable)
     }
 
     private fun stopSession() {
@@ -252,50 +247,94 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             haptics.heavyClick()
             isRunning = false
 
-            // Stop rendering on all displays
-            gammaRenderer.stop()
+            subtleFlickerOverlay.stop()
             externalPresentation?.stopRendering()
 
             audioEngine.stop()
             handler.removeCallbacks(timerRunnable)
-            handler.removeCallbacks(autoHideRunnable)
-            startButton.isEnabled = true
-            stopButton.isEnabled = false
 
-            // Make sure UI is visible and power save is off
-            gammaRenderer.visibility = View.VISIBLE
-            powerSaveOverlay.visibility = View.GONE
-            powerSaveOverlay.alpha = 0f
-            showControls()
+            restoreBrightness()
+
+            subtleFlickerOverlay.visibility = View.GONE
+            therapyControlsContainer.visibility = View.GONE
+            controlsVisible = false
+
+            // Show complete screen with actual duration
+            val completedMinutes = sessionDurationMinutes - (remainingSeconds / 60)
+            completeScreen.setSessionDuration(if (completedMinutes > 0) completedMinutes else 1)
+            navigateTo(Screen.COMPLETE)
         }
     }
 
-    private fun resetSession() {
-        haptics.click()
-        stopSession()
-        elapsedSeconds = 0
-        updateTimerDisplay()
+    private fun onSessionTimerComplete() {
+        haptics.heavyClick()
+        isRunning = false
+
+        subtleFlickerOverlay.stop()
+        externalPresentation?.stopRendering()
+
+        audioEngine.stop()
+        handler.removeCallbacks(timerRunnable)
+
+        restoreBrightness()
+
+        subtleFlickerOverlay.visibility = View.GONE
+        therapyControlsContainer.visibility = View.GONE
+        controlsVisible = false
+
+        completeScreen.setSessionDuration(sessionDurationMinutes)
+        navigateTo(Screen.COMPLETE)
+    }
+
+    private fun toggleTherapyControls() {
+        if (!isRunning || hasExternalDisplay) return
+
+        if (controlsVisible) {
+            hideTherapyControls()
+        } else {
+            showTherapyControls()
+        }
+        haptics.tick()
+    }
+
+    private fun showTherapyControls() {
+        controlsVisible = true
+        therapyControlsContainer.visibility = View.VISIBLE
+        subtleFlickerOverlay.visibility = View.VISIBLE
+        subtleFlickerOverlay.start()
+    }
+
+    private fun hideTherapyControls() {
+        controlsVisible = false
+        therapyControlsContainer.visibility = View.GONE
+        subtleFlickerOverlay.stop()
+        subtleFlickerOverlay.visibility = View.GONE
+    }
+
+    private fun restoreBrightness() {
+        if (savedBrightness >= 0f) {
+            window.attributes = window.attributes.apply {
+                screenBrightness = savedBrightness
+            }
+            savedBrightness = -1f
+        }
     }
 
     private fun updateTimerDisplay() {
-        val minutes = elapsedSeconds / 60
-        val seconds = elapsedSeconds % 60
-        timerText.text = String.format("%02d:%02d", minutes, seconds)
+        circularTimer.setRemainingTime(remainingSeconds)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         Log.i(TAG, "Configuration changed: ${newConfig.orientation}")
-        // SurfaceView handles resize via surfaceChanged callback
     }
 
     override fun onDestroy() {
         super.onDestroy()
         externalDisplayManager.stopListening()
         externalPresentation?.dismiss()
-        gammaRenderer.stop()
+        subtleFlickerOverlay.stop()
         audioEngine.release()
         handler.removeCallbacks(timerRunnable)
-        handler.removeCallbacks(autoHideRunnable)
     }
 }

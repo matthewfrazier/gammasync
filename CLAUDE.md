@@ -2,6 +2,44 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development Workflow (MANDATORY)
+
+**STOP. Before writing ANY code, follow this workflow:**
+
+### 1. Define "Done" First
+For every task, explicitly state:
+- What user action triggers the feature?
+- What observable change should the user see/feel?
+- What system state should change?
+
+### 2. Write the Test BEFORE the Implementation
+- **UI changes**: Write instrumentation test verifying visual state changes
+- **Settings/toggles**: Write test verifying the setting actually affects the system
+- **User interactions**: Write test verifying the full path from tap → feedback
+
+### 3. Pre-Deploy Verification Checklist
+Before ANY `installDebug`, verify:
+- [ ] Does the feature do what it claims? (not just compile)
+- [ ] Is the UI feedback visible/obvious? (calculate actual pixel sizes)
+- [ ] Does state change trigger UI update? (invalidate/requestLayout called)
+- [ ] Are proportions reasonable? (30% of 100dp = 30dp - is that visible?)
+
+### 4. UI-Specific Requirements
+- **Selection states**: Selected item must have OBVIOUS contrast (not subtle)
+- **Toggles/switches**: Must immediately show effect, not just store preference
+- **Progress indicators**: Must be proportionally sized (minimum 20% of container)
+- **Touch targets**: Minimum 48dp for thumb-friendly interaction
+
+### Example: Adding a Brightness Toggle
+```
+❌ WRONG: Add Switch, save to SharedPreferences, done
+✅ RIGHT:
+1. Definition of done: Toggle ON → screen brightness immediately goes to 100%
+2. Write test: `onView(withId(R.id.brightnessSwitch)).perform(click())` → assert brightness == 1.0
+3. Implement: Switch listener calls window.attributes.screenBrightness = 1f
+4. Verify: Run test, confirm brightness actually changes
+```
+
 ## Project Overview
 
 GammaSync is an Android application delivering Gamma Entrainment Using Sensory stimuli (GENUS) - synchronized 40Hz audio-visual therapy. The app requires sub-millisecond A/V synchronization and 120Hz display output.
@@ -47,6 +85,15 @@ The audio hardware clock is the single source of truth for timing - this is crit
 - **Visual Stimulus:** Isoluminant flicker (warm 2700K ↔ cool 6500K) - modulates chrominance, not luminance (epilepsy safety)
 
 ## Testing Strategy
+
+### Tier 0: UI State Verification (REQUIRED for all UI changes)
+Before deploying UI changes, instrumentation tests MUST verify:
+- Selection states visually change (background drawable, text color)
+- Toggles affect system state immediately (brightness, volume)
+- Progress indicators are proportionally sized
+- Touch targets meet 48dp minimum
+
+Run with: `./gradlew connectedDebugAndroidTest`
 
 ### Tier 1: Virtual Oscilloscope (CI)
 Tests verify 40Hz signal generation via `spyProbe` hook on `GammaAudioEngine` - no physical audio hardware needed.

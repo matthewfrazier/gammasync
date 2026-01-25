@@ -3,78 +3,85 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    android:clickable="true"
-    android:focusable="true">
+    android:background="#000000">
 
-    <!-- Visual flicker (only used when no external display) -->
-    <com.gammasync.infra.GammaRenderer
-        android:id="@+id/gammaRenderer"
+    <!-- ViewFlipper for screen navigation -->
+    <ViewFlipper
+        android:id="@+id/viewFlipper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <!-- Dark overlay for power saving (fades in when controls hidden) -->
-    <View
-        android:id="@+id/powerSaveOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000000"
-        android:alpha="0"
-        android:visibility="gone" />
+        <!-- Screen 0: Safety Disclaimer -->
+        <com.gammasync.ui.SafetyDisclaimerView
+            android:id="@+id/disclaimerScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <!-- Single-line controls at bottom -->
-    <LinearLayout
-        android:id="@+id/controlsOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:background="#88000000"
-        android:padding="20dp"
-        android:paddingBottom="40dp">
+        <!-- Screen 1: Home -->
+        <com.gammasync.ui.HomeView
+            android:id="@+id/homeScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-        <Button
-            android:id="@+id/startButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="120dp"
-            android:minHeight="72dp"
-            android:text="@string/start"
-            android:textSize="20sp"
-            android:layout_marginEnd="12dp" />
+        <!-- Screen 2: Therapy -->
+        <FrameLayout
+            android:id="@+id/therapyScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:clickable="true"
+            android:focusable="true">
 
-        <TextView
-            android:id="@+id/timerText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/timer_initial"
-            android:textSize="36sp"
-            android:fontFamily="monospace"
-            android:textColor="#FFFFFF"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp" />
+            <!-- Subtle dark flicker overlay (phone display only, shown with controls) -->
+            <com.gammasync.ui.SubtleFlickerOverlay
+                android:id="@+id/subtleFlickerOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
-        <Button
-            android:id="@+id/stopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="120dp"
-            android:minHeight="72dp"
-            android:text="@string/stop"
-            android:textSize="20sp"
-            android:enabled="false"
-            android:layout_marginEnd="12dp" />
+            <!-- Controls container - tap to show/hide -->
+            <FrameLayout
+                android:id="@+id/therapyControlsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
 
-        <Button
-            android:id="@+id/resetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="120dp"
-            android:minHeight="72dp"
-            android:text="@string/reset"
-            android:textSize="20sp" />
+                <!-- Large central timer -->
+                <com.gammasync.ui.CircularTimerView
+                    android:id="@+id/circularTimer"
+                    android:layout_width="280dp"
+                    android:layout_height="280dp"
+                    android:layout_gravity="center" />
 
-    </LinearLayout>
+                <!-- Stop button at bottom -->
+                <Button
+                    android:id="@+id/stopButton"
+                    android:layout_width="180dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="48dp"
+                    android:text="@string/stop"
+                    android:textSize="18sp"
+                    android:textAllCaps="false"
+                    android:background="@drawable/hold_button_background"
+                    android:textColor="#FFFFFF" />
+
+            </FrameLayout>
+
+        </FrameLayout>
+
+        <!-- Screen 3: Session Complete -->
+        <com.gammasync.ui.SessionCompleteView
+            android:id="@+id/completeScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Screen 4: Settings -->
+        <com.gammasync.ui.SettingsView
+            android:id="@+id/settingsScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </ViewFlipper>
 
 </FrameLayout>
