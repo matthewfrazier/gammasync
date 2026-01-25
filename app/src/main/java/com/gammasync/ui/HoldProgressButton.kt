@@ -1,4 +1,4 @@
-package com.gammasync.ui
+package com.cognihertz.ui
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.widget.AppCompatButton
-import com.gammasync.infra.HapticFeedback
+import com.cognihertz.infra.HapticFeedback
 
 /**
  * Button that requires a continuous hold for [holdDurationMs] to trigger completion.

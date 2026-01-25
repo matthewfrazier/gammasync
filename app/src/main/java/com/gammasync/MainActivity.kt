@@ -1,4 +1,4 @@
-package com.gammasync
+package com.cognihertz
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -15,20 +15,20 @@ import android.widget.TextView
 import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.gammasync.data.SettingsRepository
-import com.gammasync.domain.therapy.TherapyMode
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.TherapyProfiles
-import com.gammasync.infra.ExternalDisplayManager
-import com.gammasync.infra.GammaPresentation
-import com.gammasync.infra.HapticFeedback
-import com.gammasync.infra.UniversalAudioEngine
-import com.gammasync.infra.UniversalVisualRenderer
-import com.gammasync.ui.CircularTimerView
-import com.gammasync.ui.HomeView
-import com.gammasync.ui.SafetyDisclaimerView
-import com.gammasync.ui.SessionCompleteView
-import com.gammasync.ui.SettingsView
+import com.cognihertz.data.SettingsRepository
+import com.cognihertz.domain.therapy.TherapyMode
+import com.cognihertz.domain.therapy.TherapyProfile
+import com.cognihertz.domain.therapy.TherapyProfiles
+import com.cognihertz.infra.ExternalDisplayManager
+import com.cognihertz.infra.GammaPresentation
+import com.cognihertz.infra.HapticFeedback
+import com.cognihertz.infra.UniversalAudioEngine
+import com.cognihertz.infra.UniversalVisualRenderer
+import com.cognihertz.ui.CircularTimerView
+import com.cognihertz.ui.HomeView
+import com.cognihertz.ui.SafetyDisclaimerView
+import com.cognihertz.ui.SessionCompleteView
+import com.cognihertz.ui.SettingsView
 import com.google.android.material.button.MaterialButton
 import android.content.res.ColorStateList
 

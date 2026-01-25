@@ -1,4 +1,4 @@
-package com.gammasync.domain.therapy
+package com.cognihertz.domain.therapy
 
 /**
  * Available therapy modes in the Universal Modulation Platform.

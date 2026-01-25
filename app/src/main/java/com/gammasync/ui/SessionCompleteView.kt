@@ -1,4 +1,4 @@
-package com.gammasync.ui
+package com.cognihertz.ui
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
-import com.gammasync.R
-import com.gammasync.infra.HapticFeedback
+import com.cognihertz.R
+import com.cognihertz.infra.HapticFeedback
 
 /**
  * Session complete screen with summary and navigation options.

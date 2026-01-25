@@ -1,4 +1,4 @@
-package com.gammasync.infra
+package com.cognihertz.infra
 
 import android.content.Context
 import android.graphics.Canvas
@@ -9,7 +9,7 @@ import android.view.Choreographer
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import com.gammasync.domain.ColorTemperature
+import com.cognihertz.domain.ColorTemperature
 
 /**
  * 120Hz visual renderer synchronized to audio phase.

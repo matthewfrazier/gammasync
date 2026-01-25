@@ -1,4 +1,4 @@
-package com.gammasync.domain.therapy
+package com.cognihertz.domain.therapy
 
 /**
  * Audio stimulus modulation modes.
@@ -7,7 +7,7 @@ enum class AudioMode {
     /**
      * Isochronic tones: Volume pulsing at target frequency.
      * Single channel (mono) with amplitude modulation.
-     * Current default behavior in GammaSync.
+     * Current default behavior in CogniHertz.
      */
     ISOCHRONIC,
 

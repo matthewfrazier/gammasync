@@ -1,1 +1,1 @@
-# gammasync
+# CogniHertz

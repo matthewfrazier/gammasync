@@ -1,4 +1,4 @@
-package com.gammasync.domain.noise
+package com.cognihertz.domain.noise
 
 import kotlin.random.Random
 

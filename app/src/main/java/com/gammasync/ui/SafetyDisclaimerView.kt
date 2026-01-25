@@ -1,10 +1,10 @@
-package com.gammasync.ui
+package com.cognihertz.ui
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.gammasync.R
+import com.cognihertz.R
 
 /**
  * Full-screen epilepsy warning disclaimer.

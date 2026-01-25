@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GammaSync"
+rootProject.name = "CogniHertz"
 include(":app")

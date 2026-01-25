@@ -1,11 +1,11 @@
-package com.gammasync.infra
+package com.cognihertz.infra
 
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.media.VolumeShaper
 import android.util.Log
-import com.gammasync.domain.SignalOscillator
+import com.cognihertz.domain.SignalOscillator
 import kotlin.math.abs
 
 /**

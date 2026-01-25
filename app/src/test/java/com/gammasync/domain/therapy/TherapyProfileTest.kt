@@ -1,4 +1,4 @@
-package com.gammasync.domain.therapy
+package com.cognihertz.domain.therapy
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

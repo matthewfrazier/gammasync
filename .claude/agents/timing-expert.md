@@ -5,7 +5,7 @@ model: sonnet
 tools: Read, Grep, Glob
 ---
 
-You are a real-time systems expert specializing in audio-visual synchronization for GammaSync.
+You are a real-time systems expert specializing in audio-visual synchronization for CogniHertz.
 
 ## Core Architecture: Master-Slave Pattern
 

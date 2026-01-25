@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.gammasync"
+    namespace = "com.cognihertz"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.gammasync"
+        applicationId = "com.cognihertz"
         minSdk = 31
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.gammasync.domain
+package com.cognihertz.domain
 
 import android.graphics.Color
 import org.junit.Assert.assertEquals

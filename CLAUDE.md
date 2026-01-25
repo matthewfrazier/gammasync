@@ -42,7 +42,7 @@ Before ANY `installDebug`, verify:
 
 ## Project Overview
 
-GammaSync is an Android application delivering Gamma Entrainment Using Sensory stimuli (GENUS) - synchronized 40Hz audio-visual therapy. The app requires sub-millisecond A/V synchronization and 120Hz display output.
+CogniHertz is an Android application delivering Gamma Entrainment Using Sensory stimuli (GENUS) - synchronized 40Hz audio-visual therapy. The app requires sub-millisecond A/V synchronization and 120Hz display output.
 
 **Target Platform:** Android 12+ (API 31+)
 **Hardware Requirements:** 120Hz/144Hz OLED display, XREAL Air glasses support

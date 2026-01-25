@@ -13,13 +13,13 @@
         android:layout_height="match_parent">
 
         <!-- Screen 0: Safety Disclaimer -->
-        <com.gammasync.ui.SafetyDisclaimerView
+        <com.cognihertz.ui.SafetyDisclaimerView
             android:id="@+id/disclaimerScreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <!-- Screen 1: Home -->
-        <com.gammasync.ui.HomeView
+        <com.cognihertz.ui.HomeView
             android:id="@+id/homeScreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -34,7 +34,7 @@
             android:focusable="true">
 
             <!-- Full therapy visual renderer (phone display, used when no XREAL connected) -->
-            <com.gammasync.infra.UniversalVisualRenderer
+            <com.cognihertz.infra.UniversalVisualRenderer
                 android:id="@+id/phoneVisualRenderer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -48,7 +48,7 @@
                 android:visibility="gone">
 
                 <!-- Large central timer -->
-                <com.gammasync.ui.CircularTimerView
+                <com.cognihertz.ui.CircularTimerView
                     android:id="@+id/circularTimer"
                     android:layout_width="280dp"
                     android:layout_height="280dp"
@@ -123,13 +123,13 @@
         </FrameLayout>
 
         <!-- Screen 3: Session Complete -->
-        <com.gammasync.ui.SessionCompleteView
+        <com.cognihertz.ui.SessionCompleteView
             android:id="@+id/completeScreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <!-- Screen 4: Settings -->
-        <com.gammasync.ui.SettingsView
+        <com.cognihertz.ui.SettingsView
             android:id="@+id/settingsScreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

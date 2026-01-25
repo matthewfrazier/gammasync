@@ -34,7 +34,7 @@
         android:textColor="#AAAAAA"
         android:layout_marginBottom="16dp" />
 
-    <com.gammasync.ui.HoldProgressButton
+    <com.cognihertz.ui.HoldProgressButton
         android:id="@+id/holdToAgreeButton"
         android:layout_width="240dp"
         android:layout_height="72dp"

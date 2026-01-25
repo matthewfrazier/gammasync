@@ -1,4 +1,4 @@
-package com.gammasync.domain.therapy
+package com.cognihertz.domain.therapy
 
 /**
  * Complete therapy session configuration.

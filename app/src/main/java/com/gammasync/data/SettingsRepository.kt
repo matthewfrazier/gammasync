@@ -1,8 +1,8 @@
-package com.gammasync.data
+package com.cognihertz.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.gammasync.domain.therapy.TherapyMode
+import com.cognihertz.domain.therapy.TherapyMode
 
 /**
  * SharedPreferences wrapper for persisting user settings.

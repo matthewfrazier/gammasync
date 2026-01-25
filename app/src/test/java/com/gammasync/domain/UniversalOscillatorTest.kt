@@ -1,7 +1,7 @@
-package com.gammasync.domain
+package com.cognihertz.domain
 
-import com.gammasync.domain.therapy.FrequencyConfig
-import com.gammasync.domain.therapy.NoiseType
+import com.cognihertz.domain.therapy.FrequencyConfig
+import com.cognihertz.domain.therapy.NoiseType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

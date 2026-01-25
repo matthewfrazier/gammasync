@@ -1,4 +1,4 @@
-package com.gammasync.domain
+package com.cognihertz.domain
 
 import kotlin.math.PI
 import kotlin.math.sin

@@ -1,4 +1,4 @@
-package com.gammasync.domain
+package com.cognihertz.domain
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

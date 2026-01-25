@@ -1,9 +1,9 @@
-package com.gammasync.domain
+package com.cognihertz.domain
 
-import com.gammasync.domain.noise.BrownNoiseGenerator
-import com.gammasync.domain.noise.PinkNoiseGenerator
-import com.gammasync.domain.therapy.FrequencyConfig
-import com.gammasync.domain.therapy.NoiseType
+import com.cognihertz.domain.noise.BrownNoiseGenerator
+import com.cognihertz.domain.noise.PinkNoiseGenerator
+import com.cognihertz.domain.therapy.FrequencyConfig
+import com.cognihertz.domain.therapy.NoiseType
 import kotlin.math.PI
 import kotlin.math.sin
 

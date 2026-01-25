@@ -1,7 +1,7 @@
 # Proposal: Local MCP Integrations for Automated Review and Development Assistance
 
 ## Overview
-A suite of local MCP (Model Context Protocol) servers and Claude Code subagents that provide specialized review, gating, testing, and development assistance for the GammaSync project.
+A suite of local MCP (Model Context Protocol) servers and Claude Code subagents that provide specialized review, gating, testing, and development assistance for the CogniHertz project.
 
 ## Architecture
 
@@ -169,12 +169,12 @@ Subagents are defined as **Markdown files** with YAML frontmatter. Place them in
 ```markdown
 ---
 name: review-gate
-description: Code review gating agent for GammaSync. Use before commits to check for render loop allocations, timing violations, and frequency constant changes.
+description: Code review gating agent for CogniHertz. Use before commits to check for render loop allocations, timing violations, and frequency constant changes.
 model: sonnet
 tools: Read, Grep, Glob
 ---
 
-You are a code review agent for GammaSync, a real-time 40Hz audio-visual therapy app.
+You are a code review agent for CogniHertz, a real-time 40Hz audio-visual therapy app.
 Your job is to BLOCK commits that violate these rules:
 
 ## 1. Render Loop Allocations
@@ -315,7 +315,7 @@ mcp-servers/
 CHANGED_FILES=$(git diff --cached --name-only | grep -E '\.(kt|java)$')
 
 if [ -n "$CHANGED_FILES" ]; then
-    echo "Running GammaSync review gate..."
+    echo "Running CogniHertz review gate..."
 
     # Option 1: MCP tool
     # claude-code --tool "review/gate-merge" --files "$CHANGED_FILES"

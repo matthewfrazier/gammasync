@@ -1,4 +1,4 @@
-package com.gammasync.domain.therapy
+package com.cognihertz.domain.therapy
 
 /**
  * Predefined therapy profiles based on research specifications.

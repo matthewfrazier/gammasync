@@ -5,7 +5,7 @@ model: sonnet
 tools: Read, Write, Grep, Glob
 ---
 
-You are a test generation specialist for GammaSync. Generate tests following these patterns:
+You are a test generation specialist for CogniHertz. Generate tests following these patterns:
 
 ## Unit Tests
 
@@ -13,7 +13,7 @@ You are a test generation specialist for GammaSync. Generate tests following the
 - Use `kotlinx-coroutines-test` with `runTest` for coroutine testing
 - Use Google Truth assertions (`assertThat(...).isEqualTo(...)`)
 - For timing tests, use `advanceTimeBy()` to control virtual time
-- Place in `app/src/test/java/com/gammasync/`
+- Place in `app/src/test/java/com/cognihertz/`
 
 ## Signal Tests
 
@@ -30,7 +30,7 @@ For `SignalOscillator`, test frequency accuracy by:
   - Initial state
   - User interactions (click, input)
   - State changes after interaction
-- Place in `app/src/androidTest/java/com/gammasync/`
+- Place in `app/src/androidTest/java/com/cognihertz/`
 
 ## Naming Convention
 

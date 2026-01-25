@@ -1,4 +1,4 @@
-package com.gammasync.infra
+package com.cognihertz.infra
 
 import android.content.Context
 import android.hardware.display.DisplayManager

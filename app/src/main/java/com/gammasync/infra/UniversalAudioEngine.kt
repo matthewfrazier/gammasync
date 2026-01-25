@@ -1,14 +1,14 @@
-package com.gammasync.infra
+package com.cognihertz.infra
 
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.media.VolumeShaper
 import android.util.Log
-import com.gammasync.domain.UniversalOscillator
-import com.gammasync.domain.therapy.AudioMode
-import com.gammasync.domain.therapy.NoiseType
-import com.gammasync.domain.therapy.TherapyProfile
+import com.cognihertz.domain.UniversalOscillator
+import com.cognihertz.domain.therapy.AudioMode
+import com.cognihertz.domain.therapy.NoiseType
+import com.cognihertz.domain.therapy.TherapyProfile
 import kotlin.math.abs
 
 /**
@@ -237,7 +237,7 @@ class UniversalAudioEngine(
      */
     fun start(amplitude: Double = 0.5) {
         // Use default NeuroSync profile
-        start(com.gammasync.domain.therapy.TherapyProfiles.NEUROSYNC, amplitude)
+        start(com.cognihertz.domain.therapy.TherapyProfiles.NEUROSYNC, amplitude)
     }
 
     private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double) {

@@ -1,4 +1,4 @@
-package com.gammasync.domain.noise
+package com.cognihertz.domain.noise
 
 import org.junit.Assert.assertTrue
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.gammasync
+package com.cognihertz
 
 import android.view.View
 import androidx.test.espresso.Espresso.onView

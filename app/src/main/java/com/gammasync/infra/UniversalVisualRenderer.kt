@@ -1,4 +1,4 @@
-package com.gammasync.infra
+package com.cognihertz.infra
 
 import android.content.Context
 import android.graphics.Canvas
@@ -12,10 +12,10 @@ import android.view.Choreographer
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import com.gammasync.domain.ColorTemperature
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.VisualConfig
-import com.gammasync.domain.therapy.VisualMode
+import com.cognihertz.domain.ColorTemperature
+import com.cognihertz.domain.therapy.TherapyProfile
+import com.cognihertz.domain.therapy.VisualConfig
+import com.cognihertz.domain.therapy.VisualMode
 import kotlin.random.Random
 
 /**

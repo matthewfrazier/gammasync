@@ -1,4 +1,4 @@
-package com.gammasync.infra
+package com.cognihertz.infra
 
 import android.app.Presentation
 import android.content.Context
@@ -11,10 +11,10 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
-import com.gammasync.R
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.TherapyProfiles
-import com.gammasync.ui.CircularTimerView
+import com.cognihertz.R
+import com.cognihertz.domain.therapy.TherapyProfile
+import com.cognihertz.domain.therapy.TherapyProfiles
+import com.cognihertz.ui.CircularTimerView
 
 /**
  * Full-screen visual presentation for external displays (XREAL Air glasses).

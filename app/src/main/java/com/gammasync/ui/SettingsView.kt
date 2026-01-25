@@ -1,4 +1,4 @@
-package com.gammasync.ui
+package com.cognihertz.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -10,10 +10,10 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
-import com.gammasync.R
-import com.gammasync.data.ColorScheme
-import com.gammasync.data.SettingsRepository
-import com.gammasync.infra.HapticFeedback
+import com.cognihertz.R
+import com.cognihertz.data.ColorScheme
+import com.cognihertz.data.SettingsRepository
+import com.cognihertz.infra.HapticFeedback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
 

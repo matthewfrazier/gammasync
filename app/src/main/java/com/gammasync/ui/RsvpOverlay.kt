@@ -1,4 +1,4 @@
-package com.gammasync.ui
+package com.cognihertz.ui
 
 import android.content.Context
 import android.graphics.Canvas

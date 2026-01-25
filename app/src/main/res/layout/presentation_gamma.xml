@@ -5,14 +5,14 @@
     android:background="#000000">
 
     <!-- Full-screen visual renderer for external display -->
-    <com.gammasync.infra.UniversalVisualRenderer
+    <com.cognihertz.infra.UniversalVisualRenderer
         android:id="@+id/externalGammaRenderer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <!-- Timer overlay - shown when user taps to check time -->
     <!-- Size set programmatically to 50% of display -->
-    <com.gammasync.ui.CircularTimerView
+    <com.cognihertz.ui.CircularTimerView
         android:id="@+id/externalTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

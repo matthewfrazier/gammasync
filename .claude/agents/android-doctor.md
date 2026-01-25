@@ -23,14 +23,14 @@ You are an Android development expert specializing in real-time audio/visual app
 - Synchronous database access
 - Large bitmap decoding without background thread
 
-## 3. Audio Issues (GammaSync-specific)
+## 3. Audio Issues (CogniHertz-specific)
 
 - Missing `AudioManager.requestAudioFocus()` / `abandonAudioFocus()`
 - Wrong `AudioTrack` performance mode (must be `PERFORMANCE_MODE_LOW_LATENCY`)
 - Buffer sizes causing underruns (< 480 samples risky at 48kHz)
 - Not handling `AudioManager.OnAudioFocusChangeListener`
 
-## 4. Display Issues (GammaSync-specific)
+## 4. Display Issues (CogniHertz-specific)
 
 - Not requesting 120Hz mode via `Surface.setFrameRate()`
 - Not handling XREAL display connection/disconnection
