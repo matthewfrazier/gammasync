@@ -11,10 +11,11 @@
         android:layout_height="match_parent" />
 
     <!-- Timer overlay - shown when user taps to check time -->
+    <!-- Size set programmatically to 50% of display -->
     <com.gammasync.ui.CircularTimerView
         android:id="@+id/externalTimer"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone" />
 

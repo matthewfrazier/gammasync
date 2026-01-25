@@ -51,7 +51,6 @@ class CircularTimerView @JvmOverloads constructor(
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = textColor
         textAlign = Paint.Align.CENTER
-        textSize = 48 * resources.displayMetrics.density  // Large for glanceability
         isFakeBoldText = true
     }
 
@@ -94,6 +93,10 @@ class CircularTimerView @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         val padding = trackPaint.strokeWidth / 2
         pieRect.set(padding, padding, w - padding, h - padding)
+
+        // Scale text size to ~25% of view size for legibility
+        val size = minOf(w, h)
+        textPaint.textSize = size * 0.25f
     }
 
     override fun onDraw(canvas: Canvas) {

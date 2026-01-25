@@ -4,11 +4,13 @@ import android.app.Presentation
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.Display
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.widget.FrameLayout
 import com.gammasync.R
 import com.gammasync.ui.CircularTimerView
 
@@ -58,6 +60,14 @@ class GammaPresentation(
         gammaRenderer = findViewById(R.id.externalGammaRenderer)
         externalTimer = findViewById(R.id.externalTimer)
         phaseProvider?.let { gammaRenderer.setPhaseProvider(it) }
+
+        // Size timer to 50% of display for legibility
+        val metrics = DisplayMetrics()
+        display.getRealMetrics(metrics)
+        val timerSize = minOf(metrics.widthPixels, metrics.heightPixels) / 2
+        externalTimer.layoutParams = FrameLayout.LayoutParams(timerSize, timerSize).apply {
+            gravity = android.view.Gravity.CENTER
+        }
     }
 
     /**
