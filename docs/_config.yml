@@ -1,0 +1,36 @@
+# GitHub Pages Jekyll configuration for GammaSync legal documents
+
+# Theme
+theme: minima
+
+# Site settings
+title: "GammaSync Legal Documents"
+description: "Privacy Policy and Terms of Service for GammaSync Android app"
+
+# Permalink structure for clean URLs
+permalink: pretty
+
+# Enable clean URLs without .html extension
+plugins:
+  - jekyll-optional-front-matter
+
+# Include markdown files in processing
+include:
+  - "privacy-policy.md"
+  - "terms-of-service.md"
+
+# Default layout for markdown files
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+
+# Markdown processor
+markdown: kramdown
+highlighter: rouge
+
+# Exclude files from processing
+exclude:
+  - README.md
