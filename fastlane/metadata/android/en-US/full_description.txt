@@ -1,0 +1,23 @@
+GammaSync delivers precision 40Hz gamma entrainment using synchronized audio-visual therapy. This therapeutic application provides Gamma Entrainment Using Sensory stimuli (GENUS) for cognitive enhancement and brain health.
+
+Key Features:
+• Precise 40Hz audio-visual synchronization (sub-millisecond accuracy)
+• Supports 120Hz/144Hz OLED displays for optimal visual therapy
+• XREAL Air glasses compatibility for immersive sessions
+• Isoluminant flicker safety (modulates chrominance, not luminance)
+• Multiple therapy profiles and customization options
+• Built-in epilepsy safety disclaimers and protections
+
+Technical Excellence:
+• Master-slave timing with audio hardware clock as single source of truth
+• P99 frame times under 8.5ms for 120Hz performance
+• Audio frequency accuracy within ±0.05Hz tolerance
+• Audio-visual drift maintained under 10ms
+
+Safety First:
+• Mandatory "Hold-to-Agree" epilepsy waiver on every launch
+• No network permissions - completely offline operation
+• Open source for transparency and verification
+• No data collection or transmission
+
+GammaSync requires Android 12+ and is optimized for high-refresh rate OLED displays. This is a therapeutic research tool and should not replace professional medical advice.
