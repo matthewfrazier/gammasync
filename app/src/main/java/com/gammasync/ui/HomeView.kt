@@ -267,7 +267,8 @@ class HomeView @JvmOverloads constructor(
     }
 
     fun setDocumentLoaded(filename: String, wordCount: Int) {
-        val estimatedMinutes = (wordCount / settings?.rsvpWpm?.toFloat()?.times(60) ?: 300f).toInt().coerceAtLeast(1)
+        val wpm = settings?.rsvpWpm ?: 300
+        val estimatedMinutes = (wordCount.toFloat() / wpm).toInt().coerceAtLeast(1)
         loadTextStatus.text = context.getString(R.string.document_loaded_format, filename, wordCount, estimatedMinutes)
         clearDocumentButton.visibility = View.VISIBLE
     }

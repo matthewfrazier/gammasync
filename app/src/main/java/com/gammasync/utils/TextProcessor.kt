@@ -40,9 +40,9 @@ object TextProcessor {
         cleaned = cleaned.replace(Regex("```[^`]*```"), " ") // ```code```
         cleaned = cleaned.replace(Regex("`([^`]+)`"), "$1") // `inline code`
         
-        // Normalize quotes
-        cleaned = cleaned.replace(Regex("[""''`]"), "'")
-        cleaned = cleaned.replace(Regex("[–—]"), "-")
+        // Normalize quotes (smart quotes to straight)
+        cleaned = cleaned.replace(Regex("[\u201C\u201D\u2018\u2019`]"), "'")
+        cleaned = cleaned.replace(Regex("[\u2013\u2014]"), "-")
         
         // Normalize whitespace
         cleaned = cleaned.replace(Regex("\\s+"), " ")
