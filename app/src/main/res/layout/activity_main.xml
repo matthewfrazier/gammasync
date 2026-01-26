@@ -54,6 +54,71 @@
                 android:layout_height="match_parent"
                 android:visibility="gone">
 
+                <!-- RSVP WPM display (top, visible during Learning mode) -->
+                <LinearLayout
+                    android:id="@+id/rsvpWpmContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"
+                    android:background="@drawable/rounded_background"
+                    android:padding="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/therapyRsvpSpeedDown"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="-"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:minWidth="0dp"
+                        android:padding="0dp"
+                        app:cornerRadius="20dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginHorizontal="16dp">
+
+                        <TextView
+                            android:id="@+id/therapyWpmDisplay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="360 WPM"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF" />
+
+                        <TextView
+                            android:id="@+id/therapyThetaDisplay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1× theta"
+                            android:textSize="12sp"
+                            android:textColor="#AAAAAA" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/therapyRsvpSpeedUp"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:minWidth="0dp"
+                        android:padding="0dp"
+                        app:cornerRadius="20dp" />
+
+                </LinearLayout>
+
                 <!-- Large central timer -->
                 <com.gammasync.ui.CircularTimerView
                     android:id="@+id/circularTimer"

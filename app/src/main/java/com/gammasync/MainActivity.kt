@@ -75,6 +75,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private var controlsVisible = false
     private var isPaused = false
 
+    // RSVP WPM controls on therapy screen
+    private lateinit var rsvpWpmContainer: View
+    private lateinit var therapyWpmDisplay: TextView
+    private lateinit var therapyThetaDisplay: TextView
+    private lateinit var therapyRsvpSpeedDown: MaterialButton
+    private lateinit var therapyRsvpSpeedUp: MaterialButton
+
     // RSVP document state
     private var loadedWords: List<String> = emptyList()
 
@@ -174,6 +181,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         rsvpOverlay = findViewById(R.id.rsvpOverlay)
         therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
 
+        // RSVP WPM controls on therapy screen
+        rsvpWpmContainer = findViewById(R.id.rsvpWpmContainer)
+        therapyWpmDisplay = findViewById(R.id.therapyWpmDisplay)
+        therapyThetaDisplay = findViewById(R.id.therapyThetaDisplay)
+        therapyRsvpSpeedDown = findViewById(R.id.therapyRsvpSpeedDown)
+        therapyRsvpSpeedUp = findViewById(R.id.therapyRsvpSpeedUp)
+
         // Connect phone visual renderer to audio engine phase
         phoneVisualRenderer.setPhaseProvider { audioEngine.phase }
         phoneVisualRenderer.setSecondaryPhaseProvider { audioEngine.secondaryPhase }
@@ -212,6 +226,15 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         noiseToggleButton.setOnClickListener { toggleBackgroundNoise() }
         resumeButton.setOnClickListener { resumeSession() }
         doneButton.setOnClickListener { stopSession() }
+
+        // Therapy screen - RSVP WPM controls
+        therapyRsvpSpeedDown.setOnClickListener { adjustTherapyRsvpSpeed(-1) }
+        therapyRsvpSpeedUp.setOnClickListener { adjustTherapyRsvpSpeed(1) }
+
+        // HomeView RSVP WPM change callback
+        homeScreen.onRsvpWpmChanged = { wpm ->
+            updateRsvpWpm(wpm)
+        }
 
         // Complete screen
         completeScreen.onStartAnother = {
@@ -583,6 +606,64 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         noiseToggleButton.setIconResource(iconRes)
     }
 
+    // --- RSVP WPM Controls ---
+
+    private fun adjustTherapyRsvpSpeed(direction: Int) {
+        if (!isRunning) return
+
+        haptics.tick()
+
+        val wpmValues = HomeView.THETA_WPM_VALUES
+        val currentWpm = settings.rsvpWpm
+        val currentIndex = wpmValues.indexOfFirst { it >= currentWpm }.takeIf { it >= 0 }
+            ?: (wpmValues.size - 1)
+
+        val newIndex = (currentIndex + direction).coerceIn(0, wpmValues.size - 1)
+        if (newIndex != currentIndex) {
+            val newWpm = wpmValues[newIndex]
+            updateRsvpWpm(newWpm)
+        }
+    }
+
+    private fun updateRsvpWpm(wpm: Int) {
+        settings.rsvpWpm = wpm
+
+        // Update therapy screen display
+        therapyWpmDisplay.text = "$wpm WPM"
+        therapyThetaDisplay.text = HomeView.formatThetaMultiple(wpm)
+
+        // Update button states
+        val wpmValues = HomeView.THETA_WPM_VALUES
+        val currentIndex = wpmValues.indexOfFirst { it >= wpm }.takeIf { it >= 0 }
+            ?: (wpmValues.size - 1)
+        therapyRsvpSpeedDown.isEnabled = currentIndex > 0
+        therapyRsvpSpeedUp.isEnabled = currentIndex < wpmValues.size - 1
+        therapyRsvpSpeedDown.alpha = if (therapyRsvpSpeedDown.isEnabled) 1.0f else 0.3f
+        therapyRsvpSpeedUp.alpha = if (therapyRsvpSpeedUp.isEnabled) 1.0f else 0.3f
+
+        // Update RSVP overlay if running
+        if (rsvpOverlay.playing) {
+            rsvpOverlay.setWpm(wpm)
+        }
+
+        Log.i(TAG, "RSVP WPM changed to $wpm (${HomeView.formatThetaMultiple(wpm)})")
+    }
+
+    private fun updateTherapyWpmDisplay() {
+        val wpm = settings.rsvpWpm
+        therapyWpmDisplay.text = "$wpm WPM"
+        therapyThetaDisplay.text = HomeView.formatThetaMultiple(wpm)
+
+        // Update button states
+        val wpmValues = HomeView.THETA_WPM_VALUES
+        val currentIndex = wpmValues.indexOfFirst { it >= wpm }.takeIf { it >= 0 }
+            ?: (wpmValues.size - 1)
+        therapyRsvpSpeedDown.isEnabled = currentIndex > 0
+        therapyRsvpSpeedUp.isEnabled = currentIndex < wpmValues.size - 1
+        therapyRsvpSpeedDown.alpha = if (therapyRsvpSpeedDown.isEnabled) 1.0f else 0.3f
+        therapyRsvpSpeedUp.alpha = if (therapyRsvpSpeedUp.isEnabled) 1.0f else 0.3f
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         Log.i(TAG, "Configuration changed: ${newConfig.orientation}")
@@ -700,11 +781,17 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         rsvpOverlay.setText(loadedWords.joinToString(" "))
         rsvpOverlay.visibility = View.VISIBLE
         rsvpOverlay.start()
+
+        // Show WPM controls on therapy screen
+        rsvpWpmContainer.visibility = View.VISIBLE
+        updateTherapyWpmDisplay()
+
         Log.i(TAG, "RSVP started: ${loadedWords.size} words at ${settings.rsvpWpm} WPM")
     }
 
     private fun stopRsvp() {
         rsvpOverlay.stop()
         rsvpOverlay.visibility = View.GONE
+        rsvpWpmContainer.visibility = View.GONE
     }
 }
