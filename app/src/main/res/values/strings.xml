@@ -55,4 +55,10 @@
     <string name="background_noise">Background Noise</string>
     <string name="noise_on">On</string>
     <string name="noise_off">Off</string>
+    
+    <!-- RSVP Text Loading -->
+    <string name="load_text">📄 Load Text for RSVP</string>
+    <string name="no_document_loaded">No document loaded</string>
+    <string name="document_loaded_format">%1$s · %2$,d words (~%3$d min)</string>
+    <string name="clear_document">Clear</string>
 </resources>

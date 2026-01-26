@@ -15,6 +15,7 @@ import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfiles
 import com.gammasync.infra.HapticFeedback
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
 
 /**
@@ -29,6 +30,8 @@ class HomeView @JvmOverloads constructor(
 
     var onStartSession: ((durationMinutes: Int, mode: TherapyMode) -> Unit)? = null
     var onSettingsClicked: (() -> Unit)? = null
+    var onLoadTextClicked: (() -> Unit)? = null
+    var onClearDocumentClicked: (() -> Unit)? = null
 
     // Mode selector buttons
     private val modeNeuroSyncButton: MaterialButton
@@ -48,6 +51,11 @@ class HomeView @JvmOverloads constructor(
     private val duration30Button: MaterialButton
     private val duration60Button: MaterialButton
     private val startSessionButton: MaterialButton
+
+    // RSVP Text Loading
+    private val loadTextRow: MaterialCardView
+    private val loadTextStatus: TextView
+    private val clearDocumentButton: MaterialButton
 
     private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
     private var selectedDuration = 30
@@ -84,6 +92,11 @@ class HomeView @JvmOverloads constructor(
         duration60Button = findViewById(R.id.duration60Button)
         startSessionButton = findViewById(R.id.startSessionButton)
 
+        // RSVP Text Loading
+        loadTextRow = findViewById(R.id.loadTextRow)
+        loadTextStatus = findViewById(R.id.loadTextStatus)
+        clearDocumentButton = findViewById(R.id.clearDocumentButton)
+
         // Mode button clicks
         modeNeuroSyncButton.setOnClickListener { selectMode(TherapyMode.NEUROSYNC) }
         modeMemoryButton.setOnClickListener { selectMode(TherapyMode.MEMORY_WRITE) }
@@ -106,8 +119,20 @@ class HomeView @JvmOverloads constructor(
             onSettingsClicked?.invoke()
         }
 
+        // RSVP Text Loading clicks
+        loadTextRow.setOnClickListener {
+            haptics.tick()
+            onLoadTextClicked?.invoke()
+        }
+
+        clearDocumentButton.setOnClickListener {
+            haptics.tick()
+            onClearDocumentClicked?.invoke()
+        }
+
         updateModeSelection()
         updateDurationSelection()
+        updateLoadTextVisibility()
         updateIconColors()
     }
 
@@ -119,6 +144,8 @@ class HomeView @JvmOverloads constructor(
         updateAccentColor()
         updateModeSelection()
         updateDurationSelection()
+        updateLoadTextVisibility()
+        updateDocumentStatus()
     }
 
     private fun updateAccentColor() {
@@ -200,6 +227,7 @@ class HomeView @JvmOverloads constructor(
         }
 
         updateXrealWarning()
+        updateLoadTextVisibility()
     }
 
     private fun updateXrealWarning() {
@@ -230,6 +258,34 @@ class HomeView @JvmOverloads constructor(
                 button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
                 button.setTextColor(onSurfaceColor)
             }
+        }
+    }
+
+    private fun updateLoadTextVisibility() {
+        val shouldShow = selectedMode == TherapyMode.MEMORY_WRITE
+        loadTextRow.visibility = if (shouldShow) View.VISIBLE else View.GONE
+    }
+
+    fun setDocumentLoaded(filename: String, wordCount: Int) {
+        val wpm = settings?.rsvpWpm ?: 300
+        val estimatedMinutes = (wordCount.toFloat() / wpm).toInt().coerceAtLeast(1)
+        loadTextStatus.text = context.getString(R.string.document_loaded_format, filename, wordCount, estimatedMinutes)
+        clearDocumentButton.visibility = View.VISIBLE
+    }
+
+    fun clearDocument() {
+        loadTextStatus.text = context.getString(R.string.no_document_loaded)
+        clearDocumentButton.visibility = View.GONE
+    }
+
+    private fun updateDocumentStatus() {
+        val docName = settings?.rsvpDocumentName
+        val wordCount = settings?.rsvpDocumentWordCount ?: 0
+        
+        if (docName != null && wordCount > 0) {
+            setDocumentLoaded(docName, wordCount)
+        } else {
+            clearDocument()
         }
     }
 }

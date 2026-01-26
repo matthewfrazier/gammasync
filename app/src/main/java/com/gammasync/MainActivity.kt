@@ -1,6 +1,7 @@
 package com.gammasync
 
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,8 +14,11 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.ViewFlipper
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.gammasync.data.SettingsRepository
 import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfile
@@ -29,6 +33,7 @@ import com.gammasync.ui.HomeView
 import com.gammasync.ui.SafetyDisclaimerView
 import com.gammasync.ui.SessionCompleteView
 import com.gammasync.ui.SettingsView
+import com.gammasync.utils.DocumentLoader
 import com.google.android.material.button.MaterialButton
 import android.content.res.ColorStateList
 
@@ -89,6 +94,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var externalDisplayManager: ExternalDisplayManager
     private var externalPresentation: GammaPresentation? = null
     private var hasExternalDisplay = false
+
+    // Document picker for RSVP text loading
+    private val documentPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let { handleDocumentSelected(it) }
+    }
 
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -177,6 +189,12 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         }
         homeScreen.onSettingsClicked = {
             navigateTo(Screen.SETTINGS)
+        }
+        homeScreen.onLoadTextClicked = {
+            openDocumentPicker()
+        }
+        homeScreen.onClearDocumentClicked = {
+            clearDocument()
         }
 
         // Therapy screen - pause/resume/done buttons
@@ -557,5 +575,47 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         audioEngine.release()
         handler.removeCallbacks(timerRunnable)
         handler.removeCallbacks(autoHideRunnable)
+    }
+
+    // --- RSVP Document Management ---
+
+    private fun openDocumentPicker() {
+        documentPickerLauncher.launch(arrayOf("text/plain"))
+    }
+
+    private fun handleDocumentSelected(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                val docInfo = DocumentLoader.loadDocument(this@MainActivity, uri)
+                if (docInfo != null) {
+                    // Take persistent permission to access this URI
+                    contentResolver.takePersistableUriPermission(
+                        uri, 
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                    
+                    // Save document metadata
+                    settings.rsvpDocumentUri = uri.toString()
+                    settings.rsvpDocumentName = docInfo.filename
+                    settings.rsvpDocumentWordCount = docInfo.wordCount
+                    
+                    // Update UI
+                    homeScreen.setDocumentLoaded(docInfo.filename, docInfo.wordCount)
+                    
+                    Log.i(TAG, "Document loaded: ${docInfo.filename} (${docInfo.wordCount} words)")
+                } else {
+                    Log.w(TAG, "Failed to load document")
+                    // Could show a toast or dialog here
+                }
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Failed to get persistent permission", e)
+            }
+        }
+    }
+
+    private fun clearDocument() {
+        settings.clearRsvpDocument()
+        homeScreen.clearDocument()
+        Log.i(TAG, "Document cleared")
     }
 }
