@@ -48,11 +48,16 @@ class SettingsView @JvmOverloads constructor(
     private val darkModeButton: MaterialButton
     private val lightModeButton: MaterialButton
 
+    // Background noise toggle
+    private val noiseOnButton: MaterialButton
+    private val noiseOffButton: MaterialButton
+
     private val haptics = HapticFeedback(context)
     private var settings: SettingsRepository? = null
     private var selectedDuration = 30
     private var selectedColorScheme = ColorScheme.TEAL
     private var darkMode = true
+    private var backgroundNoiseEnabled = true
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_settings, this, true)
@@ -73,6 +78,10 @@ class SettingsView @JvmOverloads constructor(
         // Dark mode toggle
         darkModeButton = findViewById(R.id.darkModeButton)
         lightModeButton = findViewById(R.id.lightModeButton)
+
+        // Background noise toggle
+        noiseOnButton = findViewById(R.id.noiseOnButton)
+        noiseOffButton = findViewById(R.id.noiseOffButton)
 
         // Set back button tint to match theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -99,6 +108,10 @@ class SettingsView @JvmOverloads constructor(
         darkModeButton.setOnClickListener { selectDarkMode(true) }
         lightModeButton.setOnClickListener { selectDarkMode(false) }
 
+        // Background noise toggle listeners
+        noiseOnButton.setOnClickListener { selectBackgroundNoise(true) }
+        noiseOffButton.setOnClickListener { selectBackgroundNoise(false) }
+
         updateColorChips()
     }
 
@@ -107,6 +120,7 @@ class SettingsView @JvmOverloads constructor(
         selectedDuration = settingsRepository.durationMinutes
         selectedColorScheme = settingsRepository.colorScheme
         darkMode = settingsRepository.darkMode
+        backgroundNoiseEnabled = settingsRepository.backgroundNoiseEnabled
 
         // Refresh back button tint for current theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -115,6 +129,7 @@ class SettingsView @JvmOverloads constructor(
         updateDurationSelection()
         updateColorChips()
         updateDarkModeSelection()
+        updateNoiseSelection()
     }
 
     private fun selectDuration(minutes: Int) {
@@ -193,6 +208,35 @@ class SettingsView @JvmOverloads constructor(
             lightModeButton.setTextColor(0xFFFFFFFF.toInt())
             darkModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
             darkModeButton.setTextColor(onSurfaceColor)
+        }
+    }
+
+    private fun selectBackgroundNoise(enabled: Boolean) {
+        if (enabled == backgroundNoiseEnabled) return
+
+        haptics.tick()
+        backgroundNoiseEnabled = enabled
+        settings?.backgroundNoiseEnabled = enabled
+        updateNoiseSelection()
+    }
+
+    private fun updateNoiseSelection() {
+        val accentColor = selectedColorScheme.accentColor
+
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
+        if (backgroundNoiseEnabled) {
+            noiseOnButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            noiseOnButton.setTextColor(0xFFFFFFFF.toInt())
+            noiseOffButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            noiseOffButton.setTextColor(onSurfaceColor)
+        } else {
+            noiseOffButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            noiseOffButton.setTextColor(0xFFFFFFFF.toInt())
+            noiseOnButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            noiseOnButton.setTextColor(onSurfaceColor)
         }
     }
 

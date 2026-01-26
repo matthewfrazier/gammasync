@@ -23,11 +23,11 @@
     <string name="mode_sleep">Sleep</string>
     <string name="mode_migraine">Migraine</string>
     <string name="mode_mood_lift">Mood Lift</string>
-    <string name="mode_neurosync_description">40Hz gamma + pink noise for memory and cellular cleanup.\nHeadphones recommended to hear the 40Hz tone.</string>
+    <string name="mode_neurosync_description">40Hz gamma tone + pink noise for memory and cellular cleanup.\nHeadphones recommended to hear the 40Hz tone.</string>
     <string name="mode_memory_description">Theta-gamma coupling for enhanced learning.\nHeadphones recommended to hear the 40Hz bursts.</string>
-    <string name="mode_sleep_description">8Hz\u21921Hz frequency ramp for deep sleep.\nHeadphones recommended for binaural effect.</string>
-    <string name="mode_migraine_description">Static green light for migraine and pain relief.\nNo audio – headphones not required.</string>
-    <string name="mode_mood_lift_description">Split-field stimulation for mood enhancement.\nRequires headphones and XREAL glasses.</string>
+    <string name="mode_sleep_description">8Hz\u21921Hz binaural ramp + brown noise for deep sleep.\nHeadphones required for binaural effect.</string>
+    <string name="mode_migraine_description">Static green light + brown noise for migraine relief.\nNo flicker. Headphones optional.</string>
+    <string name="mode_mood_lift_description">Split-field binaural + pink noise for mood enhancement.\nRequires headphones and XREAL glasses.</string>
     <string name="xreal_required_warning">Requires XREAL glasses</string>
 
     <!-- Home Screen - Duration -->
@@ -52,4 +52,7 @@
     <string name="dark">Dark</string>
     <string name="light">Light</string>
     <string name="back">Back</string>
+    <string name="background_noise">Background Noise</string>
+    <string name="noise_on">On</string>
+    <string name="noise_off">Off</string>
 </resources>

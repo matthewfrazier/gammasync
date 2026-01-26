@@ -20,6 +20,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_COLOR_SCHEME = "color_scheme"
         private const val KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted"
         private const val KEY_DARK_MODE = "dark_mode"
+        private const val KEY_BACKGROUND_NOISE = "background_noise"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
@@ -80,6 +81,10 @@ class SettingsRepository(context: Context) {
     var darkMode: Boolean
         get() = prefs.getBoolean(KEY_DARK_MODE, true)
         set(value) = prefs.edit().putBoolean(KEY_DARK_MODE, value).apply()
+
+    var backgroundNoiseEnabled: Boolean
+        get() = prefs.getBoolean(KEY_BACKGROUND_NOISE, true)
+        set(value) = prefs.edit().putBoolean(KEY_BACKGROUND_NOISE, value).apply()
 }
 
 /**

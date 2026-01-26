@@ -133,8 +133,9 @@ class UniversalAudioEngine(
      * Start audio playback with a therapy profile.
      * @param profile The therapy profile configuration
      * @param amplitude Volume from 0.0 to 1.0
+     * @param noiseEnabled Whether to play background noise (default true)
      */
-    fun start(profile: TherapyProfile, amplitude: Double = 0.5) {
+    fun start(profile: TherapyProfile, amplitude: Double = 0.5, noiseEnabled: Boolean = true) {
         if (isPlaying) return
 
         currentProfile = profile
@@ -188,8 +189,11 @@ class UniversalAudioEngine(
         audioTrack?.play()
         volumeShaper?.apply(VolumeShaper.Operation.PLAY)
 
+        // Determine effective noise type based on setting
+        val effectiveNoiseType = if (noiseEnabled) profile.noiseType else NoiseType.NONE
+
         Log.i(TAG, "Starting ${profile.mode.displayName} mode, stereo=${profile.isStereo}, " +
-                "audioMode=${profile.audioMode}, noise=${profile.noiseType}")
+                "audioMode=${profile.audioMode}, noise=$effectiveNoiseType (setting=$noiseEnabled)")
 
         playbackThread = Thread {
             val samplesPerBuffer = bufferSize / bytesPerSample
@@ -207,7 +211,7 @@ class UniversalAudioEngine(
                 }
 
                 // Fill buffer based on audio mode
-                fillBuffer(buffer, profile, amplitude)
+                fillBuffer(buffer, profile, amplitude, effectiveNoiseType)
 
                 // Check for discontinuities
                 if (writeCount > 0) {
@@ -240,8 +244,7 @@ class UniversalAudioEngine(
         start(com.gammasync.domain.therapy.TherapyProfiles.NEUROSYNC, amplitude)
     }
 
-    private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double) {
-        val noiseType = profile.noiseType
+    private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double, noiseType: NoiseType) {
         val noiseAmplitude = DEFAULT_NOISE_AMPLITUDE
 
         when (profile.audioMode) {

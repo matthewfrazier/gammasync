@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Left circle (hemisphere abstraction) -->
+    <path
+        android:pathData="M180,156 a100,100 0 1,0 0,200 a100,100 0 1,0 0,-200"
+        android:strokeWidth="12"
+        android:strokeColor="#26A69A"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Right circle (hemisphere abstraction) -->
+    <path
+        android:pathData="M332,156 a100,100 0 1,0 0,200 a100,100 0 1,0 0,-200"
+        android:strokeWidth="12"
+        android:strokeColor="#26A69A"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Overlap region fill -->
+    <path
+        android:pathData="M256,176.5 A94,94 0 0,1 256,335.5 A94,94 0 0,1 256,176.5"
+        android:fillColor="#26A69A"
+        android:fillAlpha="0.3" />
+
+    <!-- Wave phase 1 -->
+    <path
+        android:pathData="M80,256 C130,200 180,200 256,256 C332,312 382,312 432,256"
+        android:strokeWidth="8"
+        android:strokeColor="#4DB6AC"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Wave phase 2 -->
+    <path
+        android:pathData="M80,256 C130,312 180,312 256,256 C332,200 382,200 432,256"
+        android:strokeWidth="6"
+        android:strokeColor="#80CBC4"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.6"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Center sync point -->
+    <path
+        android:pathData="M256,240 a16,16 0 1,0 0,32 a16,16 0 1,0 0,-32"
+        android:fillColor="#E0F2F1" />
+
+</vector>

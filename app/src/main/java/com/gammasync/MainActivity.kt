@@ -341,7 +341,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         isRunning = true
 
         // Start audio with the selected profile
-        audioEngine.start(currentProfile, amplitude = settings.audioAmplitude.toDouble())
+        audioEngine.start(
+            currentProfile,
+            amplitude = settings.audioAmplitude.toDouble(),
+            noiseEnabled = settings.backgroundNoiseEnabled
+        )
 
         if (hasExternalDisplay) {
             externalPresentation?.apply {
@@ -393,7 +397,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             pauseOverlay.visibility = View.GONE
 
             // Restart audio and rendering
-            audioEngine.start(currentProfile, amplitude = settings.audioAmplitude.toDouble())
+            audioEngine.start(
+                currentProfile,
+                amplitude = settings.audioAmplitude.toDouble(),
+                noiseEnabled = settings.backgroundNoiseEnabled
+            )
 
             if (hasExternalDisplay) {
                 externalPresentation?.startRendering()
