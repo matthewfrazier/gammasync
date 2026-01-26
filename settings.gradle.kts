@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "GammaSync"
 include(":app")
+include(":shared")
