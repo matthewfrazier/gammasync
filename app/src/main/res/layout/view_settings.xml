@@ -224,4 +224,64 @@
 
     </LinearLayout>
 
+    <!-- Danger Zone Section -->
+    <TextView
+        android:id="@+id/dangerZoneLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/danger_zone"
+        android:textSize="16sp"
+        android:textColor="?attr/colorError"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/dangerZoneDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/danger_zone_description"
+        android:textSize="12sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 60Hz Mode Toggle -->
+    <TextView
+        android:id="@+id/refresh60HzLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/allow_60hz_mode"
+        android:textSize="14sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/allow60HzButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="100dp"
+            android:text="@string/enable"
+            android:textSize="14sp"
+            android:layout_marginEnd="8dp"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deny60HzButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="100dp"
+            android:text="@string/disable"
+            android:textSize="14sp"
+            app:cornerRadius="16dp" />
+
+    </LinearLayout>
+
 </LinearLayout>

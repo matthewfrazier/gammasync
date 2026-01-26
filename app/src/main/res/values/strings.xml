@@ -56,6 +56,13 @@
     <string name="noise_on">On</string>
     <string name="noise_off">Off</string>
     
+    <!-- Danger Zone Settings -->
+    <string name="danger_zone">⚠️ Danger Zone</string>
+    <string name="danger_zone_description">These settings may reduce therapeutic effectiveness and are not recommended.</string>
+    <string name="allow_60hz_mode">Allow 60Hz Mode</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    
     <!-- RSVP Text Loading -->
     <string name="load_text">📄 Load Text for RSVP</string>
     <string name="no_document_loaded">No document loaded</string>

@@ -52,12 +52,17 @@ class SettingsView @JvmOverloads constructor(
     private val noiseOnButton: MaterialButton
     private val noiseOffButton: MaterialButton
 
+    // Danger zone 60Hz toggle
+    private val allow60HzButton: MaterialButton
+    private val deny60HzButton: MaterialButton
+
     private val haptics = HapticFeedback(context)
     private var settings: SettingsRepository? = null
     private var selectedDuration = 30
     private var selectedColorScheme = ColorScheme.TEAL
     private var darkMode = true
     private var backgroundNoiseEnabled = true
+    private var allow60Hz = false
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_settings, this, true)
@@ -82,6 +87,10 @@ class SettingsView @JvmOverloads constructor(
         // Background noise toggle
         noiseOnButton = findViewById(R.id.noiseOnButton)
         noiseOffButton = findViewById(R.id.noiseOffButton)
+
+        // Danger zone 60Hz toggle
+        allow60HzButton = findViewById(R.id.allow60HzButton)
+        deny60HzButton = findViewById(R.id.deny60HzButton)
 
         // Set back button tint to match theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -112,6 +121,10 @@ class SettingsView @JvmOverloads constructor(
         noiseOnButton.setOnClickListener { selectBackgroundNoise(true) }
         noiseOffButton.setOnClickListener { selectBackgroundNoise(false) }
 
+        // Danger zone 60Hz toggle listeners
+        allow60HzButton.setOnClickListener { select60HzMode(true) }
+        deny60HzButton.setOnClickListener { select60HzMode(false) }
+
         updateColorChips()
     }
 
@@ -121,6 +134,7 @@ class SettingsView @JvmOverloads constructor(
         selectedColorScheme = settingsRepository.colorScheme
         darkMode = settingsRepository.darkMode
         backgroundNoiseEnabled = settingsRepository.backgroundNoiseEnabled
+        allow60Hz = settingsRepository.allow60HzMode
 
         // Refresh back button tint for current theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -130,6 +144,7 @@ class SettingsView @JvmOverloads constructor(
         updateColorChips()
         updateDarkModeSelection()
         updateNoiseSelection()
+        update60HzSelection()
     }
 
     private fun selectDuration(minutes: Int) {
@@ -265,5 +280,61 @@ class SettingsView @JvmOverloads constructor(
             }
             view.background = drawable
         }
+    }
+
+    private fun select60HzMode(enabled: Boolean) {
+        if (enabled == allow60Hz) return
+
+        if (enabled) {
+            // Show warning dialog when enabling 60Hz mode
+            show60HzWarningDialog {
+                haptics.tick()
+                allow60Hz = enabled
+                settings?.allow60HzMode = enabled
+                update60HzSelection()
+            }
+        } else {
+            haptics.tick()
+            allow60Hz = enabled
+            settings?.allow60HzMode = enabled
+            update60HzSelection()
+        }
+    }
+
+    private fun update60HzSelection() {
+        val accentColor = selectedColorScheme.accentColor
+        val errorColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorError, 0)
+
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
+        if (allow60Hz) {
+            allow60HzButton.backgroundTintList = ColorStateList.valueOf(errorColor)
+            allow60HzButton.setTextColor(0xFFFFFFFF.toInt())
+            deny60HzButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            deny60HzButton.setTextColor(onSurfaceColor)
+        } else {
+            deny60HzButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            deny60HzButton.setTextColor(0xFFFFFFFF.toInt())
+            allow60HzButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            allow60HzButton.setTextColor(onSurfaceColor)
+        }
+    }
+
+    private fun show60HzWarningDialog(onConfirm: () -> Unit) {
+        val dialog = android.app.AlertDialog.Builder(context)
+            .setTitle("⚠️ 60Hz Mode Warning")
+            .setMessage("Enabling 60Hz mode will significantly reduce therapeutic effectiveness.\n\n" +
+                    "• Optimal therapy requires 120Hz+ displays\n" +
+                    "• 60Hz may cause visual artifacts and timing issues\n" +
+                    "• Therapeutic benefits may be reduced by 50% or more\n\n" +
+                    "This mode should only be used for testing or demonstration purposes.")
+            .setPositiveButton("Enable Anyway") { _, _ -> onConfirm() }
+            .setNegativeButton("Cancel") { _, _ -> }
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .create()
+            
+        dialog.show()
     }
 }

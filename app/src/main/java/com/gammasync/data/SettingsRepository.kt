@@ -24,6 +24,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_RSVP_DOCUMENT_URI = "rsvp_document_uri"
         private const val KEY_RSVP_DOCUMENT_NAME = "rsvp_document_name"
         private const val KEY_RSVP_DOCUMENT_WORD_COUNT = "rsvp_document_word_count"
+        private const val KEY_ALLOW_60HZ_MODE = "allow_60hz_mode"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
@@ -100,6 +101,10 @@ class SettingsRepository(context: Context) {
     var rsvpDocumentWordCount: Int
         get() = prefs.getInt(KEY_RSVP_DOCUMENT_WORD_COUNT, 0)
         set(value) = prefs.edit().putInt(KEY_RSVP_DOCUMENT_WORD_COUNT, value).apply()
+
+    var allow60HzMode: Boolean
+        get() = prefs.getBoolean(KEY_ALLOW_60HZ_MODE, false)
+        set(value) = prefs.edit().putBoolean(KEY_ALLOW_60HZ_MODE, value).apply()
 
     fun clearRsvpDocument() {
         prefs.edit()

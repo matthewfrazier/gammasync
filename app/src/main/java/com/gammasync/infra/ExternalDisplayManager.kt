@@ -4,6 +4,7 @@ import android.content.Context
 import android.hardware.display.DisplayManager
 import android.util.Log
 import android.view.Display
+import android.view.Surface
 
 /**
  * Detects and manages external displays (XREAL Air glasses, etc.)
@@ -48,6 +49,49 @@ class ExternalDisplayManager(context: Context) {
      */
     fun getExternalDisplayRefreshRate(): Float {
         return getExternalDisplay()?.refreshRate ?: 0f
+    }
+
+    /**
+     * Get the highest available refresh rate mode for the external display.
+     * Prefers 120Hz or higher for gamma entrainment therapy requirements.
+     */
+    fun getPreferredDisplayMode(): Display.Mode? {
+        val display = getExternalDisplay() ?: return null
+        val supportedModes = display.supportedModes
+        
+        Log.i(TAG, "Available display modes:")
+        supportedModes.forEach { mode ->
+            Log.i(TAG, "  ${mode.physicalWidth}x${mode.physicalHeight} @ ${mode.refreshRate}Hz")
+        }
+        
+        // Find highest refresh rate mode that meets therapy requirements
+        val preferredMode = supportedModes
+            .filter { it.refreshRate >= 120f } // Prefer 120Hz+ for optimal therapy
+            .maxByOrNull { it.refreshRate }
+            ?: supportedModes.maxByOrNull { it.refreshRate } // Fallback to highest available
+            
+        preferredMode?.let {
+            Log.i(TAG, "Selected preferred mode: ${it.physicalWidth}x${it.physicalHeight} @ ${it.refreshRate}Hz")
+        }
+        
+        return preferredMode
+    }
+
+    /**
+     * Configure a surface to use the preferred display mode for optimal refresh rate.
+     * Returns true if a high refresh rate mode (120Hz+) was configured.
+     */
+    fun configureOptimalRefreshRate(surface: Surface): Boolean {
+        val preferredMode = getPreferredDisplayMode() ?: return false
+        
+        try {
+            surface.setFrameRate(preferredMode.refreshRate, Surface.FRAME_RATE_COMPATIBILITY_DEFAULT)
+            Log.i(TAG, "Configured surface for ${preferredMode.refreshRate}Hz refresh rate")
+            return preferredMode.refreshRate >= 120f
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to configure surface frame rate: ${e.message}")
+            return false
+        }
     }
 
     /**
