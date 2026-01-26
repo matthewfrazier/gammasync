@@ -195,6 +195,50 @@ class MainActivityTest {
     }
 
     @Test
+    fun therapyScreenHasNoiseToggleButton() {
+        acceptDisclaimer()
+
+        onView(withId(R.id.modeNeuroSyncButton)).perform(click())
+        onView(withId(R.id.startSessionButton)).perform(click())
+
+        // Tap to show controls
+        onView(withId(R.id.therapyScreen)).perform(click())
+        Thread.sleep(300)
+
+        // Both pause and noise toggle buttons should be visible
+        onView(withId(R.id.pauseButton)).check(matches(isDisplayed()))
+        onView(withId(R.id.noiseToggleButton)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun noiseToggleButtonChangesIcon() {
+        acceptDisclaimer()
+
+        onView(withId(R.id.modeNeuroSyncButton)).perform(click())
+        onView(withId(R.id.startSessionButton)).perform(click())
+
+        // Show controls and verify noise toggle is visible
+        onView(withId(R.id.therapyScreen)).perform(click())
+        Thread.sleep(300)
+        
+        onView(withId(R.id.noiseToggleButton)).check(matches(isDisplayed()))
+        
+        // Toggle noise - should change icon state
+        // (We can't easily test drawable resources, but we can verify no crash and button stays visible)
+        onView(withId(R.id.noiseToggleButton)).perform(click())
+        Thread.sleep(100) // Allow time for icon update
+        
+        // Button should still be visible and functional
+        onView(withId(R.id.noiseToggleButton)).check(matches(isDisplayed()))
+        
+        // Toggle again to test both states
+        onView(withId(R.id.noiseToggleButton)).perform(click())
+        Thread.sleep(100)
+        
+        onView(withId(R.id.noiseToggleButton)).check(matches(isDisplayed()))
+    }
+
+    @Test
     fun pausingSessionShowsPauseOverlay() {
         acceptDisclaimer()
 

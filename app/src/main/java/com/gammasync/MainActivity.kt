@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     // Therapy screen views
     private lateinit var circularTimer: CircularTimerView
     private lateinit var pauseButton: MaterialButton
+    private lateinit var noiseToggleButton: MaterialButton
     private lateinit var pauseOverlay: View
     private lateinit var pauseDurationText: TextView
     private lateinit var resumeButton: MaterialButton
@@ -146,6 +147,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         // Therapy screen views
         circularTimer = findViewById(R.id.circularTimer)
         pauseButton = findViewById(R.id.pauseButton)
+        noiseToggleButton = findViewById(R.id.noiseToggleButton)
         pauseOverlay = findViewById(R.id.pauseOverlay)
         pauseDurationText = findViewById(R.id.pauseDurationText)
         resumeButton = findViewById(R.id.resumeButton)
@@ -179,6 +181,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         // Therapy screen - pause/resume/done buttons
         pauseButton.setOnClickListener { pauseSession() }
+        noiseToggleButton.setOnClickListener { toggleBackgroundNoise() }
         resumeButton.setOnClickListener { resumeSession() }
         doneButton.setOnClickListener { stopSession() }
 
@@ -314,7 +317,12 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         doneButton.setTextColor(accentColor)
         pauseButton.strokeColor = ColorStateList.valueOf(accentColor)
         pauseButton.setTextColor(accentColor)
+        noiseToggleButton.strokeColor = ColorStateList.valueOf(accentColor)
+        noiseToggleButton.setTextColor(accentColor)
         circularTimer.setAccentColor(accentColor)
+
+        // Initialize noise toggle button state
+        updateNoiseToggleButton()
 
         // Initialize timer
         circularTimer.setTotalDuration(remainingSeconds)
@@ -508,6 +516,32 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private fun updateTimerDisplay() {
         circularTimer.setRemainingTime(remainingSeconds)
         externalPresentation?.setRemainingTime(remainingSeconds)
+    }
+
+    private fun toggleBackgroundNoise() {
+        if (!isRunning) return
+
+        haptics.tick()
+        
+        // Toggle the setting
+        settings.backgroundNoiseEnabled = !settings.backgroundNoiseEnabled
+        
+        // Update the audio engine
+        audioEngine.setNoiseEnabled(settings.backgroundNoiseEnabled)
+        
+        // Update the button icon
+        updateNoiseToggleButton()
+        
+        Log.i(TAG, "Background noise toggled: ${settings.backgroundNoiseEnabled}")
+    }
+
+    private fun updateNoiseToggleButton() {
+        val iconRes = if (settings.backgroundNoiseEnabled) {
+            R.drawable.ic_noise_on
+        } else {
+            R.drawable.ic_noise_off
+        }
+        noiseToggleButton.setIconResource(iconRes)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

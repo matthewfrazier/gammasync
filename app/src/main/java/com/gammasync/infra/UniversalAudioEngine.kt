@@ -48,6 +48,9 @@ class UniversalAudioEngine(
     @Volatile
     private var playbackStartTimeNs: Long = 0
 
+    @Volatile
+    private var noiseEnabled = true
+
     // VolumeShaper configurations
     private val fadeInConfig = VolumeShaper.Configuration.Builder()
         .setDuration(FADE_DURATION_MS)
@@ -130,6 +133,15 @@ class UniversalAudioEngine(
         get() = isPlaying
 
     /**
+     * Set whether background noise is enabled during playback.
+     * Can be called during active session for runtime toggling.
+     * @param enabled Whether to enable background noise
+     */
+    fun setNoiseEnabled(enabled: Boolean) {
+        noiseEnabled = enabled
+    }
+
+    /**
      * Start audio playback with a therapy profile.
      * @param profile The therapy profile configuration
      * @param amplitude Volume from 0.0 to 1.0
@@ -179,6 +191,7 @@ class UniversalAudioEngine(
 
         isPlaying = true
         playbackStartTimeNs = System.nanoTime()
+        this.noiseEnabled = noiseEnabled  // Initialize volatile flag
         oscillator.reset()
         discontinuityCount = 0
         maxBufferGapMs = 0.0
@@ -211,7 +224,7 @@ class UniversalAudioEngine(
                 }
 
                 // Fill buffer based on audio mode
-                fillBuffer(buffer, profile, amplitude, effectiveNoiseType)
+                fillBuffer(buffer, profile, amplitude)
 
                 // Check for discontinuities
                 if (writeCount > 0) {
@@ -244,15 +257,16 @@ class UniversalAudioEngine(
         start(com.gammasync.domain.therapy.TherapyProfiles.NEUROSYNC, amplitude)
     }
 
-    private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double, noiseType: NoiseType) {
+    private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double) {
         val noiseAmplitude = DEFAULT_NOISE_AMPLITUDE
+        val effectiveNoiseType = if (noiseEnabled) profile.noiseType else NoiseType.NONE
 
         when (profile.audioMode) {
             AudioMode.ISOCHRONIC -> {
                 if (profile.isStereo) {
-                    oscillator.fillBufferStereo(buffer, amplitude, noiseType, noiseAmplitude)
+                    oscillator.fillBufferStereo(buffer, amplitude, effectiveNoiseType, noiseAmplitude)
                 } else {
-                    oscillator.fillBufferMono(buffer, amplitude, noiseType, noiseAmplitude)
+                    oscillator.fillBufferMono(buffer, amplitude, effectiveNoiseType, noiseAmplitude)
                 }
             }
 
@@ -261,7 +275,7 @@ class UniversalAudioEngine(
                     buffer,
                     BINAURAL_BASE_FREQUENCY,
                     amplitude,
-                    noiseType,
+                    effectiveNoiseType,
                     noiseAmplitude
                 )
             }
@@ -269,15 +283,15 @@ class UniversalAudioEngine(
             AudioMode.COUPLED -> {
                 // Coupled mode uses the oscillator's built-in theta-gamma nesting
                 if (profile.isStereo) {
-                    oscillator.fillBufferStereo(buffer, amplitude, noiseType, noiseAmplitude)
+                    oscillator.fillBufferStereo(buffer, amplitude, effectiveNoiseType, noiseAmplitude)
                 } else {
-                    oscillator.fillBufferMono(buffer, amplitude, noiseType, noiseAmplitude)
+                    oscillator.fillBufferMono(buffer, amplitude, effectiveNoiseType, noiseAmplitude)
                 }
             }
 
             AudioMode.SILENT -> {
                 // Only noise, no tone
-                fillNoiseOnly(buffer, noiseType, noiseAmplitude)
+                fillNoiseOnly(buffer, effectiveNoiseType, noiseAmplitude)
             }
         }
     }

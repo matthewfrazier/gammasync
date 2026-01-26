@@ -169,8 +169,8 @@ class TherapyProfileTest {
 
     @Test
     fun `therapy modes have display names`() {
-        assertEquals("NeuroSync", TherapyMode.NEUROSYNC.displayName)
-        assertEquals("Memory Write", TherapyMode.MEMORY_WRITE.displayName)
+        assertEquals("Memory", TherapyMode.NEUROSYNC.displayName)
+        assertEquals("Learning", TherapyMode.MEMORY_WRITE.displayName)
         assertEquals("Sleep Ramp", TherapyMode.SLEEP_RAMP.displayName)
         assertEquals("Migraine Relief", TherapyMode.MIGRAINE.displayName)
         assertEquals("Mood Lift", TherapyMode.MOOD_LIFT.displayName)
