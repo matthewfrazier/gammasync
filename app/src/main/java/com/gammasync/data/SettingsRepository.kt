@@ -21,6 +21,9 @@ class SettingsRepository(context: Context) {
         private const val KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted"
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_BACKGROUND_NOISE = "background_noise"
+        private const val KEY_RSVP_DOCUMENT_URI = "rsvp_document_uri"
+        private const val KEY_RSVP_DOCUMENT_NAME = "rsvp_document_name"
+        private const val KEY_RSVP_DOCUMENT_WORD_COUNT = "rsvp_document_word_count"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
@@ -85,6 +88,26 @@ class SettingsRepository(context: Context) {
     var backgroundNoiseEnabled: Boolean
         get() = prefs.getBoolean(KEY_BACKGROUND_NOISE, true)
         set(value) = prefs.edit().putBoolean(KEY_BACKGROUND_NOISE, value).apply()
+
+    var rsvpDocumentUri: String?
+        get() = prefs.getString(KEY_RSVP_DOCUMENT_URI, null)
+        set(value) = prefs.edit().putString(KEY_RSVP_DOCUMENT_URI, value).apply()
+
+    var rsvpDocumentName: String?
+        get() = prefs.getString(KEY_RSVP_DOCUMENT_NAME, null)
+        set(value) = prefs.edit().putString(KEY_RSVP_DOCUMENT_NAME, value).apply()
+
+    var rsvpDocumentWordCount: Int
+        get() = prefs.getInt(KEY_RSVP_DOCUMENT_WORD_COUNT, 0)
+        set(value) = prefs.edit().putInt(KEY_RSVP_DOCUMENT_WORD_COUNT, value).apply()
+
+    fun clearRsvpDocument() {
+        prefs.edit()
+            .remove(KEY_RSVP_DOCUMENT_URI)
+            .remove(KEY_RSVP_DOCUMENT_NAME)
+            .remove(KEY_RSVP_DOCUMENT_WORD_COUNT)
+            .apply()
+    }
 }
 
 /**

@@ -347,4 +347,36 @@ class MainActivityTest {
         onView(withId(R.id.disclaimerScreen)).check(matches(not(isDisplayed())))
         onView(withId(R.id.holdToAgreeButton)).check(matches(not(isDisplayed())))
     }
+
+    // --- RSVP Text Loading Tests ---
+
+    @Test
+    fun loadTextRowHiddenForNonLearningModes() {
+        acceptDisclaimer()
+
+        // Select NeuroSync mode - Load Text should be hidden
+        onView(withId(R.id.modeNeuroSyncButton)).perform(click())
+        onView(withId(R.id.loadTextRow)).check(matches(not(isDisplayed())))
+
+        // Select Sleep mode - Load Text should be hidden
+        onView(withId(R.id.modeSleepButton)).perform(click())
+        onView(withId(R.id.loadTextRow)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun loadTextRowVisibleForLearningMode() {
+        acceptDisclaimer()
+
+        // Select Learning mode - Load Text should appear
+        onView(withId(R.id.modeMemoryButton)).perform(click())
+        onView(withId(R.id.loadTextRow)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun loadTextRowInitiallyShowsNoDocumentLoaded() {
+        acceptDisclaimer()
+
+        onView(withId(R.id.modeMemoryButton)).perform(click())
+        onView(withId(R.id.loadTextStatus)).check(matches(withText(R.string.no_document_loaded)))
+    }
 }
