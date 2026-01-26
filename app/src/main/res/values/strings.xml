@@ -55,4 +55,15 @@
     <string name="background_noise">Background Noise</string>
     <string name="noise_on">On</string>
     <string name="noise_off">Off</string>
+
+    <!-- RSVP Settings -->
+    <string name="rsvp_settings">RSVP (Speed Reading)</string>
+    <string name="rsvp_text_size">Text Size</string>
+    <string name="rsvp_size_small">Small</string>
+    <string name="rsvp_size_medium">Medium</string>
+    <string name="rsvp_size_large">Large</string>
+    <string name="rsvp_anchor_highlight">Anchor Letter</string>
+    <string name="rsvp_anchor_description">Highlight focus point in red</string>
+    <string name="rsvp_annotations">Progress Display</string>
+    <string name="rsvp_annotations_description">Show word count and progress bar</string>
 </resources>

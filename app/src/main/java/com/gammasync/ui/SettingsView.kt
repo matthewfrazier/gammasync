@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.R
 import com.gammasync.data.ColorScheme
+import com.gammasync.data.RsvpTextSize
 import com.gammasync.data.SettingsRepository
 import com.gammasync.infra.HapticFeedback
 import com.google.android.material.button.MaterialButton
@@ -52,12 +53,24 @@ class SettingsView @JvmOverloads constructor(
     private val noiseOnButton: MaterialButton
     private val noiseOffButton: MaterialButton
 
+    // RSVP settings
+    private val rsvpSizeSmall: MaterialButton
+    private val rsvpSizeMedium: MaterialButton
+    private val rsvpSizeLarge: MaterialButton
+    private val rsvpAnchorOn: MaterialButton
+    private val rsvpAnchorOff: MaterialButton
+    private val rsvpAnnotationsOn: MaterialButton
+    private val rsvpAnnotationsOff: MaterialButton
+
     private val haptics = HapticFeedback(context)
     private var settings: SettingsRepository? = null
     private var selectedDuration = 30
     private var selectedColorScheme = ColorScheme.TEAL
     private var darkMode = true
     private var backgroundNoiseEnabled = true
+    private var rsvpTextSize = RsvpTextSize.MEDIUM
+    private var rsvpAnchorHighlight = true
+    private var rsvpAnnotations = true
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_settings, this, true)
@@ -82,6 +95,15 @@ class SettingsView @JvmOverloads constructor(
         // Background noise toggle
         noiseOnButton = findViewById(R.id.noiseOnButton)
         noiseOffButton = findViewById(R.id.noiseOffButton)
+
+        // RSVP settings
+        rsvpSizeSmall = findViewById(R.id.rsvpSizeSmall)
+        rsvpSizeMedium = findViewById(R.id.rsvpSizeMedium)
+        rsvpSizeLarge = findViewById(R.id.rsvpSizeLarge)
+        rsvpAnchorOn = findViewById(R.id.rsvpAnchorOn)
+        rsvpAnchorOff = findViewById(R.id.rsvpAnchorOff)
+        rsvpAnnotationsOn = findViewById(R.id.rsvpAnnotationsOn)
+        rsvpAnnotationsOff = findViewById(R.id.rsvpAnnotationsOff)
 
         // Set back button tint to match theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -112,6 +134,15 @@ class SettingsView @JvmOverloads constructor(
         noiseOnButton.setOnClickListener { selectBackgroundNoise(true) }
         noiseOffButton.setOnClickListener { selectBackgroundNoise(false) }
 
+        // RSVP settings listeners
+        rsvpSizeSmall.setOnClickListener { selectRsvpSize(RsvpTextSize.SMALL) }
+        rsvpSizeMedium.setOnClickListener { selectRsvpSize(RsvpTextSize.MEDIUM) }
+        rsvpSizeLarge.setOnClickListener { selectRsvpSize(RsvpTextSize.LARGE) }
+        rsvpAnchorOn.setOnClickListener { selectRsvpAnchor(true) }
+        rsvpAnchorOff.setOnClickListener { selectRsvpAnchor(false) }
+        rsvpAnnotationsOn.setOnClickListener { selectRsvpAnnotations(true) }
+        rsvpAnnotationsOff.setOnClickListener { selectRsvpAnnotations(false) }
+
         updateColorChips()
     }
 
@@ -121,6 +152,9 @@ class SettingsView @JvmOverloads constructor(
         selectedColorScheme = settingsRepository.colorScheme
         darkMode = settingsRepository.darkMode
         backgroundNoiseEnabled = settingsRepository.backgroundNoiseEnabled
+        rsvpTextSize = settingsRepository.rsvpTextSize
+        rsvpAnchorHighlight = settingsRepository.rsvpAnchorHighlight
+        rsvpAnnotations = settingsRepository.rsvpAnnotations
 
         // Refresh back button tint for current theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -130,6 +164,9 @@ class SettingsView @JvmOverloads constructor(
         updateColorChips()
         updateDarkModeSelection()
         updateNoiseSelection()
+        updateRsvpSizeSelection()
+        updateRsvpAnchorSelection()
+        updateRsvpAnnotationsSelection()
     }
 
     private fun selectDuration(minutes: Int) {
@@ -264,6 +301,91 @@ class SettingsView @JvmOverloads constructor(
                 }
             }
             view.background = drawable
+        }
+    }
+
+    // --- RSVP Settings ---
+
+    private fun selectRsvpSize(size: RsvpTextSize) {
+        if (size == rsvpTextSize) return
+        haptics.tick()
+        rsvpTextSize = size
+        settings?.rsvpTextSize = size
+        updateRsvpSizeSelection()
+    }
+
+    private fun updateRsvpSizeSelection() {
+        val accentColor = selectedColorScheme.accentColor
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
+        val sizeButtons = listOf(
+            RsvpTextSize.SMALL to rsvpSizeSmall,
+            RsvpTextSize.MEDIUM to rsvpSizeMedium,
+            RsvpTextSize.LARGE to rsvpSizeLarge
+        )
+
+        sizeButtons.forEach { (size, button) ->
+            val isSelected = size == rsvpTextSize
+            if (isSelected) {
+                button.backgroundTintList = ColorStateList.valueOf(accentColor)
+                button.setTextColor(0xFFFFFFFF.toInt())
+            } else {
+                button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+                button.setTextColor(onSurfaceColor)
+            }
+        }
+    }
+
+    private fun selectRsvpAnchor(enabled: Boolean) {
+        if (enabled == rsvpAnchorHighlight) return
+        haptics.tick()
+        rsvpAnchorHighlight = enabled
+        settings?.rsvpAnchorHighlight = enabled
+        updateRsvpAnchorSelection()
+    }
+
+    private fun updateRsvpAnchorSelection() {
+        val accentColor = selectedColorScheme.accentColor
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
+        if (rsvpAnchorHighlight) {
+            rsvpAnchorOn.backgroundTintList = ColorStateList.valueOf(accentColor)
+            rsvpAnchorOn.setTextColor(0xFFFFFFFF.toInt())
+            rsvpAnchorOff.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            rsvpAnchorOff.setTextColor(onSurfaceColor)
+        } else {
+            rsvpAnchorOff.backgroundTintList = ColorStateList.valueOf(accentColor)
+            rsvpAnchorOff.setTextColor(0xFFFFFFFF.toInt())
+            rsvpAnchorOn.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            rsvpAnchorOn.setTextColor(onSurfaceColor)
+        }
+    }
+
+    private fun selectRsvpAnnotations(enabled: Boolean) {
+        if (enabled == rsvpAnnotations) return
+        haptics.tick()
+        rsvpAnnotations = enabled
+        settings?.rsvpAnnotations = enabled
+        updateRsvpAnnotationsSelection()
+    }
+
+    private fun updateRsvpAnnotationsSelection() {
+        val accentColor = selectedColorScheme.accentColor
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+
+        if (rsvpAnnotations) {
+            rsvpAnnotationsOn.backgroundTintList = ColorStateList.valueOf(accentColor)
+            rsvpAnnotationsOn.setTextColor(0xFFFFFFFF.toInt())
+            rsvpAnnotationsOff.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            rsvpAnnotationsOff.setTextColor(onSurfaceColor)
+        } else {
+            rsvpAnnotationsOff.backgroundTintList = ColorStateList.valueOf(accentColor)
+            rsvpAnnotationsOff.setTextColor(0xFFFFFFFF.toInt())
+            rsvpAnnotationsOn.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            rsvpAnnotationsOn.setTextColor(onSurfaceColor)
         }
     }
 }

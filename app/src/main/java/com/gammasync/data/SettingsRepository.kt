@@ -21,6 +21,9 @@ class SettingsRepository(context: Context) {
         private const val KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted"
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_BACKGROUND_NOISE = "background_noise"
+        private const val KEY_RSVP_TEXT_SIZE = "rsvp_text_size"
+        private const val KEY_RSVP_ANCHOR_HIGHLIGHT = "rsvp_anchor_highlight"
+        private const val KEY_RSVP_ANNOTATIONS = "rsvp_annotations"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
@@ -85,6 +88,43 @@ class SettingsRepository(context: Context) {
     var backgroundNoiseEnabled: Boolean
         get() = prefs.getBoolean(KEY_BACKGROUND_NOISE, true)
         set(value) = prefs.edit().putBoolean(KEY_BACKGROUND_NOISE, value).apply()
+
+    /**
+     * RSVP text size: SMALL (10%), MEDIUM (15%), LARGE (20%) of screen height.
+     */
+    var rsvpTextSize: RsvpTextSize
+        get() {
+            val sizeName = prefs.getString(KEY_RSVP_TEXT_SIZE, RsvpTextSize.MEDIUM.name)
+            return try {
+                RsvpTextSize.valueOf(sizeName ?: RsvpTextSize.MEDIUM.name)
+            } catch (e: IllegalArgumentException) {
+                RsvpTextSize.MEDIUM
+            }
+        }
+        set(value) = prefs.edit().putString(KEY_RSVP_TEXT_SIZE, value.name).apply()
+
+    /**
+     * Whether to highlight the anchor letter (ORP - Optimal Recognition Point).
+     */
+    var rsvpAnchorHighlight: Boolean
+        get() = prefs.getBoolean(KEY_RSVP_ANCHOR_HIGHLIGHT, true)
+        set(value) = prefs.edit().putBoolean(KEY_RSVP_ANCHOR_HIGHLIGHT, value).apply()
+
+    /**
+     * Whether to show annotations (progress bar, word count).
+     */
+    var rsvpAnnotations: Boolean
+        get() = prefs.getBoolean(KEY_RSVP_ANNOTATIONS, true)
+        set(value) = prefs.edit().putBoolean(KEY_RSVP_ANNOTATIONS, value).apply()
+}
+
+/**
+ * RSVP text size options as percentage of screen height.
+ */
+enum class RsvpTextSize(val heightPercent: Float) {
+    SMALL(0.10f),
+    MEDIUM(0.15f),
+    LARGE(0.20f)
 }
 
 /**

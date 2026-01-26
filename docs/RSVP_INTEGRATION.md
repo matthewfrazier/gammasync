@@ -13,10 +13,30 @@ Integrate Rapid Serial Visual Presentation (RSVP) with Learning mode to enable r
 | Component | Status | Location |
 |-----------|--------|----------|
 | RsvpOverlay | ✅ Complete | `ui/RsvpOverlay.kt` |
-| RSVP Settings | ✅ Storage ready | `data/SettingsRepository.kt` |
+| RSVP Settings | ✅ Complete | `data/SettingsRepository.kt` |
+| RSVP Settings UI | ✅ Complete | `ui/SettingsView.kt` |
 | TextProcessor | ✅ Complete | `domain/text/TextProcessor.kt` |
 | DocumentLoader | ✅ Complete | `infra/DocumentLoader.kt` |
 | Learning Mode | ✅ Audio/visual ready | `TherapyProfiles.MEMORY_WRITE` |
+
+## RSVP Display Features
+
+### Text Size (Settings)
+- **Small**: 10% of screen height
+- **Medium**: 15% of screen height (default)
+- **Large**: 20% of screen height
+
+### Anchor Letter (ORP)
+The Optimal Recognition Point is highlighted in red to reduce eye movement:
+- Words 1-3 chars: first letter
+- Words 4-5 chars: second letter
+- Words 6-9 chars: third letter
+- Words 10-13 chars: fourth letter
+- Longer words: ~25% position
+
+### Annotations
+- Progress bar at bottom of screen
+- Word count display (current / total)
 
 ## Implementation Phases
 
@@ -48,15 +68,13 @@ Integrate Rapid Serial Visual Presentation (RSVP) with Learning mode to enable r
 - Optimal phase-lock timing for word transitions
 - Whether to pause RSVP on session pause
 
-### Phase 4: Settings UI
-- [ ] Add RSVP section to Settings screen
-- [ ] WPM slider (100-1000, default 300)
-- [ ] Phase-lock toggle (sync words to gamma bursts)
-- [ ] Font size preference
-
-**Research needed:**
-- Should WPM affect estimated session duration?
-- Default phase-lock behavior
+### Phase 4: Settings UI ✅
+- [x] Add RSVP section to Settings screen
+- [x] Text size selector (Small/Medium/Large)
+- [x] Anchor letter highlight toggle
+- [x] Progress annotations toggle
+- [ ] WPM slider (100-1000, default 300) - future
+- [ ] Phase-lock toggle - future
 
 ### Phase 5: Polish & Testing
 - [ ] Instrumentation tests for file loading flow
