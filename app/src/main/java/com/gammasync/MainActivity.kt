@@ -32,8 +32,10 @@ import com.gammasync.ui.CircularTimerView
 import com.gammasync.ui.HomeView
 import com.gammasync.ui.SafetyDisclaimerView
 import com.gammasync.ui.SessionCompleteView
+import com.gammasync.ui.RsvpOverlay
 import com.gammasync.ui.SettingsView
 import com.gammasync.utils.DocumentLoader
+import com.gammasync.utils.TextProcessor
 import com.google.android.material.button.MaterialButton
 import android.content.res.ColorStateList
 
@@ -68,9 +70,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var resumeButton: MaterialButton
     private lateinit var doneButton: MaterialButton
     private lateinit var phoneVisualRenderer: UniversalVisualRenderer
+    private lateinit var rsvpOverlay: RsvpOverlay
     private lateinit var therapyControlsContainer: View
     private var controlsVisible = false
     private var isPaused = false
+
+    // RSVP document state
+    private var loadedWords: List<String> = emptyList()
 
     // Auto-hide timer controls
     private val autoHideRunnable = Runnable { hideTherapyControls() }
@@ -165,6 +171,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         resumeButton = findViewById(R.id.resumeButton)
         doneButton = findViewById(R.id.doneButton)
         phoneVisualRenderer = findViewById(R.id.phoneVisualRenderer)
+        rsvpOverlay = findViewById(R.id.rsvpOverlay)
         therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
 
         // Connect phone visual renderer to audio engine phase
@@ -196,6 +203,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         homeScreen.onClearDocumentClicked = {
             clearDocument()
         }
+
+        // Restore previously loaded document if any
+        restoreSavedDocument()
 
         // Therapy screen - pause/resume/done buttons
         pauseButton.setOnClickListener { pauseSession() }
@@ -392,6 +402,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         // Show controls initially
         showTherapyControls()
 
+        // Start RSVP if in Learning mode with loaded document
+        startRsvp()
+
         handler.post(timerRunnable)
     }
 
@@ -403,6 +416,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             // Stop audio and rendering but keep timer paused
             audioEngine.stop()
             phoneVisualRenderer.stop()
+            rsvpOverlay.stop()
             externalPresentation?.stopRendering()
             handler.removeCallbacks(timerRunnable)
             handler.removeCallbacks(autoHideRunnable)
@@ -435,6 +449,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
                 phoneVisualRenderer.start()
             }
 
+            // Resume RSVP if applicable
+            if (currentProfile.mode == TherapyMode.MEMORY_WRITE && loadedWords.isNotEmpty()) {
+                rsvpOverlay.start()
+            }
+
             // Resume timer
             handler.post(timerRunnable)
 
@@ -449,6 +468,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         isPaused = false
 
         phoneVisualRenderer.stop()
+        stopRsvp()
         externalPresentation?.stopRendering()
 
         audioEngine.stop()
@@ -472,6 +492,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         isPaused = false
 
         phoneVisualRenderer.stop()
+        stopRsvp()
         externalPresentation?.stopRendering()
 
         audioEngine.stop()
@@ -590,19 +611,22 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
                 if (docInfo != null) {
                     // Take persistent permission to access this URI
                     contentResolver.takePersistableUriPermission(
-                        uri, 
+                        uri,
                         android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
-                    
+
                     // Save document metadata
                     settings.rsvpDocumentUri = uri.toString()
                     settings.rsvpDocumentName = docInfo.filename
                     settings.rsvpDocumentWordCount = docInfo.wordCount
-                    
+
+                    // Store words for RSVP display
+                    loadedWords = TextProcessor.getWords(docInfo.text)
+
                     // Update UI
                     homeScreen.setDocumentLoaded(docInfo.filename, docInfo.wordCount)
-                    
-                    Log.i(TAG, "Document loaded: ${docInfo.filename} (${docInfo.wordCount} words)")
+
+                    Log.i(TAG, "Document loaded: ${docInfo.filename} (${loadedWords.size} words)")
                 } else {
                     Log.w(TAG, "Failed to load document")
                     // Could show a toast or dialog here
@@ -615,7 +639,72 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private fun clearDocument() {
         settings.clearRsvpDocument()
+        loadedWords = emptyList()
         homeScreen.clearDocument()
         Log.i(TAG, "Document cleared")
+    }
+
+    private fun restoreSavedDocument() {
+        val uriString = settings.rsvpDocumentUri ?: return
+        val docName = settings.rsvpDocumentName ?: return
+        val wordCount = settings.rsvpDocumentWordCount
+        if (wordCount == 0) return
+
+        // Try to reload the document content
+        lifecycleScope.launch {
+            try {
+                val uri = Uri.parse(uriString)
+                val docInfo = DocumentLoader.loadDocument(this@MainActivity, uri)
+                if (docInfo != null) {
+                    loadedWords = TextProcessor.getWords(docInfo.text)
+                    homeScreen.setDocumentLoaded(docName, loadedWords.size)
+                    Log.i(TAG, "Restored document: $docName (${loadedWords.size} words)")
+                } else {
+                    // Document no longer accessible, clear saved reference
+                    clearDocument()
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to restore document: ${e.message}")
+                clearDocument()
+            }
+        }
+    }
+
+    /**
+     * Load sample document from assets for testing.
+     * Call from ADB: adb shell am broadcast -a com.gammasync.LOAD_SAMPLE
+     */
+    fun loadSampleDocument() {
+        lifecycleScope.launch {
+            try {
+                val text = assets.open("samples/the_waste_land.txt").bufferedReader().use { it.readText() }
+                val cleanedText = TextProcessor.sanitize(text)
+                loadedWords = TextProcessor.getWords(cleanedText)
+
+                settings.rsvpDocumentName = "The Waste Land"
+                settings.rsvpDocumentWordCount = loadedWords.size
+
+                homeScreen.setDocumentLoaded("The Waste Land", loadedWords.size)
+                Log.i(TAG, "Sample document loaded: ${loadedWords.size} words")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load sample document", e)
+            }
+        }
+    }
+
+    private fun startRsvp() {
+        if (loadedWords.isEmpty()) return
+        if (currentProfile.mode != TherapyMode.MEMORY_WRITE) return
+
+        rsvpOverlay.setWpm(settings.rsvpWpm)
+        rsvpOverlay.setText(loadedWords.joinToString(" "))
+        rsvpOverlay.visibility = View.VISIBLE
+        rsvpOverlay.start()
+        Log.i(TAG, "RSVP started: ${loadedWords.size} words at ${settings.rsvpWpm} WPM")
+    }
+
+    private fun stopRsvp() {
+        rsvpOverlay.stop()
+        rsvpOverlay.visibility = View.GONE
     }
 }

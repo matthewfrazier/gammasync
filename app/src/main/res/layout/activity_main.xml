@@ -40,6 +40,13 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
+            <!-- RSVP text overlay (Learning mode only) -->
+            <com.gammasync.ui.RsvpOverlay
+                android:id="@+id/rsvpOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
             <!-- Controls container - tap to show/hide -->
             <FrameLayout
                 android:id="@+id/therapyControlsContainer"
