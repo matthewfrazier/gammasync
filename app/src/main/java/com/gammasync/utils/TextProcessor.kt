@@ -35,30 +35,53 @@ object TextProcessor {
      */
     fun sanitize(text: String): String {
         var cleaned = text
-        
+
         // Strip HTML tags
         cleaned = cleaned.replace(Regex("<[^>]+>"), " ")
-        
-        // Remove URLs (http/https)
-        cleaned = cleaned.replace(Regex("https?://\\S+"), " ")
-        
-        // Remove email addresses
-        cleaned = cleaned.replace(Regex("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"), " ")
-        
-        // Remove markdown formatting
+
+        // Remove markdown headers (###, ##, #) - must be before bold/italic
+        cleaned = cleaned.replace(Regex("^#{1,6}\\s+", RegexOption.MULTILINE), "")
+
+        // Remove markdown formatting - do this BEFORE URL removal
         cleaned = cleaned.replace(Regex("\\*\\*([^*]+)\\*\\*"), "$1") // **bold**
         cleaned = cleaned.replace(Regex("\\*([^*]+)\\*"), "$1") // *italic*
         cleaned = cleaned.replace(Regex("_([^_]+)_"), "$1") // _italic_
-        cleaned = cleaned.replace(Regex("\\[([^\\]]+)\\]\\([^)]+\\)"), "$1") // [text](url)
-        
+        cleaned = cleaned.replace(Regex("\\[([^\\]]+)\\]\\([^)]+\\)"), "$1") // [text](url) - extract text, URL removed later
+
+        // Remove URLs (http/https) - after markdown links so we catch both inline and link URLs
+        cleaned = cleaned.replace(Regex("https?://\\S+"), " ")
+
+        // Remove email addresses
+        cleaned = cleaned.replace(Regex("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"), " ")
+
+        // Remove markdown lists (-, *, +, numbered) BEFORE normalizing dashes
+        // This way we only remove true markdown lists, not compound words with em-dashes
+        cleaned = cleaned.replace(Regex("^[\\s]*[-\u2013\u2014*+]\\s+", RegexOption.MULTILINE), "")
+        cleaned = cleaned.replace(Regex("^[\\s]*\\d+\\.\\s+", RegexOption.MULTILINE), "")
+
+        // Normalize quotes and dashes AFTER markdown list removal
+        // This preserves hyphens in compound words like "well-known"
+        cleaned = cleaned.replace(Regex("[\u201C\u201D]"), "\"")  // Smart double quotes to straight
+        cleaned = cleaned.replace(Regex("[\u2018\u2019]"), "'")   // Smart single quotes to straight
+        cleaned = cleaned.replace(Regex("[\u2013\u2014]"), "-")   // Em/en dash to hyphen
+
         // Remove code blocks
         cleaned = cleaned.replace(Regex("```[^`]*```"), " ") // ```code```
         cleaned = cleaned.replace(Regex("`([^`]+)`"), "$1") // `inline code`
-        
-        // Normalize quotes (smart quotes to straight)
-        cleaned = cleaned.replace(Regex("[\u201C\u201D\u2018\u2019`]"), "'")
-        cleaned = cleaned.replace(Regex("[\u2013\u2014]"), "-")
-        
+
+        // Remove emojis and other pictographs
+        // Unicode ranges for emoji: https://unicode.org/emoji/charts/full-emoji-list.html
+        cleaned = cleaned.replace(Regex("[\u2600-\u27BF]"), "") // Miscellaneous Symbols
+        cleaned = cleaned.replace(Regex("[\uD83C-\uDBFF\uDC00-\uDFFF]+"), "") // Emoji surrogate pairs
+        cleaned = cleaned.replace(Regex("[\u2300-\u23FF]"), "") // Miscellaneous Technical
+        cleaned = cleaned.replace(Regex("[\u2B50-\u2B55]"), "") // Stars and other symbols
+        cleaned = cleaned.replace(Regex("[\u200D\uFE0F]"), "") // Zero-width joiner and variation selector
+
+        // Remove special symbols (preserve only basic punctuation and hyphen)
+        // Preserved: letters, digits, whitespace, . , ! ? ; : ' " -
+        // Note: hyphen at end of character class to avoid needing escape
+        cleaned = cleaned.replace(Regex("[^\\p{L}\\p{N}\\s.,!?;:'\"-]"), " ")
+
         // Normalize whitespace
         cleaned = cleaned.replace(Regex("\\s+"), " ")
         cleaned = cleaned.trim()
