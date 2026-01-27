@@ -596,8 +596,14 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         // Toggle the setting
         settings.backgroundNoiseEnabled = !settings.backgroundNoiseEnabled
         
-        // Update the audio engine
-        audioEngine.setNoiseEnabled(settings.backgroundNoiseEnabled)
+        // Restart audio engine to immediately apply the noise setting change
+        // This ensures the setting takes effect without waiting for the next buffer cycle
+        audioEngine.stop()
+        audioEngine.start(
+            currentProfile,
+            amplitude = settings.audioAmplitude.toDouble(),
+            noiseEnabled = settings.backgroundNoiseEnabled
+        )
         
         // Update the button icon
         updateNoiseToggleButton()
