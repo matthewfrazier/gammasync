@@ -32,6 +32,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_RSVP_MAX_GLIMPSE_CHARS = "rsvp_max_glimpse_chars"
         private const val KEY_RSVP_MAX_GLIMPSE_WORDS = "rsvp_max_glimpse_words"
         private const val KEY_RSVP_RESUME_WORD_INDEX = "rsvp_resume_word_index"
+        private const val KEY_RSVP_PHASE_LOCK = "rsvp_phase_lock"
 
         private const val DEFAULT_DURATION_MINUTES = 30
         private const val DEFAULT_AUDIO_AMPLITUDE = 0.3f
@@ -143,6 +144,10 @@ class SettingsRepository(context: Context) {
     var rsvpMaxGlimpseWords: Int
         get() = prefs.getInt(KEY_RSVP_MAX_GLIMPSE_WORDS, 3)
         set(value) = prefs.edit().putInt(KEY_RSVP_MAX_GLIMPSE_WORDS, value.coerceIn(1, 5)).apply()
+
+    var rsvpPhaseLockEnabled: Boolean
+        get() = prefs.getBoolean(KEY_RSVP_PHASE_LOCK, false)
+        set(value) = prefs.edit().putBoolean(KEY_RSVP_PHASE_LOCK, value).apply()
 
     var rsvpResumeWordIndex: Int
         get() = prefs.getInt(KEY_RSVP_RESUME_WORD_INDEX, 0)

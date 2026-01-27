@@ -146,6 +146,7 @@ class HomeView @JvmOverloads constructor(
     private val rsvpTxtTextSizeValue: TextView
     private val rsvpSwitchOrpHighlight: MaterialSwitch
     private val rsvpSwitchHyphenation: MaterialSwitch
+    private val rsvpSwitchPhaseLock: MaterialSwitch
 
     private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
     private var currentWpmIndex = THETA_WPM_VALUES.indexOf(360) // Default to 1× theta
@@ -226,6 +227,7 @@ class HomeView @JvmOverloads constructor(
         rsvpTxtTextSizeValue = findViewById(R.id.rsvpTxtTextSizeValue)
         rsvpSwitchOrpHighlight = findViewById(R.id.rsvpSwitchOrpHighlight)
         rsvpSwitchHyphenation = findViewById(R.id.rsvpSwitchHyphenation)
+        rsvpSwitchPhaseLock = findViewById(R.id.rsvpSwitchPhaseLock)
 
         // Bottom navigation listener
         bottomNavigation.setOnItemSelectedListener { item ->
@@ -316,6 +318,10 @@ class HomeView @JvmOverloads constructor(
             settings?.rsvpHyphenationEnabled = isChecked
         }
 
+        rsvpSwitchPhaseLock.setOnCheckedChangeListener { _, isChecked ->
+            settings?.rsvpPhaseLockEnabled = isChecked
+        }
+
         updateModeSelection()
         updateDurationSelection()
         updateLoadTextVisibility()
@@ -355,6 +361,7 @@ class HomeView @JvmOverloads constructor(
         rsvpTxtTextSizeValue.text = "${rsvpSeekTextSize.progress}%"
         rsvpSwitchOrpHighlight.isChecked = settingsRepository.rsvpOrpHighlightEnabled
         rsvpSwitchHyphenation.isChecked = settingsRepository.rsvpHyphenationEnabled
+        rsvpSwitchPhaseLock.isChecked = settingsRepository.rsvpPhaseLockEnabled
 
         updateAccentColor()
         updateModeSelection()

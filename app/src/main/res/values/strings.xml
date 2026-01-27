@@ -74,6 +74,8 @@
     <string name="focus_letter_highlight">Focus Letter Highlight</string>
     <string name="break_long_words">Break Long Words</string>
     <string name="reading_speed">Reading Speed (Theta-Harmonic WPM)</string>
+    <string name="phase_locked_transitions">Phase-Locked Transitions</string>
+    <string name="phase_locked_description">Sync word changes to 40Hz gamma cycle peaks</string>
     <string name="rsvp_settings">RSVP Settings</string>
     <string name="configure_in_settings">Configure display settings</string>
 </resources>

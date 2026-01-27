@@ -793,6 +793,14 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
         rsvpOverlay.setWpm(settings.rsvpWpm)
         rsvpOverlay.setText(loadedWords.joinToString(" "))
+
+        // Configure phase-lock mode
+        if (settings.rsvpPhaseLockEnabled) {
+            rsvpOverlay.enablePhaseLock { audioEngine.phase }
+        } else {
+            rsvpOverlay.disablePhaseLock()
+        }
+
         rsvpOverlay.visibility = View.VISIBLE
         rsvpOverlay.start()
 
@@ -800,7 +808,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         rsvpWpmContainer.visibility = View.VISIBLE
         updateTherapyWpmDisplay()
 
-        Log.i(TAG, "RSVP started: ${loadedWords.size} words at ${settings.rsvpWpm} WPM")
+        Log.i(TAG, "RSVP started: ${loadedWords.size} words at ${settings.rsvpWpm} WPM (phase-lock: ${settings.rsvpPhaseLockEnabled})")
     }
 
     private fun stopRsvp() {
