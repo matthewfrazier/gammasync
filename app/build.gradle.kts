@@ -49,6 +49,15 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.activity:activity-ktx:1.8.2")
 
+    // Coroutines for async operations
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // HTTP client for URL fetching
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // HTML parsing
+    implementation("org.jsoup:jsoup:1.17.2")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.11.1")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

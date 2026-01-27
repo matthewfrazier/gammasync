@@ -1,5 +1,6 @@
 package com.gammasync
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -154,11 +155,43 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         externalDisplayManager = ExternalDisplayManager(this)
         externalDisplayManager.startListening(this)
 
+        // Handle shared content from other apps
+        handleSharedContent(intent)
+
         // Skip disclaimer if already accepted, otherwise show it
         if (settings.disclaimerAccepted) {
             navigateTo(Screen.HOME)
         } else {
             navigateTo(Screen.DISCLAIMER)
+        }
+    }
+
+    /**
+     * Handle shared text/URLs from other apps via share target.
+     */
+    private fun handleSharedContent(intent: Intent) {
+        if (intent.action != Intent.ACTION_SEND || intent.type != "text/plain") {
+            return
+        }
+
+        val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
+        Log.i(TAG, "Received shared content: ${sharedText.take(100)}...")
+
+        // Navigate to RSVP details screen after disclaimer check
+        handler.post {
+            if (settings.disclaimerAccepted) {
+                rsvpDetailsScreen.loadSettings(settings)
+                rsvpDetailsScreen.handleSharedContent(sharedText)
+                navigateTo(Screen.RSVP_DETAILS)
+            } else {
+                // Store for later processing after disclaimer
+                disclaimerScreen.onDisclaimerAccepted = {
+                    settings.disclaimerAccepted = true
+                    rsvpDetailsScreen.loadSettings(settings)
+                    rsvpDetailsScreen.handleSharedContent(sharedText)
+                    navigateTo(Screen.RSVP_DETAILS)
+                }
+            }
         }
     }
 

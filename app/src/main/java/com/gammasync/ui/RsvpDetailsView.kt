@@ -22,6 +22,15 @@ import com.google.android.material.textfield.TextInputEditText
 import com.gammasync.domain.rsvp.ProcessedDocument
 import com.gammasync.domain.rsvp.RsvpSettings
 import com.gammasync.utils.TextProcessor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.jsoup.Jsoup
+import java.util.concurrent.TimeUnit
 
 /**
  * RSVP details screen for document selection and settings.
@@ -84,6 +93,14 @@ class RsvpDetailsView @JvmOverloads constructor(
     private var processedDocument: ProcessedDocument? = null
     private var rawText: String? = null
     private var accentColor = ColorScheme.TEAL.accentColor
+
+    // Coroutines for async URL fetching
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+    private val httpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .followRedirects(true)
+        .build()
 
     // Callbacks
     var onBackPressed: (() -> Unit)? = null
@@ -263,16 +280,119 @@ class RsvpDetailsView @JvmOverloads constructor(
      * Fetch content from a URL.
      */
     private fun fetchUrl(urlString: String) {
+        // Validate URL format
+        val url = try {
+            val cleanUrl = if (!urlString.startsWith("http://") && !urlString.startsWith("https://")) {
+                "https://$urlString"
+            } else {
+                urlString
+            }
+            cleanUrl
+        } catch (e: Exception) {
+            inputUrl.error = "Invalid URL format"
+            return
+        }
+
         // Show loading state
         btnFetchUrl.isEnabled = false
         btnFetchUrl.text = "Fetching..."
+        inputUrl.error = null
 
-        // TODO: Implement actual URL fetching with coroutines
-        // For now, show error message
-        post {
-            btnFetchUrl.isEnabled = true
-            btnFetchUrl.text = "Fetch"
-            inputUrl.error = "URL fetching not yet implemented"
+        coroutineScope.launch {
+            try {
+                val content = withContext(Dispatchers.IO) {
+                    fetchUrlContent(url)
+                }
+
+                // Success - process the fetched content
+                post {
+                    btnFetchUrl.isEnabled = true
+                    btnFetchUrl.text = "Fetch"
+
+                    val displayName = try {
+                        android.net.Uri.parse(url).host ?: url
+                    } catch (e: Exception) {
+                        url
+                    }
+
+                    processText(content, displayName, url)
+
+                    Log.i(TAG, "URL fetched successfully: $url (${content.length} chars)")
+                }
+            } catch (e: Exception) {
+                // Error handling
+                post {
+                    btnFetchUrl.isEnabled = true
+                    btnFetchUrl.text = "Fetch"
+
+                    val errorMsg = when {
+                        e is java.net.UnknownHostException -> "Could not reach URL. Check internet connection."
+                        e is java.net.SocketTimeoutException -> "Request timed out. Try again."
+                        e.message?.contains("429") == true -> "Too many requests. Wait and try again."
+                        e.message?.contains("403") == true -> "Access denied by website."
+                        e.message?.contains("404") == true -> "URL not found."
+                        else -> "Failed to fetch URL: ${e.message}"
+                    }
+
+                    inputUrl.error = errorMsg
+                    Log.w(TAG, "URL fetch failed: $url", e)
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch and parse content from URL (runs on IO thread).
+     */
+    private fun fetchUrlContent(url: String): String {
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("User-Agent", "Mozilla/5.0 (Android) CogniHertz/1.0")
+            .build()
+
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw Exception("HTTP ${response.code}")
+            }
+
+            val contentType = response.header("Content-Type")?.lowercase() ?: ""
+            val body = response.body?.string() ?: throw Exception("Empty response")
+
+            // Check size limit (5MB max)
+            if (body.length > 5_000_000) {
+                throw Exception("Content too large (${body.length / 1_000_000}MB). Max 5MB.")
+            }
+
+            return when {
+                contentType.contains("text/html") -> {
+                    // Parse HTML and extract text
+                    val doc = Jsoup.parse(body)
+
+                    // Remove script and style elements
+                    doc.select("script, style, nav, footer, header").remove()
+
+                    // Extract text from body
+                    val text = doc.body()?.text() ?: doc.text()
+
+                    if (text.isBlank()) {
+                        throw Exception("No readable text found in HTML")
+                    }
+
+                    text
+                }
+                contentType.contains("text/plain") -> {
+                    body
+                }
+                else -> {
+                    // Try parsing as HTML anyway
+                    try {
+                        val doc = Jsoup.parse(body)
+                        doc.body()?.text() ?: body
+                    } catch (e: Exception) {
+                        body
+                    }
+                }
+            }
         }
     }
 
@@ -342,5 +462,40 @@ class RsvpDetailsView @JvmOverloads constructor(
         txtSelectedFile.text = "No file selected"
         inputUrl.text?.clear()
         inputPaste.text?.clear()
+    }
+
+    /**
+     * Handle shared content from other apps.
+     * Detects URLs vs plain text and auto-populates the appropriate tab.
+     */
+    fun handleSharedContent(sharedText: String) {
+        // Check if shared text looks like a URL
+        val isUrl = sharedText.startsWith("http://") ||
+                    sharedText.startsWith("https://") ||
+                    (sharedText.contains(".") && !sharedText.contains("\n") && sharedText.length < 500)
+
+        if (isUrl) {
+            // Switch to URL tab and populate
+            selectTab(Tab.URL)
+            inputUrl.setText(sharedText.trim())
+
+            // Auto-trigger fetch
+            post {
+                fetchUrl(sharedText.trim())
+            }
+
+            Log.i(TAG, "Shared URL detected, auto-fetching: $sharedText")
+        } else {
+            // Switch to Paste tab and populate
+            selectTab(Tab.PASTE)
+            inputPaste.setText(sharedText)
+
+            // Auto-process the pasted text
+            post {
+                processText(sharedText, "Shared Text", "clipboard")
+            }
+
+            Log.i(TAG, "Shared text detected (${sharedText.length} chars)")
+        }
     }
 }
