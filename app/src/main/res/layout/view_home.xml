@@ -1,471 +1,819 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/homeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <!-- Top section: Title and Mode selector -->
+    <!-- Compact Header: Logo + Title inline, top-left -->
     <LinearLayout
+        android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
 
-        <!-- App logo -->
         <ImageView
             android:id="@+id/appLogo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_gravity="center_horizontal"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_logo"
             android:contentDescription="@string/app_name" />
 
-        <!-- App title -->
         <TextView
             android:id="@+id/appTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="12dp"
             android:text="@string/app_name"
-            android:textSize="28sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"
-            android:layout_marginBottom="16dp" />
+            android:textColor="?attr/colorOnSurface" />
 
-        <!-- Mode selector label -->
-        <TextView
-            android:id="@+id/modeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/select_mode"
-            android:textSize="14sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginBottom="12dp" />
+    </LinearLayout>
 
-        <!-- NeuroSync -->
-        <LinearLayout
+    <!-- Tab Content Area -->
+    <FrameLayout
+        android:id="@+id/tabContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Experience Tab Content -->
+        <ScrollView
+            android:id="@+id/experienceTabContent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/modeNeuroSyncButton"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_neurosync"
-                android:textSize="14sp"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp" />
-
-            <ImageView
-                android:id="@+id/iconNeuroSyncPhone"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="12dp"
-                android:src="@drawable/ic_phone"
-                app:tint="?attr/colorPrimary" />
-
-            <!-- Spacer for alignment with modes that have 2 icons -->
-            <View
-                android:layout_width="28dp"
-                android:layout_height="1dp" />
-
-        </LinearLayout>
-
-        <!-- Sleep Ramp -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/modeSleepButton"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_sleep"
-                android:textSize="14sp"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp" />
-
-            <ImageView
-                android:id="@+id/iconSleepPhone"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="12dp"
-                android:src="@drawable/ic_phone"
-                app:tint="?attr/colorPrimary" />
-
-            <ImageView
-                android:id="@+id/iconSleepHeadphones"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="4dp"
-                android:src="@drawable/ic_headphones"
-                app:tint="?attr/colorPrimary" />
-
-        </LinearLayout>
-
-        <!-- Migraine Relief -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/modeMigraineButton"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_migraine"
-                android:textSize="14sp"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp" />
-
-            <ImageView
-                android:id="@+id/iconMigrainePhone"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="12dp"
-                android:src="@drawable/ic_phone"
-                app:tint="?attr/colorPrimary" />
-
-            <!-- Spacer for alignment -->
-            <View
-                android:layout_width="28dp"
-                android:layout_height="1dp" />
-
-        </LinearLayout>
-
-        <!-- Mood Lift -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/modeMoodLiftButton"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_mood_lift"
-                android:textSize="14sp"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp" />
-
-            <ImageView
-                android:id="@+id/iconMoodLiftHeadphones"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="12dp"
-                android:src="@drawable/ic_headphones" />
-
-            <ImageView
-                android:id="@+id/iconMoodLiftGlasses"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="4dp"
-                android:src="@drawable/ic_glasses" />
-
-        </LinearLayout>
-
-        <!-- Memory Write -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/modeMemoryButton"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/mode_memory"
-                android:textSize="14sp"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp" />
-
-            <ImageView
-                android:id="@+id/iconMemoryPhone"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="12dp"
-                android:src="@drawable/ic_phone"
-                app:tint="?attr/colorPrimary" />
-
-            <ImageView
-                android:id="@+id/iconMemoryGlasses"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="4dp"
-                android:src="@drawable/ic_glasses"
-                app:tint="?attr/colorPrimary" />
-
-        </LinearLayout>
-
-        <!-- Mode description -->
-        <TextView
-            android:id="@+id/modeDescriptionText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/mode_neurosync_description"
-            android:textSize="15sp"
-            android:textColor="?attr/colorOnSurface"
-            android:lineSpacingMultiplier="1.3"
-            android:gravity="start"
-            android:minHeight="48dp" />
-
-        <!-- XREAL warning (hidden by default) -->
-        <TextView
-            android:id="@+id/xrealWarningText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/xreal_required_warning"
-            android:textSize="12sp"
-            android:textColor="@color/status_required"
-            android:gravity="start"
-            android:visibility="gone"
-            android:layout_marginTop="8dp" />
-
-        <!-- RSVP Text Loading (visible only for Learning mode) -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/loadTextRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:visibility="gone"
-            app:cardBackgroundColor="?attr/colorSurfaceVariant"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp">
+                android:orientation="vertical"
+                android:padding="24dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/loadTextTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/load_text"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-
-                    <TextView
-                        android:id="@+id/loadTextStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/no_document_loaded"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginTop="4dp" />
-
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/clearDocumentButton"
-                    style="@style/Widget.Material3.Button.TextButton"
+                <!-- Mode selector label -->
+                <TextView
+                    android:id="@+id/modeLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/clear_document"
+                    android:text="@string/select_mode"
                     android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- NeuroSync -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/modeNeuroSyncButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/mode_neurosync"
+                        android:textSize="14sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="16dp" />
+
+                    <ImageView
+                        android:id="@+id/iconNeuroSyncPhone"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_phone"
+                        app:tint="?attr/colorPrimary" />
+
+                    <View
+                        android:layout_width="28dp"
+                        android:layout_height="1dp" />
+
+                </LinearLayout>
+
+                <!-- Sleep Ramp -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/modeSleepButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/mode_sleep"
+                        android:textSize="14sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="16dp" />
+
+                    <ImageView
+                        android:id="@+id/iconSleepPhone"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_phone"
+                        app:tint="?attr/colorPrimary" />
+
+                    <ImageView
+                        android:id="@+id/iconSleepHeadphones"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_headphones"
+                        app:tint="?attr/colorPrimary" />
+
+                </LinearLayout>
+
+                <!-- Migraine Relief -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/modeMigraineButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/mode_migraine"
+                        android:textSize="14sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="16dp" />
+
+                    <ImageView
+                        android:id="@+id/iconMigrainePhone"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_phone"
+                        app:tint="?attr/colorPrimary" />
+
+                    <View
+                        android:layout_width="28dp"
+                        android:layout_height="1dp" />
+
+                </LinearLayout>
+
+                <!-- Mood Lift -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/modeMoodLiftButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/mode_mood_lift"
+                        android:textSize="14sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="16dp" />
+
+                    <ImageView
+                        android:id="@+id/iconMoodLiftHeadphones"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_headphones" />
+
+                    <ImageView
+                        android:id="@+id/iconMoodLiftGlasses"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_glasses" />
+
+                </LinearLayout>
+
+                <!-- Memory Write (Learning) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/modeMemoryButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/mode_memory"
+                        android:textSize="14sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="16dp" />
+
+                    <ImageView
+                        android:id="@+id/iconMemoryPhone"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_phone"
+                        app:tint="?attr/colorPrimary" />
+
+                    <ImageView
+                        android:id="@+id/iconMemoryGlasses"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_glasses"
+                        app:tint="?attr/colorPrimary" />
+
+                </LinearLayout>
+
+                <!-- Mode description -->
+                <TextView
+                    android:id="@+id/modeDescriptionText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mode_neurosync_description"
+                    android:textSize="15sp"
+                    android:textColor="?attr/colorOnSurface"
+                    android:lineSpacingMultiplier="1.3"
+                    android:gravity="start"
+                    android:minHeight="48dp" />
+
+                <!-- XREAL warning (hidden by default) -->
+                <TextView
+                    android:id="@+id/xrealWarningText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/xreal_required_warning"
+                    android:textSize="12sp"
+                    android:textColor="@color/status_required"
+                    android:gravity="start"
+                    android:visibility="gone"
+                    android:layout_marginTop="8dp" />
+
+                <!-- RSVP Text Loading (visible only for Learning mode) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/loadTextRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/loadTextTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/load_text"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/loadTextStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/no_document_loaded"
+                                android:textSize="14sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="4dp" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/clearDocumentButton"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/clear_document"
+                            android:textSize="14sp"
+                            android:textAllCaps="false"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Spacer -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="16dp" />
+
+                <!-- Duration selector -->
+                <TextView
+                    android:id="@+id/durationLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_duration"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/duration15Button"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/duration_15"
+                        android:textSize="15sp"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/duration30Button"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/duration_30"
+                        android:textSize="15sp"
+                        android:textAllCaps="false"
+                        android:layout_marginEnd="8dp"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/duration60Button"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="@string/duration_60"
+                        android:textSize="15sp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="16dp" />
+
+                </LinearLayout>
+
+                <!-- Start button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/startSessionButton"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="@string/start_session"
+                    android:textSize="18sp"
                     android:textAllCaps="false"
-                    android:visibility="gone" />
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp" />
 
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </ScrollView>
 
-        <!-- RSVP Speed Controls (visible when document loaded) -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/rsvpSpeedRow"
+        <!-- History Tab Content (Placeholder) -->
+        <LinearLayout
+            android:id="@+id/historyTabContent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:visibility="gone"
-            app:cardBackgroundColor="?attr/colorSurfaceVariant"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_history"
+                android:alpha="0.5"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/history_placeholder"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Settings Tab Content (embedded) -->
+        <ScrollView
+            android:id="@+id/settingsTabContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="12dp">
+                android:orientation="vertical"
+                android:padding="24dp">
 
-                <!-- Speed down button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/rsvpSpeedDown"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:text="-"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="12dp" />
-
-                <!-- Speed display -->
-                <LinearLayout
-                    android:layout_width="0dp"
+                <!-- Default Duration -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="12dp">
+                    android:text="@string/default_duration"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp" />
 
-                    <TextView
-                        android:id="@+id/rsvpWpmDisplay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="360 WPM"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurface" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="32dp">
 
-                    <TextView
-                        android:id="@+id/rsvpThetaDisplay"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settingsDuration15"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1× theta"
+                        android:layout_height="48dp"
+                        android:minWidth="80dp"
+                        android:text="@string/duration_15"
                         android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginTop="2dp" />
+                        android:layout_marginEnd="8dp"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settingsDuration30"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:minWidth="80dp"
+                        android:text="@string/duration_30"
+                        android:textSize="14sp"
+                        android:layout_marginEnd="8dp"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settingsDuration60"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:minWidth="80dp"
+                        android:text="@string/duration_60"
+                        android:textSize="14sp"
+                        app:cornerRadius="16dp" />
 
                 </LinearLayout>
 
-                <!-- Speed up button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/rsvpSpeedUp"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:text="+"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="12dp" />
+                <!-- Color Theme -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/color_theme"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="32dp">
+
+                    <View
+                        android:id="@+id/colorTeal"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@color/accent_teal" />
+
+                    <View
+                        android:id="@+id/colorBlue"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@color/accent_blue" />
+
+                    <View
+                        android:id="@+id/colorPurple"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@color/accent_purple" />
+
+                    <View
+                        android:id="@+id/colorGreen"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@color/accent_green" />
+
+                    <View
+                        android:id="@+id/colorOrange"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@color/accent_orange" />
+
+                    <View
+                        android:id="@+id/colorRed"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@color/accent_red" />
+
+                </LinearLayout>
+
+                <!-- Theme Mode (Dark/Light) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/theme_mode"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="32dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/darkModeButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:minWidth="100dp"
+                        android:text="@string/dark"
+                        android:textSize="14sp"
+                        android:layout_marginEnd="8dp"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/lightModeButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:minWidth="100dp"
+                        android:text="@string/light"
+                        android:textSize="14sp"
+                        app:cornerRadius="16dp" />
+
+                </LinearLayout>
+
+                <!-- Background Noise -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/background_noise"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="32dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/noiseOnButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:minWidth="100dp"
+                        android:text="@string/noise_on"
+                        android:textSize="14sp"
+                        android:layout_marginEnd="8dp"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/noiseOffButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:minWidth="100dp"
+                        android:text="@string/noise_off"
+                        android:textSize="14sp"
+                        app:cornerRadius="16dp" />
+
+                </LinearLayout>
+
+                <!-- RSVP Display Settings -->
+                <TextView
+                    android:id="@+id/rsvpLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rsvp_display"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginTop="32dp" />
+
+                <!-- Text Size -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_size"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <SeekBar
+                        android:id="@+id/rsvpSeekTextSize"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:min="5"
+                        android:max="25"
+                        android:progress="15"
+                        android:progressTint="?attr/colorPrimary"
+                        android:thumbTint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/rsvpTxtTextSizeValue"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:text="15%"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp"
+                        android:gravity="end"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- ORP Highlight Toggle -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/focus_letter_highlight"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/rsvpSwitchOrpHighlight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true" />
+
+                </LinearLayout>
+
+                <!-- Hyphenation Toggle -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/break_long_words"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/rsvpSwitchHyphenation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true" />
+
+                </LinearLayout>
+
+                <!-- Reading Speed (WPM) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reading_speed"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/rsvpSpeedRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="32dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="12dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/rsvpSpeedDown"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:text="-"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_marginHorizontal="12dp">
+
+                            <TextView
+                                android:id="@+id/rsvpWpmDisplay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="360 WPM"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+
+                            <TextView
+                                android:id="@+id/rsvpThetaDisplay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1× theta"
+                                android:textSize="14sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/rsvpSpeedUp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:text="+"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </ScrollView>
 
-    </LinearLayout>
+    </FrameLayout>
 
-    <!-- Bottom section: Duration and controls -->
-    <LinearLayout
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp"
-        android:paddingBottom="32dp">
+        android:background="?attr/colorSurface"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled" />
 
-        <!-- Duration selector -->
-        <TextView
-            android:id="@+id/durationLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/select_duration"
-            android:textSize="14sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginBottom="12dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="20dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/duration15Button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/duration_15"
-                android:textSize="15sp"
-                android:textAllCaps="false"
-                android:layout_marginEnd="8dp"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/duration30Button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/duration_30"
-                android:textSize="15sp"
-                android:textAllCaps="false"
-                android:layout_marginEnd="8dp"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/duration60Button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/duration_60"
-                android:textSize="15sp"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp" />
-
-        </LinearLayout>
-
-        <!-- Start button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/startSessionButton"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/start_session"
-            android:textSize="18sp"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
-
-        <!-- Settings link -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/settingsButton"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/settings"
-            android:textSize="14sp"
-            android:textAllCaps="false" />
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

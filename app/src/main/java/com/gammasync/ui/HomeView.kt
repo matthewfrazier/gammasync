@@ -2,24 +2,31 @@ package com.gammasync.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.SeekBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.R
 import com.gammasync.data.ColorScheme
 import com.gammasync.data.SettingsRepository
 import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfiles
 import com.gammasync.infra.HapticFeedback
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.materialswitch.MaterialSwitch
 
 /**
- * Home screen with mode selector, duration selector and start button.
+ * Home screen with mode selector, duration selector, start button, and bottom navigation tabs.
  * Uses Material 3 theming for automatic dark/light mode support.
  */
 class HomeView @JvmOverloads constructor(
@@ -76,10 +83,17 @@ class HomeView @JvmOverloads constructor(
     }
 
     var onStartSession: ((durationMinutes: Int, mode: TherapyMode) -> Unit)? = null
-    var onSettingsClicked: (() -> Unit)? = null
     var onLoadTextClicked: (() -> Unit)? = null
     var onClearDocumentClicked: (() -> Unit)? = null
     var onRsvpWpmChanged: ((Int) -> Unit)? = null
+    var onColorSchemeChanged: ((ColorScheme) -> Unit)? = null
+    var onDarkModeChanged: ((Boolean) -> Unit)? = null
+
+    // Bottom navigation
+    private val bottomNavigation: BottomNavigationView
+    private val experienceTabContent: ScrollView
+    private val historyTabContent: LinearLayout
+    private val settingsTabContent: ScrollView
 
     // Mode selector buttons
     private val modeNeuroSyncButton: MaterialButton
@@ -94,7 +108,7 @@ class HomeView @JvmOverloads constructor(
     private val iconMoodLiftHeadphones: ImageView
     private val iconMoodLiftGlasses: ImageView
 
-    // Duration selector buttons
+    // Duration selector buttons (Experience tab)
     private val duration15Button: MaterialButton
     private val duration30Button: MaterialButton
     private val duration60Button: MaterialButton
@@ -112,6 +126,27 @@ class HomeView @JvmOverloads constructor(
     private val rsvpWpmDisplay: TextView
     private val rsvpThetaDisplay: TextView
 
+    // Settings tab views
+    private val settingsDuration15: MaterialButton
+    private val settingsDuration30: MaterialButton
+    private val settingsDuration60: MaterialButton
+    private val colorTeal: View
+    private val colorBlue: View
+    private val colorPurple: View
+    private val colorGreen: View
+    private val colorOrange: View
+    private val colorRed: View
+    private val darkModeButton: MaterialButton
+    private val lightModeButton: MaterialButton
+    private val noiseOnButton: MaterialButton
+    private val noiseOffButton: MaterialButton
+
+    // RSVP display settings (in Settings tab)
+    private val rsvpSeekTextSize: SeekBar
+    private val rsvpTxtTextSizeValue: TextView
+    private val rsvpSwitchOrpHighlight: MaterialSwitch
+    private val rsvpSwitchHyphenation: MaterialSwitch
+
     private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
     private var currentWpmIndex = THETA_WPM_VALUES.indexOf(360) // Default to 1× theta
     private var selectedDuration = 30
@@ -121,13 +156,24 @@ class HomeView @JvmOverloads constructor(
 
     // Accent color for selected state
     private var accentColor = 0xFF26A69A.toInt()
+    private var selectedColorScheme = ColorScheme.TEAL
+    private var darkMode = true
+    private var backgroundNoiseEnabled = true
 
-    // Icon tint colors
-    private val iconTintRequired = 0xFFFF5252.toInt()
-    private val iconTintConnected = 0xFF4CAF50.toInt()
+    // Icon tint colors - theme-aware
+    private val iconTintRequired: Int
+        get() = MaterialColors.getColor(this, com.google.android.material.R.attr.colorError, 0xFFFF5252.toInt())
+    private val iconTintConnected: Int
+        get() = MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, 0xFF4CAF50.toInt())
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_home, this, true)
+
+        // Bottom navigation
+        bottomNavigation = findViewById(R.id.bottomNavigation)
+        experienceTabContent = findViewById(R.id.experienceTabContent)
+        historyTabContent = findViewById(R.id.historyTabContent)
+        settingsTabContent = findViewById(R.id.settingsTabContent)
 
         // Mode selector
         modeNeuroSyncButton = findViewById(R.id.modeNeuroSyncButton)
@@ -160,6 +206,46 @@ class HomeView @JvmOverloads constructor(
         rsvpWpmDisplay = findViewById(R.id.rsvpWpmDisplay)
         rsvpThetaDisplay = findViewById(R.id.rsvpThetaDisplay)
 
+        // Settings tab views
+        settingsDuration15 = findViewById(R.id.settingsDuration15)
+        settingsDuration30 = findViewById(R.id.settingsDuration30)
+        settingsDuration60 = findViewById(R.id.settingsDuration60)
+        colorTeal = findViewById(R.id.colorTeal)
+        colorBlue = findViewById(R.id.colorBlue)
+        colorPurple = findViewById(R.id.colorPurple)
+        colorGreen = findViewById(R.id.colorGreen)
+        colorOrange = findViewById(R.id.colorOrange)
+        colorRed = findViewById(R.id.colorRed)
+        darkModeButton = findViewById(R.id.darkModeButton)
+        lightModeButton = findViewById(R.id.lightModeButton)
+        noiseOnButton = findViewById(R.id.noiseOnButton)
+        noiseOffButton = findViewById(R.id.noiseOffButton)
+
+        // RSVP display settings (in Settings tab)
+        rsvpSeekTextSize = findViewById(R.id.rsvpSeekTextSize)
+        rsvpTxtTextSizeValue = findViewById(R.id.rsvpTxtTextSizeValue)
+        rsvpSwitchOrpHighlight = findViewById(R.id.rsvpSwitchOrpHighlight)
+        rsvpSwitchHyphenation = findViewById(R.id.rsvpSwitchHyphenation)
+
+        // Bottom navigation listener
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_experience -> {
+                    showTab(Tab.EXPERIENCE)
+                    true
+                }
+                R.id.nav_history -> {
+                    showTab(Tab.HISTORY)
+                    true
+                }
+                R.id.nav_settings -> {
+                    showTab(Tab.SETTINGS)
+                    true
+                }
+                else -> false
+            }
+        }
+
         // Mode button clicks
         modeNeuroSyncButton.setOnClickListener { selectMode(TherapyMode.NEUROSYNC) }
         modeMemoryButton.setOnClickListener { selectMode(TherapyMode.MEMORY_WRITE) }
@@ -167,7 +253,7 @@ class HomeView @JvmOverloads constructor(
         modeMigraineButton.setOnClickListener { selectMode(TherapyMode.MIGRAINE) }
         modeMoodLiftButton.setOnClickListener { selectMode(TherapyMode.MOOD_LIFT) }
 
-        // Duration button clicks
+        // Duration button clicks (Experience tab)
         duration15Button.setOnClickListener { selectDuration(15) }
         duration30Button.setOnClickListener { selectDuration(30) }
         duration60Button.setOnClickListener { selectDuration(60) }
@@ -175,11 +261,6 @@ class HomeView @JvmOverloads constructor(
         startSessionButton.setOnClickListener {
             haptics.heavyClick()
             onStartSession?.invoke(selectedDuration, selectedMode)
-        }
-
-        findViewById<View>(R.id.settingsButton).setOnClickListener {
-            haptics.tick()
-            onSettingsClicked?.invoke()
         }
 
         // RSVP Text Loading clicks
@@ -197,10 +278,67 @@ class HomeView @JvmOverloads constructor(
         rsvpSpeedDown.setOnClickListener { adjustRsvpSpeed(-1) }
         rsvpSpeedUp.setOnClickListener { adjustRsvpSpeed(1) }
 
+        // Settings tab clicks
+        settingsDuration15.setOnClickListener { selectSettingsDuration(15) }
+        settingsDuration30.setOnClickListener { selectSettingsDuration(30) }
+        settingsDuration60.setOnClickListener { selectSettingsDuration(60) }
+
+        colorTeal.setOnClickListener { selectColorScheme(ColorScheme.TEAL) }
+        colorBlue.setOnClickListener { selectColorScheme(ColorScheme.BLUE) }
+        colorPurple.setOnClickListener { selectColorScheme(ColorScheme.PURPLE) }
+        colorGreen.setOnClickListener { selectColorScheme(ColorScheme.GREEN) }
+        colorOrange.setOnClickListener { selectColorScheme(ColorScheme.ORANGE) }
+        colorRed.setOnClickListener { selectColorScheme(ColorScheme.RED) }
+
+        darkModeButton.setOnClickListener { selectDarkMode(true) }
+        lightModeButton.setOnClickListener { selectDarkMode(false) }
+
+        noiseOnButton.setOnClickListener { selectBackgroundNoise(true) }
+        noiseOffButton.setOnClickListener { selectBackgroundNoise(false) }
+
+        // RSVP settings listeners
+        rsvpSeekTextSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                rsvpTxtTextSizeValue.text = "$progress%"
+                if (fromUser) {
+                    settings?.rsvpTextSizePercent = progress / 100f
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        rsvpSwitchOrpHighlight.setOnCheckedChangeListener { _, isChecked ->
+            settings?.rsvpOrpHighlightEnabled = isChecked
+        }
+
+        rsvpSwitchHyphenation.setOnCheckedChangeListener { _, isChecked ->
+            settings?.rsvpHyphenationEnabled = isChecked
+        }
+
         updateModeSelection()
         updateDurationSelection()
         updateLoadTextVisibility()
         updateIconColors()
+        updateColorChips()
+    }
+
+    private enum class Tab {
+        EXPERIENCE, HISTORY, SETTINGS
+    }
+
+    private fun showTab(tab: Tab) {
+        experienceTabContent.visibility = if (tab == Tab.EXPERIENCE) View.VISIBLE else View.GONE
+        historyTabContent.visibility = if (tab == Tab.HISTORY) View.VISIBLE else View.GONE
+        settingsTabContent.visibility = if (tab == Tab.SETTINGS) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Navigate to the Settings tab programmatically.
+     */
+    fun navigateToSettingsTab() {
+        bottomNavigation.selectedItemId = R.id.nav_settings
+        showTab(Tab.SETTINGS)
     }
 
     fun bindSettings(settingsRepository: SettingsRepository) {
@@ -208,11 +346,25 @@ class HomeView @JvmOverloads constructor(
         selectedDuration = settingsRepository.durationMinutes
         selectedMode = settingsRepository.therapyMode
         accentColor = settingsRepository.colorScheme.accentColor
+        selectedColorScheme = settingsRepository.colorScheme
+        darkMode = settingsRepository.darkMode
+        backgroundNoiseEnabled = settingsRepository.backgroundNoiseEnabled
+
+        // Load RSVP settings
+        rsvpSeekTextSize.progress = (settingsRepository.rsvpTextSizePercent * 100).toInt()
+        rsvpTxtTextSizeValue.text = "${rsvpSeekTextSize.progress}%"
+        rsvpSwitchOrpHighlight.isChecked = settingsRepository.rsvpOrpHighlightEnabled
+        rsvpSwitchHyphenation.isChecked = settingsRepository.rsvpHyphenationEnabled
+
         updateAccentColor()
         updateModeSelection()
         updateDurationSelection()
         updateLoadTextVisibility()
         updateDocumentStatus()
+        updateColorChips()
+        updateSettingsDurationSelection()
+        updateDarkModeSelection()
+        updateNoiseSelection()
     }
 
     private fun updateAccentColor() {
@@ -271,12 +423,13 @@ class HomeView @JvmOverloads constructor(
         // Get theme-aware colors for unselected state
         val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
 
         modeButtons.forEach { (mode, button) ->
             val isSelected = mode == selectedMode
             if (isSelected) {
                 button.backgroundTintList = ColorStateList.valueOf(accentColor)
-                button.setTextColor(0xFFFFFFFF.toInt())
+                button.setTextColor(onPrimaryColor)
             } else {
                 // Transparent background with theme-appropriate text color
                 button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
@@ -315,12 +468,13 @@ class HomeView @JvmOverloads constructor(
         // Get theme-aware colors for unselected state
         val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
 
         durationButtons.forEach { (duration, button) ->
             val isSelected = duration == selectedDuration
             if (isSelected) {
                 button.backgroundTintList = ColorStateList.valueOf(accentColor)
-                button.setTextColor(0xFFFFFFFF.toInt())
+                button.setTextColor(onPrimaryColor)
             } else {
                 button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
                 button.setTextColor(onSurfaceColor)
@@ -335,14 +489,8 @@ class HomeView @JvmOverloads constructor(
     }
 
     private fun updateRsvpSpeedVisibility() {
-        // Show speed controls when in Learning mode and document is loaded
-        val docLoaded = (settings?.rsvpDocumentWordCount ?: 0) > 0
-        val shouldShow = selectedMode == TherapyMode.MEMORY_WRITE && docLoaded
-        rsvpSpeedRow.visibility = if (shouldShow) View.VISIBLE else View.GONE
-
-        if (shouldShow) {
-            updateRsvpWpmDisplay()
-        }
+        // WPM controls are always visible in Settings tab - just update the display
+        updateRsvpWpmDisplay()
     }
 
     private fun adjustRsvpSpeed(direction: Int) {
@@ -390,17 +538,159 @@ class HomeView @JvmOverloads constructor(
     fun clearDocument() {
         loadTextStatus.text = context.getString(R.string.no_document_loaded)
         clearDocumentButton.visibility = View.GONE
-        rsvpSpeedRow.visibility = View.GONE
+        // WPM controls are now in Settings tab and always visible
     }
 
     private fun updateDocumentStatus() {
         val docName = settings?.rsvpDocumentName
         val wordCount = settings?.rsvpDocumentWordCount ?: 0
-        
+
         if (docName != null && wordCount > 0) {
             setDocumentLoaded(docName, wordCount)
         } else {
             clearDocument()
+        }
+    }
+
+    // --- Settings Tab Methods ---
+
+    private fun selectSettingsDuration(minutes: Int) {
+        haptics.tick()
+        selectedDuration = minutes
+        settings?.durationMinutes = minutes
+        updateSettingsDurationSelection()
+        updateDurationSelection() // Also update experience tab
+    }
+
+    private fun updateSettingsDurationSelection() {
+        val durationButtons = listOf(
+            15 to settingsDuration15,
+            30 to settingsDuration30,
+            60 to settingsDuration60
+        )
+
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
+
+        durationButtons.forEach { (duration, button) ->
+            val isSelected = duration == selectedDuration
+            if (isSelected) {
+                button.backgroundTintList = ColorStateList.valueOf(accentColor)
+                button.setTextColor(onPrimaryColor)
+            } else {
+                button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+                button.setTextColor(onSurfaceColor)
+            }
+        }
+    }
+
+    private fun selectColorScheme(scheme: ColorScheme) {
+        if (scheme == selectedColorScheme) return
+
+        haptics.tick()
+        selectedColorScheme = scheme
+        accentColor = scheme.accentColor
+        settings?.colorScheme = scheme
+        updateColorChips()
+        updateDurationSelection()
+        updateSettingsDurationSelection()
+        updateDarkModeSelection()
+        updateNoiseSelection()
+        updateModeSelection()
+        updateAccentColor()
+        onColorSchemeChanged?.invoke(scheme)
+    }
+
+    private fun selectDarkMode(isDark: Boolean) {
+        if (isDark == darkMode) return
+
+        haptics.tick()
+        darkMode = isDark
+        settings?.darkMode = isDark
+
+        // Use AppCompatDelegate to switch the entire app's theme
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        updateDarkModeSelection()
+        onDarkModeChanged?.invoke(isDark)
+    }
+
+    private fun updateDarkModeSelection() {
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
+
+        if (darkMode) {
+            darkModeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            darkModeButton.setTextColor(onPrimaryColor)
+            lightModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            lightModeButton.setTextColor(onSurfaceColor)
+        } else {
+            lightModeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            lightModeButton.setTextColor(onPrimaryColor)
+            darkModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            darkModeButton.setTextColor(onSurfaceColor)
+        }
+    }
+
+    private fun selectBackgroundNoise(enabled: Boolean) {
+        if (enabled == backgroundNoiseEnabled) return
+
+        haptics.tick()
+        backgroundNoiseEnabled = enabled
+        settings?.backgroundNoiseEnabled = enabled
+        updateNoiseSelection()
+    }
+
+    private fun updateNoiseSelection() {
+        // Get theme-aware colors for unselected state
+        val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
+        val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
+
+        if (backgroundNoiseEnabled) {
+            noiseOnButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            noiseOnButton.setTextColor(onPrimaryColor)
+            noiseOffButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            noiseOffButton.setTextColor(onSurfaceColor)
+        } else {
+            noiseOffButton.backgroundTintList = ColorStateList.valueOf(accentColor)
+            noiseOffButton.setTextColor(onPrimaryColor)
+            noiseOnButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+            noiseOnButton.setTextColor(onSurfaceColor)
+        }
+    }
+
+    private fun updateColorChips() {
+        val colorViews = mapOf(
+            ColorScheme.TEAL to colorTeal,
+            ColorScheme.BLUE to colorBlue,
+            ColorScheme.PURPLE to colorPurple,
+            ColorScheme.GREEN to colorGreen,
+            ColorScheme.ORANGE to colorOrange,
+            ColorScheme.RED to colorRed
+        )
+
+        val density = resources.displayMetrics.density
+        val borderColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0xFFFFFFFF.toInt())
+
+        colorViews.forEach { (scheme, view) ->
+            val isSelected = scheme == selectedColorScheme
+            val drawable = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 12f * density
+                setColor(scheme.accentColor)
+                if (isSelected) {
+                    // Theme-aware border for selected color
+                    setStroke((3 * density).toInt(), borderColor)
+                }
+            }
+            view.background = drawable
         }
     }
 }

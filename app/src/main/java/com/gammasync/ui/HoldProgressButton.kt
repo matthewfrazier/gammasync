@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.widget.AppCompatButton
 import com.gammasync.infra.HapticFeedback
+import com.google.android.material.color.MaterialColors
 
 /**
  * Button that requires a continuous hold for [holdDurationMs] to trigger completion.
@@ -39,13 +40,12 @@ class HoldProgressButton @JvmOverloads constructor(
         style = Paint.Style.STROKE
         strokeWidth = PROGRESS_STROKE_WIDTH
         strokeCap = Paint.Cap.ROUND
-        color = 0xFF26A69A.toInt() // Teal progress
     }
 
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = PROGRESS_STROKE_WIDTH
-        color = 0x40FFFFFF // Semi-transparent white track
+        color = 0x40FFFFFF // Semi-transparent white track (acceptable overlay)
     }
 
     private val progressRect = RectF()
@@ -111,6 +111,9 @@ class HoldProgressButton @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        // Update progress color to be theme-aware
+        progressPaint.color = MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, 0xFF26A69A.toInt())
+
         // Draw track (background ring)
         canvas.drawRoundRect(progressRect, progressRect.height() / 2, progressRect.height() / 2, trackPaint)
 

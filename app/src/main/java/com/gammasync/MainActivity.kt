@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import com.gammasync.data.SettingsRepository
+import com.gammasync.domain.rsvp.ProcessedDocument
 import com.gammasync.domain.therapy.TherapyMode
 import com.gammasync.domain.therapy.TherapyProfile
 import com.gammasync.domain.therapy.TherapyProfiles
@@ -33,7 +34,7 @@ import com.gammasync.ui.HomeView
 import com.gammasync.ui.SafetyDisclaimerView
 import com.gammasync.ui.SessionCompleteView
 import com.gammasync.ui.RsvpOverlay
-import com.gammasync.ui.SettingsView
+import com.gammasync.ui.RsvpDetailsView
 import com.gammasync.utils.DocumentLoader
 import com.gammasync.utils.TextProcessor
 import com.google.android.material.button.MaterialButton
@@ -46,11 +47,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     }
 
     enum class Screen {
-        DISCLAIMER,  // 0
-        HOME,        // 1
-        THERAPY,     // 2
-        COMPLETE,    // 3
-        SETTINGS     // 4
+        DISCLAIMER,    // 0
+        HOME,          // 1
+        THERAPY,       // 2
+        COMPLETE,      // 3
+        RSVP_DETAILS   // 4
     }
 
     // Views
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var homeScreen: HomeView
     private lateinit var therapyScreen: FrameLayout
     private lateinit var completeScreen: SessionCompleteView
-    private lateinit var settingsScreen: SettingsView
+    private lateinit var rsvpDetailsScreen: RsvpDetailsView
 
     // Therapy screen views
     private lateinit var circularTimer: CircularTimerView
@@ -167,7 +168,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         homeScreen = findViewById(R.id.homeScreen)
         therapyScreen = findViewById(R.id.therapyScreen)
         completeScreen = findViewById(R.id.completeScreen)
-        settingsScreen = findViewById(R.id.settingsScreen)
+        rsvpDetailsScreen = findViewById(R.id.rsvpDetailsScreen)
 
         // Therapy screen views
         circularTimer = findViewById(R.id.circularTimer)
@@ -208,14 +209,20 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         homeScreen.onStartSession = { durationMinutes, mode ->
             startSession(durationMinutes, mode)
         }
-        homeScreen.onSettingsClicked = {
-            navigateTo(Screen.SETTINGS)
-        }
         homeScreen.onLoadTextClicked = {
-            openDocumentPicker()
+            rsvpDetailsScreen.loadSettings(settings)
+            navigateTo(Screen.RSVP_DETAILS)
         }
         homeScreen.onClearDocumentClicked = {
             clearDocument()
+        }
+        homeScreen.onColorSchemeChanged = {
+            // Settings changed from embedded tab - rebind to refresh
+            homeScreen.bindSettings(settings)
+        }
+        homeScreen.onDarkModeChanged = {
+            // Theme changed from embedded tab - rebind to refresh
+            homeScreen.bindSettings(settings)
         }
 
         // Restore previously loaded document if any
@@ -244,19 +251,20 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             finish()
         }
 
-        // Settings screen
-        settingsScreen.bindSettings(settings)
-        settingsScreen.onBackClicked = {
-            homeScreen.bindSettings(settings)
+        // RSVP Details screen
+        rsvpDetailsScreen.onBackPressed = {
             navigateTo(Screen.HOME)
         }
-        settingsScreen.onColorSchemeChanged = {
-            // Refresh home screen with new color scheme (no need to recreate)
-            homeScreen.bindSettings(settings)
+        rsvpDetailsScreen.onFileSelectRequested = {
+            openDocumentPicker()
         }
-        settingsScreen.onDarkModeChanged = {
-            // Refresh home screen with new theme
-            homeScreen.bindSettings(settings)
+        rsvpDetailsScreen.onDocumentSelected = { document ->
+            handleProcessedDocument(document)
+            navigateTo(Screen.HOME)
+        }
+        rsvpDetailsScreen.onRsvpSettingsClicked = {
+            navigateTo(Screen.HOME)
+            homeScreen.navigateToSettingsTab()
         }
     }
 
@@ -696,26 +704,32 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
                         android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
 
-                    // Save document metadata
-                    settings.rsvpDocumentUri = uri.toString()
-                    settings.rsvpDocumentName = docInfo.filename
-                    settings.rsvpDocumentWordCount = docInfo.wordCount
+                    // Pass to RsvpDetailsView for preview
+                    rsvpDetailsScreen.onFileSelected(uri, docInfo.filename, docInfo.text)
 
-                    // Store words for RSVP display
-                    loadedWords = TextProcessor.getWords(docInfo.text)
-
-                    // Update UI
-                    homeScreen.setDocumentLoaded(docInfo.filename, docInfo.wordCount)
-
-                    Log.i(TAG, "Document loaded: ${docInfo.filename} (${loadedWords.size} words)")
+                    Log.i(TAG, "Document selected: ${docInfo.filename} (${docInfo.wordCount} words)")
                 } else {
                     Log.w(TAG, "Failed to load document")
-                    // Could show a toast or dialog here
                 }
             } catch (e: SecurityException) {
                 Log.e(TAG, "Failed to get persistent permission", e)
             }
         }
+    }
+
+    private fun handleProcessedDocument(document: ProcessedDocument) {
+        // Save document metadata
+        settings.rsvpDocumentUri = document.sourceId
+        settings.rsvpDocumentName = document.displayName
+        settings.rsvpDocumentWordCount = document.totalWords
+
+        // Store words for RSVP display (join glimpse texts for legacy mode)
+        loadedWords = document.glimpses.map { it.text.split(" ") }.flatten()
+
+        // Update HomeView
+        homeScreen.setDocumentLoaded(document.displayName, document.totalWords)
+
+        Log.i(TAG, "Document processed: ${document.displayName} (${document.totalWords} words, ${document.glimpses.size} glimpses)")
     }
 
     private fun clearDocument() {

@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Accent color options -->
+    <!-- Background colors -->
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#1E1E1E</color>
+    <color name="surface_light">#2C2C2C</color>
+
+    <!-- Text colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_on_accent">#FFFFFF</color>
+
+    <!-- Accent colors -->
+    <color name="accent">#26A69A</color>
+    <color name="accent_dark">#1E7A71</color>
     <color name="accent_teal">#26A69A</color>
     <color name="accent_blue">#42A5F5</color>
     <color name="accent_purple">#AB47BC</color>
     <color name="accent_green">#66BB6A</color>
     <color name="accent_orange">#FFA726</color>
     <color name="accent_red">#EF5350</color>
+
+    <!-- Switch colors -->
+    <color name="switch_thumb">#26A69A</color>
+    <color name="switch_track">#4D4D4D</color>
 
     <!-- Status colors -->
     <color name="status_connected">#4CAF50</color>

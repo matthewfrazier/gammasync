@@ -223,9 +223,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- Screen 4: Settings -->
-        <com.gammasync.ui.SettingsView
-            android:id="@+id/settingsScreen"
+        <!-- Screen 4: RSVP Details -->
+        <com.gammasync.ui.RsvpDetailsView
+            android:id="@+id/rsvpDetailsScreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

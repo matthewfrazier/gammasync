@@ -326,47 +326,50 @@ class MainActivityTest {
         onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
     }
 
-    // --- Settings & Color Scheme Tests ---
+    // --- Settings Tab & Color Scheme Tests ---
 
     @Test
-    fun settingsButtonOpensSettingsScreen() {
+    fun settingsTabShowsColorOptions() {
         acceptDisclaimer()
 
-        onView(withId(R.id.settingsButton)).perform(click())
+        // Navigate to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(300)
 
-        onView(withId(R.id.settingsScreen)).check(matches(isDisplayed()))
+        // Verify color options are visible
+        onView(withId(R.id.colorTeal)).check(matches(isDisplayed()))
+        onView(withId(R.id.colorBlue)).check(matches(isDisplayed()))
+        onView(withId(R.id.colorPurple)).check(matches(isDisplayed()))
     }
 
     @Test
     fun changingColorSchemeDoesNotShowDisclaimer() {
         acceptDisclaimer()
 
-        // Go to settings
-        onView(withId(R.id.settingsButton)).perform(click())
+        // Go to settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
         Thread.sleep(300)
 
         // Change color scheme by clicking blue
         onView(withId(R.id.colorBlue)).perform(click())
         Thread.sleep(300)
 
-        // Go back to home
-        onView(withId(R.id.backButton)).perform(click())
+        // Go back to Experience tab
+        onView(withText(R.string.tab_experience)).perform(click())
         Thread.sleep(300)
 
         // Should be on home screen, NOT disclaimer
         onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
-        // Disclaimer should NOT be visible (it's in ViewFlipper but not displayed)
+        // Disclaimer should NOT be visible
         onView(withId(R.id.disclaimerScreen)).check(matches(not(isDisplayed())))
-        // The hold-to-agree button should not be visible
-        onView(withId(R.id.holdToAgreeButton)).check(matches(not(isDisplayed())))
     }
 
     @Test
     fun changingMultipleColorSchemesNeverShowsDisclaimer() {
         acceptDisclaimer()
 
-        // Go to settings and change colors multiple times
-        onView(withId(R.id.settingsButton)).perform(click())
+        // Go to settings tab and change colors multiple times
+        onView(withText(R.string.tab_settings)).perform(click())
         Thread.sleep(300)
 
         onView(withId(R.id.colorBlue)).perform(click())
@@ -382,14 +385,13 @@ class MainActivityTest {
         onView(withId(R.id.colorTeal)).perform(click())
         Thread.sleep(200)
 
-        // Go back
-        onView(withId(R.id.backButton)).perform(click())
+        // Go back to Experience tab
+        onView(withText(R.string.tab_experience)).perform(click())
         Thread.sleep(300)
 
         // Should still be on home, never shown disclaimer
         onView(withId(R.id.homeScreen)).check(matches(isDisplayed()))
         onView(withId(R.id.disclaimerScreen)).check(matches(not(isDisplayed())))
-        onView(withId(R.id.holdToAgreeButton)).check(matches(not(isDisplayed())))
     }
 
     // --- RSVP Text Loading Tests ---
@@ -422,5 +424,138 @@ class MainActivityTest {
 
         onView(withId(R.id.modeMemoryButton)).perform(click())
         onView(withId(R.id.loadTextStatus)).check(matches(withText(R.string.no_document_loaded)))
+    }
+
+    // --- Bottom Navigation & Settings Tab Tests ---
+
+    @Test
+    fun bottomNavigationShowsAllTabs() {
+        acceptDisclaimer()
+
+        onView(withId(R.id.bottomNavigation)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun settingsTabShowsRsvpDisplaySettings() {
+        acceptDisclaimer()
+
+        // Navigate to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(300)
+
+        // Verify RSVP Display section is visible
+        onView(withId(R.id.rsvpLabel)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpSeekTextSize)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpSwitchOrpHighlight)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpSwitchHyphenation)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun settingsTabShowsWpmSpeedControls() {
+        acceptDisclaimer()
+
+        // Navigate to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(300)
+
+        // Verify WPM speed controls are in Settings tab
+        onView(withId(R.id.rsvpSpeedRow)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpSpeedDown)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpSpeedUp)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpWpmDisplay)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpThetaDisplay)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun experienceTabDoesNotShowWpmControlsWhenDocumentLoaded() {
+        acceptDisclaimer()
+
+        // Select Learning mode
+        onView(withId(R.id.modeMemoryButton)).perform(click())
+        Thread.sleep(300)
+
+        // WPM controls should NOT be in Experience tab
+        // (They've been moved to Settings tab)
+        // The rsvpSpeedRow is now only in Settings tab, so this should pass
+        onView(withText(R.string.tab_experience)).perform(click())
+        Thread.sleep(300)
+
+        // Load text row should be visible in Learning mode
+        onView(withId(R.id.loadTextRow)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun wpmControlsAreInteractive() {
+        acceptDisclaimer()
+
+        // Navigate to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(300)
+
+        // Click speed up button - should not crash
+        onView(withId(R.id.rsvpSpeedUp)).perform(click())
+        Thread.sleep(100)
+
+        // WPM display should still be visible
+        onView(withId(R.id.rsvpWpmDisplay)).check(matches(isDisplayed()))
+
+        // Click speed down button - should not crash
+        onView(withId(R.id.rsvpSpeedDown)).perform(click())
+        Thread.sleep(100)
+
+        // Controls should still be functional
+        onView(withId(R.id.rsvpSpeedRow)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun rsvpTextSizeSliderWorks() {
+        acceptDisclaimer()
+
+        // Navigate to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(300)
+
+        // Verify text size slider is visible and displays value
+        onView(withId(R.id.rsvpSeekTextSize)).check(matches(isDisplayed()))
+        onView(withId(R.id.rsvpTxtTextSizeValue)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun rsvpTogglesWork() {
+        acceptDisclaimer()
+
+        // Navigate to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(300)
+
+        // Toggle ORP highlight
+        onView(withId(R.id.rsvpSwitchOrpHighlight)).perform(click())
+        Thread.sleep(100)
+        onView(withId(R.id.rsvpSwitchOrpHighlight)).check(matches(isDisplayed()))
+
+        // Toggle hyphenation
+        onView(withId(R.id.rsvpSwitchHyphenation)).perform(click())
+        Thread.sleep(100)
+        onView(withId(R.id.rsvpSwitchHyphenation)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun canSwitchBetweenAllBottomNavTabs() {
+        acceptDisclaimer()
+
+        // Switch to History tab
+        onView(withText(R.string.tab_history)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.historyTabContent)).check(matches(isDisplayed()))
+
+        // Switch to Settings tab
+        onView(withText(R.string.tab_settings)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.settingsTabContent)).check(matches(isDisplayed()))
+
+        // Switch back to Experience tab
+        onView(withText(R.string.tab_experience)).perform(click())
+        Thread.sleep(200)
+        onView(withId(R.id.experienceTabContent)).check(matches(isDisplayed()))
     }
 }

@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import com.google.android.material.color.MaterialColors
 
 /**
  * Circular pie timer that fills clockwise as time progresses.
@@ -30,7 +31,6 @@ class CircularTimerView @JvmOverloads constructor(
     private val backgroundColor = 0x40000000  // 25% black
     private val trackColor = 0x40FFFFFF       // 25% white
     private var progressColor = 0xFF26A69A.toInt()  // Teal (default)
-    private val textColor = 0xFFFFFFFF.toInt()
 
     private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -49,7 +49,6 @@ class CircularTimerView @JvmOverloads constructor(
     }
 
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = textColor
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
@@ -109,6 +108,9 @@ class CircularTimerView @JvmOverloads constructor(
         val cx = width / 2f
         val cy = height / 2f
         val radius = minOf(cx, cy) - trackPaint.strokeWidth / 2
+
+        // Update text color to be theme-aware
+        textPaint.color = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0xFFFFFFFF.toInt())
 
         // Draw circular background (semi-transparent)
         canvas.drawCircle(cx, cy, radius, backgroundPaint)

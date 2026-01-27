@@ -56,9 +56,24 @@
     <string name="noise_on">On</string>
     <string name="noise_off">Off</string>
     
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_experience">Experience</string>
+    <string name="tab_history">History</string>
+    <string name="tab_settings">Settings</string>
+    <string name="history_placeholder">Session history coming soon</string>
+
     <!-- RSVP Text Loading -->
-    <string name="load_text">📄 Load Text for RSVP</string>
+    <string name="load_text">📄 Load Learning Text</string>
     <string name="no_document_loaded">No document loaded</string>
     <string name="document_loaded_format">%1$s · %2$,d words (~%3$d min)</string>
     <string name="clear_document">Clear</string>
+
+    <!-- RSVP Display Settings -->
+    <string name="rsvp_display">RSVP Display</string>
+    <string name="text_size">Text Size</string>
+    <string name="focus_letter_highlight">Focus Letter Highlight</string>
+    <string name="break_long_words">Break Long Words</string>
+    <string name="reading_speed">Reading Speed (Theta-Harmonic WPM)</string>
+    <string name="rsvp_settings">RSVP Settings</string>
+    <string name="configure_in_settings">Configure display settings</string>
 </resources>

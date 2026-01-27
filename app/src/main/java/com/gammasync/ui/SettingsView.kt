@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.R
@@ -16,6 +17,7 @@ import com.gammasync.data.SettingsRepository
 import com.gammasync.infra.HapticFeedback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.materialswitch.MaterialSwitch
 
 /**
  * Settings screen for configuring default session duration, color theme, and dark mode.
@@ -52,6 +54,12 @@ class SettingsView @JvmOverloads constructor(
     private val noiseOnButton: MaterialButton
     private val noiseOffButton: MaterialButton
 
+    // RSVP display settings
+    private val rsvpSeekTextSize: SeekBar
+    private val rsvpTxtTextSizeValue: TextView
+    private val rsvpSwitchOrpHighlight: MaterialSwitch
+    private val rsvpSwitchHyphenation: MaterialSwitch
+
     private val haptics = HapticFeedback(context)
     private var settings: SettingsRepository? = null
     private var selectedDuration = 30
@@ -83,6 +91,12 @@ class SettingsView @JvmOverloads constructor(
         noiseOnButton = findViewById(R.id.noiseOnButton)
         noiseOffButton = findViewById(R.id.noiseOffButton)
 
+        // RSVP display settings
+        rsvpSeekTextSize = findViewById(R.id.rsvpSeekTextSize)
+        rsvpTxtTextSizeValue = findViewById(R.id.rsvpTxtTextSizeValue)
+        rsvpSwitchOrpHighlight = findViewById(R.id.rsvpSwitchOrpHighlight)
+        rsvpSwitchHyphenation = findViewById(R.id.rsvpSwitchHyphenation)
+
         // Set back button tint to match theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
         backButton.imageTintList = ColorStateList.valueOf(onSurfaceColor)
@@ -112,6 +126,26 @@ class SettingsView @JvmOverloads constructor(
         noiseOnButton.setOnClickListener { selectBackgroundNoise(true) }
         noiseOffButton.setOnClickListener { selectBackgroundNoise(false) }
 
+        // RSVP settings listeners
+        rsvpSeekTextSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                rsvpTxtTextSizeValue.text = "$progress%"
+                if (fromUser) {
+                    settings?.rsvpTextSizePercent = progress / 100f
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        rsvpSwitchOrpHighlight.setOnCheckedChangeListener { _, isChecked ->
+            settings?.rsvpOrpHighlightEnabled = isChecked
+        }
+
+        rsvpSwitchHyphenation.setOnCheckedChangeListener { _, isChecked ->
+            settings?.rsvpHyphenationEnabled = isChecked
+        }
+
         updateColorChips()
     }
 
@@ -121,6 +155,12 @@ class SettingsView @JvmOverloads constructor(
         selectedColorScheme = settingsRepository.colorScheme
         darkMode = settingsRepository.darkMode
         backgroundNoiseEnabled = settingsRepository.backgroundNoiseEnabled
+
+        // Load RSVP settings
+        rsvpSeekTextSize.progress = (settingsRepository.rsvpTextSizePercent * 100).toInt()
+        rsvpTxtTextSizeValue.text = "${rsvpSeekTextSize.progress}%"
+        rsvpSwitchOrpHighlight.isChecked = settingsRepository.rsvpOrpHighlightEnabled
+        rsvpSwitchHyphenation.isChecked = settingsRepository.rsvpHyphenationEnabled
 
         // Refresh back button tint for current theme
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
@@ -150,12 +190,13 @@ class SettingsView @JvmOverloads constructor(
         // Get theme-aware colors for unselected state
         val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
 
         durationButtons.forEach { (duration, button) ->
             val isSelected = duration == selectedDuration
             if (isSelected) {
                 button.backgroundTintList = ColorStateList.valueOf(accentColor)
-                button.setTextColor(0xFFFFFFFF.toInt())
+                button.setTextColor(onPrimaryColor)
             } else {
                 button.backgroundTintList = ColorStateList.valueOf(surfaceColor)
                 button.setTextColor(onSurfaceColor)
@@ -197,15 +238,16 @@ class SettingsView @JvmOverloads constructor(
         // Get theme-aware colors for unselected state
         val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
 
         if (darkMode) {
             darkModeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
-            darkModeButton.setTextColor(0xFFFFFFFF.toInt())
+            darkModeButton.setTextColor(onPrimaryColor)
             lightModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
             lightModeButton.setTextColor(onSurfaceColor)
         } else {
             lightModeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
-            lightModeButton.setTextColor(0xFFFFFFFF.toInt())
+            lightModeButton.setTextColor(onPrimaryColor)
             darkModeButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
             darkModeButton.setTextColor(onSurfaceColor)
         }
@@ -226,15 +268,16 @@ class SettingsView @JvmOverloads constructor(
         // Get theme-aware colors for unselected state
         val surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, 0)
         val onSurfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0)
+        val onPrimaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary, 0xFFFFFFFF.toInt())
 
         if (backgroundNoiseEnabled) {
             noiseOnButton.backgroundTintList = ColorStateList.valueOf(accentColor)
-            noiseOnButton.setTextColor(0xFFFFFFFF.toInt())
+            noiseOnButton.setTextColor(onPrimaryColor)
             noiseOffButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
             noiseOffButton.setTextColor(onSurfaceColor)
         } else {
             noiseOffButton.backgroundTintList = ColorStateList.valueOf(accentColor)
-            noiseOffButton.setTextColor(0xFFFFFFFF.toInt())
+            noiseOffButton.setTextColor(onPrimaryColor)
             noiseOnButton.backgroundTintList = ColorStateList.valueOf(surfaceColor)
             noiseOnButton.setTextColor(onSurfaceColor)
         }
@@ -251,6 +294,7 @@ class SettingsView @JvmOverloads constructor(
         )
 
         val density = resources.displayMetrics.density
+        val borderColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0xFFFFFFFF.toInt())
 
         colorViews.forEach { (scheme, view) ->
             val isSelected = scheme == selectedColorScheme
@@ -259,8 +303,8 @@ class SettingsView @JvmOverloads constructor(
                 cornerRadius = 12f * density
                 setColor(scheme.accentColor)
                 if (isSelected) {
-                    // White border for selected color
-                    setStroke((3 * density).toInt(), 0xFFFFFFFF.toInt())
+                    // Theme-aware border for selected color
+                    setStroke((3 * density).toInt(), borderColor)
                 }
             }
             view.background = drawable

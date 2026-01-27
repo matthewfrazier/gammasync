@@ -1,0 +1,340 @@
+# CogniHertz
+
+**Gamma Entrainment Using Sensory Stimuli (GENUS) - An Open-Source Tool for Cognitive Exploration**
+
+CogniHertz is an Android application for exploring gamma brainwave entrainment through precisely-timed 40Hz audiovisual stimulation. A tool for psychonauts, cognitive enhancement enthusiasts, and anyone interested in pushing the boundaries of human perception and learning.
+
+> **DISCLAIMER**: This app is for entertainment and personal research purposes only. It is not a medical device and makes no therapeutic claims. Consult healthcare professionals before using if you have any medical conditions.
+
+---
+
+## 🧠 The Science
+
+Gamma brainwaves (30-100Hz) represent the brain's highest-frequency oscillations, associated with peak cognitive performance, heightened awareness, and integrated neural processing. Emerging research demonstrates that external 40Hz sensory stimulation can entrain endogenous gamma oscillations, potentially modulating consciousness, memory, and perception.
+
+### Key Research Areas
+
+**Alzheimer's Disease & Cognitive Decline**
+- Tsai et al. (2019) demonstrated that 40Hz audiovisual stimulation reduced amyloid plaques and improved cognitive function in mouse models of Alzheimer's disease ([Nature, 2019](https://www.nature.com/articles/s41586-019-1333-6))
+- Human trials have shown promising results in mild cognitive impairment patients (Clements-Cortes et al., 2016)
+- The GENUS approach targets specific brain regions through precise sensory timing
+
+**Memory Enhancement**
+- Gamma oscillations correlate with memory encoding and retrieval (Herrmann et al., 2010)
+- Phase-locked gamma activity may strengthen synaptic connections during learning
+- Theta-gamma coupling (6Hz + 40Hz) plays a role in memory consolidation during REM sleep
+
+**Neural Synchronization**
+- 40Hz stimulation may promote synchronized neural firing across brain regions
+- Enhanced gamma power correlates with improved attention and perceptual binding
+- Isoluminant flicker (chromatic changes without brightness changes) provides safer long-term exposure
+
+**Sleep & Circadian Rhythms**
+- Binaural beats and brown noise may influence sleep architecture
+- Gradual frequency ramps (8Hz→1Hz) align with natural sleep transition patterns
+- Auditory entrainment shows promise for improving sleep quality
+
+### Theoretical Mechanisms
+
+**Frequency Following Response (FFR)**
+- The brain's natural tendency to synchronize neural oscillations to external rhythmic stimuli
+- Most pronounced in visual and auditory cortices
+- May propagate to deeper brain structures through thalamocortical circuits
+
+**Resonance & Harmonic Coupling**
+- Theta (4-8Hz) and gamma (30-100Hz) waves naturally couple during memory tasks
+- 40Hz may act as a harmonic frequency for neural network optimization
+- Cross-frequency coupling coordinates activity across brain regions
+
+---
+
+## ⚡ Features
+
+### Therapy Modes
+
+**🧠 Memory Mode**
+- Pure 40Hz gamma stimulation with pink noise
+- Isoluminant chromatic flicker (2700K ↔ 6500K)
+- Optimized for cellular cleanup and memory consolidation
+- Headphones recommended to perceive the 40Hz audio tone
+
+**📚 Learning Mode**
+- Theta-gamma coupling (6Hz bursts × 40Hz carrier)
+- RSVP (Rapid Serial Visual Presentation) text display
+- Theta-harmonic reading speeds (60-2000 WPM)
+- Enhanced learning through synchronized brainwave states
+
+**😴 Sleep Mode**
+- 8Hz→1Hz binaural beat ramp with brown noise
+- Gradual frequency descent over 30-60 minutes
+- Follows natural sleep transition patterns
+- Requires headphones for binaural effect
+
+**🌿 Migraine Mode**
+- Static green light (narrow-band 530nm)
+- No flicker - soothing continuous illumination
+- Brown noise for auditory masking
+- Based on research into green light therapy (Noseda et al., 2016)
+
+**✨ Mood Lift Mode**
+- Split-field binaural 40Hz stimulation
+- Independent left/right eye targeting
+- Requires XREAL Air AR glasses
+- Pink noise accompaniment
+
+### Technical Capabilities
+
+- **Precise Timing**: Master-slave architecture with audio clock as timing source
+- **120Hz Display**: Utilizes high-refresh-rate displays for flicker precision
+- **Isoluminant Flicker**: Chromatic modulation (warm ↔ cool) without brightness changes
+- **Sub-millisecond A/V Sync**: Hardware-level synchronization between audio and visual stimuli
+- **RSVP Engine**: Advanced text processing with ORP (Optimal Recognition Point) highlighting
+- **Customizable Sessions**: 15/30/60 minute durations, multiple color schemes
+- **Background Noise**: Integrated pink/brown noise generation
+
+---
+
+## 📱 System Requirements
+
+- **Android 12+** (API Level 31+)
+- **120Hz or 144Hz OLED display** (essential for proper 40Hz flicker)
+- **Headphones recommended** for all modes with audio components
+- **XREAL Air glasses required** for Mood Lift mode
+- 64-bit ARM processor recommended for optimal performance
+
+---
+
+## 🚀 Getting Started
+
+### Installation
+
+1. Download the latest APK from [Releases](https://github.com/yourusername/gammasync/releases)
+2. Enable "Install from Unknown Sources" in Android settings
+3. Install and launch CogniHertz
+4. Read and acknowledge the photosensitivity warning
+
+### First Session
+
+1. **Choose Your Mode**: Memory mode provides pure 40Hz gamma stimulation - a good starting point
+2. **Set Duration**: 15-60 minutes depending on your experience level
+3. **Optimize Environment**: Dim lighting enhances visual entrainment; headphones recommended
+4. **Comfortable Position**: Sit 2-3 feet from device, relaxed but alert
+5. **Press and Hold**: Hold the start button to begin
+
+### Safety Guidelines
+
+⚠️ **Contraindications:**
+- Epilepsy or seizure disorders
+- Photosensitive conditions
+- Migraine triggers from flashing lights
+
+**Operating Parameters:**
+- Do not use while driving or operating machinery
+- Stop if experiencing discomfort, dizziness, or visual disturbances
+- Maintain 2-3 feet viewing distance
+
+---
+
+## 🎯 Use Cases
+
+### Psychonauts & Consciousness Explorers
+- Experience altered states through neural entrainment
+- Explore the phenomenology of gamma oscillations
+- Map subjective effects across different frequencies and modalities
+- Document personal responses to sensory stimulation patterns
+- Integrate with meditation, breathwork, or other practices
+
+### Learning Enhancement & Accelerated Reading
+- Use RSVP mode for high-speed text processing (60-2000 WPM)
+- Experiment with theta-gamma coupling during study sessions
+- Explore memory consolidation through 40Hz post-learning exposure
+- Optimize information retention and recall
+- Push cognitive boundaries with theta-harmonic reading speeds
+
+### Cognitive Performance Optimization
+- Fine-tune attention and focus through gamma entrainment
+- Experiment with pre-task stimulation protocols
+- Track performance changes across different modes
+- Integrate into flow-state triggering routines
+- Develop personalized cognitive enhancement stacks
+
+### Researchers & Experimenters
+- Replicate published GENUS protocols
+- Explore novel timing parameters and frequency combinations
+- Measure subjective cognitive and perceptual effects
+- Contribute to citizen science and open research
+- Document reproducible protocols for the community
+
+---
+
+## 🔬 Research References
+
+1. **Iaccarino, H. F., et al. (2016)**. "Gamma frequency entrainment attenuates amyloid load and modifies microglia." *Nature*, 540(7632), 230-235. [DOI: 10.1038/nature20587](https://doi.org/10.1038/nature20587)
+
+2. **Adaikkan, C., et al. (2019)**. "Gamma Entrainment Binds Higher-Order Brain Regions and Offers Neuroprotection." *Neuron*, 102(5), 929-943. [DOI: 10.1016/j.neuron.2019.04.011](https://doi.org/10.1016/j.neuron.2019.04.011)
+
+3. **Martorell, A. J., et al. (2019)**. "Multi-sensory Gamma Stimulation Ameliorates Alzheimer's-Associated Pathology and Improves Cognition." *Cell*, 177(2), 256-271. [DOI: 10.1016/j.cell.2019.02.014](https://doi.org/10.1016/j.cell.2019.02.014)
+
+4. **Herrmann, C. S., et al. (2016)**. "Transcranial alternating current stimulation: a review of the underlying mechanisms and modulation of cognitive processes." *Frontiers in Human Neuroscience*, 10, 279. [DOI: 10.3389/fnhum.2016.00279](https://doi.org/10.3389/fnhum.2016.00279)
+
+5. **Clements-Cortes, A., et al. (2016)**. "Short-Term Effects of Rhythmic Sensory Stimulation in Alzheimer's Disease: An Exploratory Pilot Study." *Journal of Alzheimer's Disease*, 52(2), 651-660. [DOI: 10.3233/JAD-160081](https://doi.org/10.3233/JAD-160081)
+
+6. **Noseda, R., et al. (2016)**. "Migraine photophobia originating in cone-driven retinal pathways." *Brain*, 139(7), 1971-1986. [DOI: 10.1093/brain/aww119](https://doi.org/10.1093/brain/aww119)
+
+7. **Lisman, J. E., & Jensen, O. (2013)**. "The theta-gamma neural code." *Neuron*, 77(6), 1002-1016. [DOI: 10.1016/j.neuron.2013.03.007](https://doi.org/10.1016/j.neuron.2013.03.007)
+
+---
+
+## 🏗️ Architecture
+
+### Master-Slave Timing Pattern
+
+The audio hardware clock serves as the **single source of truth** for all timing:
+
+- **Master (Audio)**: `GammaAudioEngine` wraps `AudioTrack`, consuming samples at 48kHz sample rate
+- **Slave (Video)**: `GammaRenderer` queries audio engine for current 40Hz phase and renders accordingly
+- **Zero Drift**: Video never uses system time - only audio phase determines visual output
+
+### Layer Separation
+
+- **Domain Layer**: Pure Kotlin signal math with no Android dependencies
+- **Infrastructure Layer**: Android-specific implementations (audio, rendering, display management)
+- **UI Layer**: Material Design 3 components with theme-aware styling
+
+### Key Constraints
+
+- **Frame Time P99**: < 8.5ms (required for 120Hz stability)
+- **Audio Frequency Accuracy**: 40.0Hz ±0.05Hz
+- **A/V Drift Tolerance**: < 10ms over 60-minute session
+- **Isoluminant Flicker**: Chrominance modulation only (epilepsy safety)
+
+---
+
+## 🛠️ Development
+
+### Prerequisites
+
+```bash
+# Android Studio Koala or later
+# Android SDK 34+
+# JDK 17+ (bundled with Android Studio)
+
+# Set JAVA_HOME (macOS with Android Studio)
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
+### Building
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/gammasync.git
+cd gammasync
+
+# Build debug APK
+./gradlew assembleDebug
+
+# Install to connected device
+./gradlew installDebug
+
+# Run tests
+./gradlew testDebugUnitTest
+./gradlew connectedDebugAndroidTest
+```
+
+### Project Structure
+
+```
+app/src/main/java/com/gammasync/
+├── domain/               # Pure Kotlin business logic
+│   ├── therapy/         # Therapy mode definitions
+│   └── rsvp/            # RSVP text processing
+├── infra/               # Android-specific implementations
+│   ├── GammaAudioEngine.kt
+│   ├── GammaRenderer.kt
+│   └── HapticFeedback.kt
+├── ui/                  # Material Design 3 UI components
+│   ├── HomeView.kt
+│   ├── RsvpDetailsView.kt
+│   └── CircularTimerView.kt
+├── data/                # Settings persistence
+└── utils/               # Helpers (text processing, document loading)
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from researchers, developers, and enthusiasts! Areas of interest:
+
+- **Protocol Refinement**: Optimize timing parameters based on research
+- **New Modalities**: Implement additional stimulation patterns
+- **Measurement Tools**: Integrate EEG or other biometric feedback
+- **Cross-Platform**: Port to iOS or web platforms
+- **Documentation**: Improve guides and educational content
+- **Testing**: Expand test coverage, especially hardware timing tests
+
+### Contribution Guidelines
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Follow existing code style (Kotlin conventions, Material Design patterns)
+4. Add tests for new functionality
+5. Update documentation as needed
+6. Submit a pull request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+Open source to advance neurotechnology research and enable community-driven innovation.
+
+---
+
+## ⚠️ Legal Disclaimer
+
+**NOT A MEDICAL DEVICE. NOT INTENDED TO DIAGNOSE, TREAT, CURE, OR PREVENT ANY DISEASE.**
+
+This app is for entertainment and personal research purposes only. Not a substitute for professional medical advice.
+
+**Contraindications:**
+- Epilepsy or seizure disorders
+- Photosensitive conditions
+- Do not use as replacement for prescribed medical treatment
+
+The research cited explores mechanisms and effects in controlled settings. Results from studies do not guarantee individual outcomes. Stop use if experiencing adverse effects and consult medical professionals as needed.
+
+By using CogniHertz, you acknowledge use at your own risk.
+
+---
+
+## 🙏 Acknowledgments
+
+- Dr. Li-Huei Tsai and the Tsai Lab at MIT for pioneering GENUS research
+- The psychonaut and biohacker communities for fearless exploration
+- Open-source developers advancing neurotechnology tools
+- Researchers pushing the boundaries of non-invasive brain stimulation
+
+---
+
+## 📧 Contact
+
+**Questions? Ideas? Research collaborations?**
+
+- GitHub Issues: [Report bugs or request features](https://github.com/yourusername/gammasync/issues)
+- Discussions: [Join the conversation](https://github.com/yourusername/gammasync/discussions)
+- Email: your.email@example.com
+
+---
+
+## 🔗 Links
+
+- [Official Website](#) (Coming soon)
+- [Research Wiki](#) (Coming soon)
+- [User Guide](#) (Coming soon)
+- [Developer Documentation](#) (Coming soon)
+
+---
+
+*Open-source tools for exploring the frontiers of human cognition.*
