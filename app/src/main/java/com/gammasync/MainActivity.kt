@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var completeScreen: SessionCompleteView
     private lateinit var rsvpDetailsScreen: RsvpDetailsView
 
-    // Therapy screen views
+    // Session screen views
     private lateinit var circularTimer: CircularTimerView
     private lateinit var pauseButton: MaterialButton
     private lateinit var noiseToggleButton: MaterialButton
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private var controlsVisible = false
     private var isPaused = false
 
-    // RSVP WPM controls on therapy screen
+    // RSVP WPM controls on session screen
     private lateinit var rsvpWpmContainer: View
     private lateinit var therapyWpmDisplay: TextView
     private lateinit var therapyThetaDisplay: TextView
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var haptics: HapticFeedback
     private lateinit var settings: SettingsRepository
 
-    // Current therapy session
+    // Current session profile
     private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
 
     // External display (XREAL) support
@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         completeScreen = findViewById(R.id.completeScreen)
         rsvpDetailsScreen = findViewById(R.id.rsvpDetailsScreen)
 
-        // Therapy screen views
+        // Session screen views
         circularTimer = findViewById(R.id.circularTimer)
         pauseButton = findViewById(R.id.pauseButton)
         noiseToggleButton = findViewById(R.id.noiseToggleButton)
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         rsvpOverlay = findViewById(R.id.rsvpOverlay)
         therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
 
-        // RSVP WPM controls on therapy screen
+        // RSVP WPM controls on session screen
         rsvpWpmContainer = findViewById(R.id.rsvpWpmContainer)
         therapyWpmDisplay = findViewById(R.id.therapyWpmDisplay)
         therapyThetaDisplay = findViewById(R.id.therapyThetaDisplay)
@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         phoneVisualRenderer.setPhaseProvider { audioEngine.phase }
         phoneVisualRenderer.setSecondaryPhaseProvider { audioEngine.secondaryPhase }
 
-        // Tap therapy screen to toggle controls visibility
+        // Tap session screen to toggle controls visibility
         therapyScreen.setOnClickListener { toggleTherapyControls() }
     }
 
@@ -228,13 +228,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         // Restore previously loaded document if any
         restoreSavedDocument()
 
-        // Therapy screen - pause/resume/done buttons
+        // Session screen - pause/resume/done buttons
         pauseButton.setOnClickListener { pauseSession() }
         noiseToggleButton.setOnClickListener { toggleBackgroundNoise() }
         resumeButton.setOnClickListener { resumeSession() }
         doneButton.setOnClickListener { stopSession() }
 
-        // Therapy screen - RSVP WPM controls
+        // Session screen - RSVP WPM controls
         therapyRsvpSpeedDown.setOnClickListener { adjustTherapyRsvpSpeed(-1) }
         therapyRsvpSpeedUp.setOnClickListener { adjustTherapyRsvpSpeed(1) }
 
@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private fun navigateTo(screen: Screen) {
         viewFlipper.displayedChild = screen.ordinal
 
-        // Enter immersive mode for therapy, exit for other screens
+        // Enter immersive mode for sessions, exit for other screens
         if (screen == Screen.THERAPY) {
             enterImmersiveMode()
         } else {
@@ -331,7 +331,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
                 startRendering()
                 if (controlsVisible) showTimer()
             }
-            // Stop phone renderer (XREAL shows the therapy visual now)
+            // Stop phone renderer (XREAL shows the session visual now)
             phoneVisualRenderer.stop()
             phoneVisualRenderer.visibility = View.GONE
         }
@@ -362,14 +362,14 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     // --- Session Control ---
 
     private fun startSession(durationMinutes: Int, mode: TherapyMode) {
-        // Get the therapy profile for the selected mode
+        // Get the experience profile for the selected mode
         currentProfile = TherapyProfiles.forMode(mode)
         sessionDurationMinutes = durationMinutes
         remainingSeconds = durationMinutes * 60
 
         Log.i(TAG, "Starting session: ${mode.displayName}, duration=${durationMinutes}min")
 
-        // Apply accent color to therapy screen buttons
+        // Apply accent color to session screen buttons
         val accentColor = settings.colorScheme.accentColor
         resumeButton.backgroundTintList = ColorStateList.valueOf(accentColor)
         doneButton.strokeColor = ColorStateList.valueOf(accentColor)
@@ -424,7 +424,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             // Phone shows controls only when XREAL connected
             phoneVisualRenderer.visibility = View.GONE
         } else {
-            // Show full therapy visual on phone when no external display
+            // Show full session visual on phone when no external display
             phoneVisualRenderer.configure(currentProfile)
             phoneVisualRenderer.visibility = View.VISIBLE
             phoneVisualRenderer.start()
@@ -636,7 +636,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private fun updateRsvpWpm(wpm: Int) {
         settings.rsvpWpm = wpm
 
-        // Update therapy screen display
+        // Update session screen display
         therapyWpmDisplay.text = "$wpm WPM"
         therapyThetaDisplay.text = HomeView.formatThetaMultiple(wpm)
 
@@ -804,7 +804,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         rsvpOverlay.visibility = View.VISIBLE
         rsvpOverlay.start()
 
-        // Show WPM controls on therapy screen
+        // Show WPM controls on session screen
         rsvpWpmContainer.visibility = View.VISIBLE
         updateTherapyWpmDisplay()
 
