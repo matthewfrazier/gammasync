@@ -45,7 +45,7 @@ object TherapyProfiles {
         noiseType = NoiseType.PINK,
         isStereo = false,
         visualConfig = VisualConfig.ISOLUMINANT.copy(luminanceNoise = true),
-        defaultDurationMinutes = 20
+        defaultDurationMinutes = 15
     )
 
     /**
@@ -109,7 +109,7 @@ object TherapyProfiles {
         noiseType = NoiseType.PINK,
         isStereo = true,
         visualConfig = VisualConfig.ISOLUMINANT,
-        defaultDurationMinutes = 20
+        defaultDurationMinutes = 15
     )
 
     /**
