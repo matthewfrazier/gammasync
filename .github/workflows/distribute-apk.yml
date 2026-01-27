@@ -1,0 +1,147 @@
+name: Distribute APK
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Get version info
+        id: version
+        run: |
+          echo "version_name=$(grep 'versionName' app/build.gradle.kts | awk -F'"' '{print $2}')" >> $GITHUB_OUTPUT
+          echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            NOTES="PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}
+
+          Changes in this build:
+          $(git log --oneline -5 --pretty=format:'- %s')"
+          else
+            NOTES="Build from main branch
+
+          Recent commits:
+          $(git log --oneline -5 --pretty=format:'- %s')"
+          fi
+
+          # Save to file for Firebase
+          echo "$NOTES" > release_notes.txt
+
+          # Also output for PR comment
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Option 1: Firebase App Distribution (Recommended)
+      # Uncomment after setting up Firebase project and adding secrets
+      # - name: Distribute to Firebase
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_APP_ID }}
+      #     serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      #     groups: testers
+      #     file: app/build/outputs/apk/debug/app-debug.apk
+      #     releaseNotes: file://release_notes.txt
+
+      # Option 2: GitHub Releases (Alternative - works immediately)
+      - name: Create Prerelease
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: dev-${{ steps.version.outputs.commit_sha }}
+          name: Development Build ${{ steps.version.outputs.commit_sha }}
+          body: ${{ steps.notes.outputs.notes }}
+          files: app/build/outputs/apk/debug/app-debug.apk
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Option 3: PR Artifact with QR Code
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gammasync-debug-${{ github.event.pull_request.number || steps.version.outputs.commit_sha }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const apkPath = 'app/build/outputs/apk/debug/app-debug.apk';
+            const stats = fs.statSync(apkPath);
+            const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
+
+            const comment = `## 📱 Test Build Ready
+
+            **Version:** \`${{ steps.version.outputs.version_name }}\`
+            **Commit:** \`${{ steps.version.outputs.commit_sha }}\`
+            **Size:** ${fileSizeMB} MB
+
+            ### 🔗 Installation Options
+
+            #### Option 1: Direct Download (Easiest for Phone)
+            1. Download APK from GitHub Releases (will be available after merge to main)
+            2. Or use GitHub CLI:
+               \`\`\`bash
+               gh run download ${{ github.run_id }} -n gammasync-debug-${{ github.event.pull_request.number }}
+               \`\`\`
+
+            #### Option 2: ADB Install
+            \`\`\`bash
+            gh run download ${{ github.run_id }} -n gammasync-debug-${{ github.event.pull_request.number }}
+            adb install -r app-debug.apk
+            \`\`\`
+
+            #### Option 3: Manual Download
+            1. Go to [Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Scroll to "Artifacts" section
+            3. Download \`gammasync-debug-${{ github.event.pull_request.number }}\`
+            4. Extract ZIP and transfer APK to phone
+            5. Install APK (may need to enable "Install from Unknown Sources")
+
+            ### 📝 Release Notes
+            \`\`\`
+            ${{ steps.notes.outputs.notes }}
+            \`\`\`
+
+            ### ✅ Testing Checklist
+            - [ ] App launches successfully
+            - [ ] Changed functionality works as expected
+            - [ ] No crashes or UI issues
+            - [ ] Performance is acceptable
+
+            ---
+            💡 **Tip:** After this PR merges, a prerelease will be created at [Releases](${{ github.server_url }}/${{ github.repository }}/releases) with a direct download link.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
