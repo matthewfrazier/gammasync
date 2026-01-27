@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- Screen 2: Therapy -->
+        <!-- Screen 2: Experience -->
         <FrameLayout
             android:id="@+id/therapyScreen"
             android:layout_width="match_parent"
@@ -33,7 +33,7 @@
             android:clickable="true"
             android:focusable="true">
 
-            <!-- Full therapy visual renderer (phone display, used when no XREAL connected) -->
+            <!-- Full experience visual renderer (phone display, used when no XREAL connected) -->
             <com.gammasync.infra.UniversalVisualRenderer
                 android:id="@+id/phoneVisualRenderer"
                 android:layout_width="match_parent"

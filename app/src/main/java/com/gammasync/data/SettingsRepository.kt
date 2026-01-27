@@ -3,7 +3,7 @@ package com.gammasync.data
 import android.content.Context
 import android.content.SharedPreferences
 import com.gammasync.domain.rsvp.RsvpSettings
-import com.gammasync.domain.therapy.TherapyMode
+import com.gammasync.domain.experience.ExperienceMode
 
 /**
  * SharedPreferences wrapper for persisting user settings.
@@ -15,7 +15,7 @@ class SettingsRepository(context: Context) {
         private const val KEY_DURATION_MINUTES = "duration_minutes"
         private const val KEY_AUDIO_AMPLITUDE = "audio_amplitude"
         private const val KEY_MAX_BRIGHTNESS = "max_brightness"
-        private const val KEY_THERAPY_MODE = "therapy_mode"
+        private const val KEY_EXPERIENCE_MODE = "experience_mode"
         private const val KEY_RSVP_ENABLED = "rsvp_enabled"
         private const val KEY_RSVP_WPM = "rsvp_wpm"
         private const val KEY_COLOR_SCHEME = "color_scheme"
@@ -56,16 +56,16 @@ class SettingsRepository(context: Context) {
         get() = prefs.getBoolean(KEY_MAX_BRIGHTNESS, DEFAULT_MAX_BRIGHTNESS)
         set(value) = prefs.edit().putBoolean(KEY_MAX_BRIGHTNESS, value).apply()
 
-    var therapyMode: TherapyMode
+    var experienceMode: ExperienceMode
         get() {
-            val modeName = prefs.getString(KEY_THERAPY_MODE, TherapyMode.NEUROSYNC.name)
+            val modeName = prefs.getString(KEY_EXPERIENCE_MODE, ExperienceMode.NEUROSYNC.name)
             return try {
-                TherapyMode.valueOf(modeName ?: TherapyMode.NEUROSYNC.name)
+                ExperienceMode.valueOf(modeName ?: ExperienceMode.NEUROSYNC.name)
             } catch (e: IllegalArgumentException) {
-                TherapyMode.NEUROSYNC
+                ExperienceMode.NEUROSYNC
             }
         }
-        set(value) = prefs.edit().putString(KEY_THERAPY_MODE, value.name).apply()
+        set(value) = prefs.edit().putString(KEY_EXPERIENCE_MODE, value.name).apply()
 
     var rsvpEnabled: Boolean
         get() = prefs.getBoolean(KEY_RSVP_ENABLED, false)

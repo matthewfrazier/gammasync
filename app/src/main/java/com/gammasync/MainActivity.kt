@@ -21,9 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import com.gammasync.data.SettingsRepository
 import com.gammasync.domain.rsvp.ProcessedDocument
-import com.gammasync.domain.therapy.TherapyMode
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.TherapyProfiles
+import com.gammasync.domain.experience.ExperienceMode
+import com.gammasync.domain.experience.ExperienceProfile
+import com.gammasync.domain.experience.ExperienceProfiles
 import com.gammasync.infra.ExternalDisplayManager
 import com.gammasync.infra.GammaPresentation
 import com.gammasync.infra.HapticFeedback
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     enum class Screen {
         DISCLAIMER,    // 0
         HOME,          // 1
-        THERAPY,       // 2
+        EXPERIENCE,    // 2
         COMPLETE,      // 3
         RSVP_DETAILS   // 4
     }
@@ -58,11 +58,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var viewFlipper: ViewFlipper
     private lateinit var disclaimerScreen: SafetyDisclaimerView
     private lateinit var homeScreen: HomeView
-    private lateinit var therapyScreen: FrameLayout
+    private lateinit var experienceScreen: FrameLayout
     private lateinit var completeScreen: SessionCompleteView
     private lateinit var rsvpDetailsScreen: RsvpDetailsView
 
-    // Therapy screen views
+    // Experience screen views
     private lateinit var circularTimer: CircularTimerView
     private lateinit var pauseButton: MaterialButton
     private lateinit var noiseToggleButton: MaterialButton
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private var controlsVisible = false
     private var isPaused = false
 
-    // RSVP WPM controls on therapy screen
+    // RSVP WPM controls on experience screen
     private lateinit var rsvpWpmContainer: View
     private lateinit var therapyWpmDisplay: TextView
     private lateinit var therapyThetaDisplay: TextView
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private var loadedWords: List<String> = emptyList()
 
     // Auto-hide timer controls
-    private val autoHideRunnable = Runnable { hideTherapyControls() }
+    private val autoHideRunnable = Runnable { hideExperienceControls() }
     private val autoHideDelayMs = 3000L
 
     private val handler = Handler(Looper.getMainLooper())
@@ -101,8 +101,8 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private lateinit var haptics: HapticFeedback
     private lateinit var settings: SettingsRepository
 
-    // Current therapy session
-    private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
+    // Current experience session
+    private var currentProfile: ExperienceProfile = ExperienceProfiles.NEUROSYNC
 
     // External display (XREAL) support
     private lateinit var externalDisplayManager: ExternalDisplayManager
@@ -166,11 +166,11 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         viewFlipper = findViewById(R.id.viewFlipper)
         disclaimerScreen = findViewById(R.id.disclaimerScreen)
         homeScreen = findViewById(R.id.homeScreen)
-        therapyScreen = findViewById(R.id.therapyScreen)
+        experienceScreen = findViewById(R.id.therapyScreen)
         completeScreen = findViewById(R.id.completeScreen)
         rsvpDetailsScreen = findViewById(R.id.rsvpDetailsScreen)
 
-        // Therapy screen views
+        // Experience screen views
         circularTimer = findViewById(R.id.circularTimer)
         pauseButton = findViewById(R.id.pauseButton)
         noiseToggleButton = findViewById(R.id.noiseToggleButton)
@@ -180,21 +180,21 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         doneButton = findViewById(R.id.doneButton)
         phoneVisualRenderer = findViewById(R.id.phoneVisualRenderer)
         rsvpOverlay = findViewById(R.id.rsvpOverlay)
-        therapyControlsContainer = findViewById(R.id.therapyControlsContainer)
+        experienceControlsContainer = findViewById(R.id.therapyControlsContainer)
 
-        // RSVP WPM controls on therapy screen
+        // RSVP WPM controls on experience screen
         rsvpWpmContainer = findViewById(R.id.rsvpWpmContainer)
-        therapyWpmDisplay = findViewById(R.id.therapyWpmDisplay)
-        therapyThetaDisplay = findViewById(R.id.therapyThetaDisplay)
-        therapyRsvpSpeedDown = findViewById(R.id.therapyRsvpSpeedDown)
-        therapyRsvpSpeedUp = findViewById(R.id.therapyRsvpSpeedUp)
+        experienceWpmDisplay = findViewById(R.id.therapyWpmDisplay)
+        experienceThetaDisplay = findViewById(R.id.therapyThetaDisplay)
+        experienceRsvpSpeedDown = findViewById(R.id.therapyRsvpSpeedDown)
+        experienceRsvpSpeedUp = findViewById(R.id.therapyRsvpSpeedUp)
 
         // Connect phone visual renderer to audio engine phase
         phoneVisualRenderer.setPhaseProvider { audioEngine.phase }
         phoneVisualRenderer.setSecondaryPhaseProvider { audioEngine.secondaryPhase }
 
-        // Tap therapy screen to toggle controls visibility
-        therapyScreen.setOnClickListener { toggleTherapyControls() }
+        // Tap experience screen to toggle controls visibility
+        experienceScreen.setOnClickListener { toggleExperienceControls() }
     }
 
     private fun setupScreens() {
@@ -234,9 +234,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         resumeButton.setOnClickListener { resumeSession() }
         doneButton.setOnClickListener { stopSession() }
 
-        // Therapy screen - RSVP WPM controls
-        therapyRsvpSpeedDown.setOnClickListener { adjustTherapyRsvpSpeed(-1) }
-        therapyRsvpSpeedUp.setOnClickListener { adjustTherapyRsvpSpeed(1) }
+        // Experience screen - RSVP WPM controls
+        experienceRsvpSpeedDown.setOnClickListener { adjustExperienceRsvpSpeed(-1) }
+        experienceRsvpSpeedUp.setOnClickListener { adjustExperienceRsvpSpeed(1) }
 
         // HomeView RSVP WPM change callback
         homeScreen.onRsvpWpmChanged = { wpm ->
@@ -271,8 +271,8 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
     private fun navigateTo(screen: Screen) {
         viewFlipper.displayedChild = screen.ordinal
 
-        // Enter immersive mode for therapy, exit for other screens
-        if (screen == Screen.THERAPY) {
+        // Enter immersive mode for experience, exit for other screens
+        if (screen == Screen.EXPERIENCE) {
             enterImmersiveMode()
         } else {
             exitImmersiveMode()
@@ -353,7 +353,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             phoneVisualRenderer.configure(currentProfile)
             phoneVisualRenderer.visibility = View.VISIBLE
             phoneVisualRenderer.start()
-            showTherapyControls()
+            showExperienceControls()
         }
 
         Log.i(TAG, "Display mode: Phone")
@@ -361,9 +361,9 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     // --- Session Control ---
 
-    private fun startSession(durationMinutes: Int, mode: TherapyMode) {
-        // Get the therapy profile for the selected mode
-        currentProfile = TherapyProfiles.forMode(mode)
+    private fun startSession(durationMinutes: Int, mode: ExperienceMode) {
+        // Get the experience profile for the selected mode
+        currentProfile = ExperienceProfiles.forMode(mode)
         sessionDurationMinutes = durationMinutes
         remainingSeconds = durationMinutes * 60
 
@@ -387,7 +387,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         circularTimer.setTotalDuration(remainingSeconds)
         updateTimerDisplay()
 
-        navigateTo(Screen.THERAPY)
+        navigateTo(Screen.EXPERIENCE)
 
         // Apply max brightness if enabled (or if profile requires it)
         val needsMaxBrightness = settings.maxBrightness ||
@@ -424,14 +424,14 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             // Phone shows controls only when XREAL connected
             phoneVisualRenderer.visibility = View.GONE
         } else {
-            // Show full therapy visual on phone when no external display
+            // Show full experience visual on phone when no external display
             phoneVisualRenderer.configure(currentProfile)
             phoneVisualRenderer.visibility = View.VISIBLE
             phoneVisualRenderer.start()
         }
 
         // Show controls initially
-        showTherapyControls()
+        showExperienceControls()
 
         // Start RSVP if in Learning mode with loaded document
         startRsvp()
@@ -455,7 +455,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             // Show pause overlay with session duration
             pauseDurationText.text = "$sessionDurationMinutes min session"
             pauseOverlay.visibility = View.VISIBLE
-            therapyControlsContainer.visibility = View.GONE
+            experienceControlsContainer.visibility = View.GONE
         }
     }
 
@@ -481,7 +481,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             }
 
             // Resume RSVP if applicable
-            if (currentProfile.mode == TherapyMode.MEMORY_WRITE && loadedWords.isNotEmpty()) {
+            if (currentProfile.mode == ExperienceMode.MEMORY_WRITE && loadedWords.isNotEmpty()) {
                 rsvpOverlay.start()
             }
 
@@ -489,7 +489,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
             handler.post(timerRunnable)
 
             // Show controls briefly then auto-hide
-            showTherapyControls()
+            showExperienceControls()
         }
     }
 
@@ -509,7 +509,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         restoreBrightness()
 
         phoneVisualRenderer.visibility = View.GONE
-        therapyControlsContainer.visibility = View.GONE
+        experienceControlsContainer.visibility = View.GONE
         pauseOverlay.visibility = View.GONE
         controlsVisible = false
 
@@ -533,7 +533,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         restoreBrightness()
 
         phoneVisualRenderer.visibility = View.GONE
-        therapyControlsContainer.visibility = View.GONE
+        experienceControlsContainer.visibility = View.GONE
         pauseOverlay.visibility = View.GONE
         controlsVisible = false
 
@@ -541,13 +541,13 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
         navigateTo(Screen.COMPLETE)
     }
 
-    private fun toggleTherapyControls() {
+    private fun toggleExperienceControls() {
         if (!isRunning || isPaused) return
 
         if (controlsVisible) {
-            hideTherapyControls()
+            hideExperienceControls()
         } else {
-            showTherapyControls()
+            showExperienceControls()
         }
         haptics.tick()
     }
@@ -568,7 +568,7 @@ class MainActivity : AppCompatActivity(), ExternalDisplayManager.DisplayListener
 
     private fun hideTherapyControls() {
         controlsVisible = false
-        therapyControlsContainer.visibility = View.GONE
+        experienceControlsContainer.visibility = View.GONE
 
         // Hide timer on XREAL display too
         externalPresentation?.hideTimer()

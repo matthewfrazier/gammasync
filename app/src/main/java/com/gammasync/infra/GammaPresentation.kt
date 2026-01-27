@@ -12,8 +12,8 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import com.gammasync.R
-import com.gammasync.domain.therapy.TherapyProfile
-import com.gammasync.domain.therapy.TherapyProfiles
+import com.gammasync.domain.experience.ExperienceProfile
+import com.gammasync.domain.experience.ExperienceProfiles
 import com.gammasync.ui.CircularTimerView
 
 /**
@@ -22,7 +22,7 @@ import com.gammasync.ui.CircularTimerView
  * Renders synchronized visual stimulus on connected AR glasses
  * while the phone displays the control UI.
  *
- * Supports all therapy visual modes:
+ * Supports all experience visual modes:
  * - SINE: Smooth warm↔cool interpolation
  * - STROBE: Sharp on/off transitions
  * - STATIC: Single color, no animation
@@ -38,7 +38,7 @@ class GammaPresentation(
 
     private var phaseProvider: (() -> Double)? = null
     private var secondaryPhaseProvider: (() -> Double)? = null
-    private var currentProfile: TherapyProfile = TherapyProfiles.NEUROSYNC
+    private var currentProfile: ExperienceProfile = ExperienceProfiles.NEUROSYNC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +46,7 @@ class GammaPresentation(
         setContentView(R.layout.presentation_gamma)
 
         // Full screen immersive mode - hide all system UI
-        // Keep screen on and show over lock screen for uninterrupted therapy
+        // Keep screen on and show over lock screen for uninterrupted experience
         window?.apply {
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
@@ -92,10 +92,10 @@ class GammaPresentation(
     }
 
     /**
-     * Configure the renderer with a therapy profile.
+     * Configure the renderer with an experience profile.
      * Must be called before startRendering() for non-default modes.
      */
-    fun configure(profile: TherapyProfile) {
+    fun configure(profile: ExperienceProfile) {
         currentProfile = profile
         if (::visualRenderer.isInitialized) {
             visualRenderer.configure(profile)

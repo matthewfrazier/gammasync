@@ -34,7 +34,7 @@
   <text x="580" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="600" fill="#E0F2F1">CogniHertz</text>
 
   <!-- Tagline -->
-  <text x="580" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#80CBC4">40Hz Audio-Visual Therapy</text>
+  <text x="580" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#80CBC4">40Hz Audio-Visual Experience</text>
 
   <!-- Subtitle -->
   <text x="580" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#4DB6AC" opacity="0.8">Focus | Memory | Clarity</text>

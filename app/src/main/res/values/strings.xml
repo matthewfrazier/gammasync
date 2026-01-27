@@ -17,7 +17,7 @@
     <string name="hold_to_agree">Hold to Agree</string>
 
     <!-- Home Screen - Mode Selection -->
-    <string name="select_mode">Therapy Mode</string>
+    <string name="select_mode">Experience Mode</string>
     <string name="mode_neurosync">Memory</string>
     <string name="mode_memory">Learning</string>
     <string name="mode_sleep">Sleep</string>

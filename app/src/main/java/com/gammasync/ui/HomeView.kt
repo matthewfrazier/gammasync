@@ -16,8 +16,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.gammasync.R
 import com.gammasync.data.ColorScheme
 import com.gammasync.data.SettingsRepository
-import com.gammasync.domain.therapy.TherapyMode
-import com.gammasync.domain.therapy.TherapyProfiles
+import com.gammasync.domain.experience.ExperienceMode
+import com.gammasync.domain.experience.ExperienceProfiles
 import com.gammasync.infra.HapticFeedback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
@@ -82,7 +82,7 @@ class HomeView @JvmOverloads constructor(
         }
     }
 
-    var onStartSession: ((durationMinutes: Int, mode: TherapyMode) -> Unit)? = null
+    var onStartSession: ((durationMinutes: Int, mode: ExperienceMode) -> Unit)? = null
     var onLoadTextClicked: (() -> Unit)? = null
     var onClearDocumentClicked: (() -> Unit)? = null
     var onRsvpWpmChanged: ((Int) -> Unit)? = null
@@ -148,7 +148,7 @@ class HomeView @JvmOverloads constructor(
     private val rsvpSwitchHyphenation: MaterialSwitch
     private val rsvpSwitchPhaseLock: MaterialSwitch
 
-    private var selectedMode: TherapyMode = TherapyMode.NEUROSYNC
+    private var selectedMode: ExperienceMode = ExperienceMode.NEUROSYNC
     private var currentWpmIndex = THETA_WPM_VALUES.indexOf(360) // Default to 1× theta
     private var selectedDuration = 30
     private var settings: SettingsRepository? = null
@@ -249,11 +249,11 @@ class HomeView @JvmOverloads constructor(
         }
 
         // Mode button clicks
-        modeNeuroSyncButton.setOnClickListener { selectMode(TherapyMode.NEUROSYNC) }
-        modeMemoryButton.setOnClickListener { selectMode(TherapyMode.MEMORY_WRITE) }
-        modeSleepButton.setOnClickListener { selectMode(TherapyMode.SLEEP_RAMP) }
-        modeMigraineButton.setOnClickListener { selectMode(TherapyMode.MIGRAINE) }
-        modeMoodLiftButton.setOnClickListener { selectMode(TherapyMode.MOOD_LIFT) }
+        modeNeuroSyncButton.setOnClickListener { selectMode(ExperienceMode.NEUROSYNC) }
+        modeMemoryButton.setOnClickListener { selectMode(ExperienceMode.MEMORY_WRITE) }
+        modeSleepButton.setOnClickListener { selectMode(ExperienceMode.SLEEP_RAMP) }
+        modeMigraineButton.setOnClickListener { selectMode(ExperienceMode.MIGRAINE) }
+        modeMoodLiftButton.setOnClickListener { selectMode(ExperienceMode.MOOD_LIFT) }
 
         // Duration button clicks (Experience tab)
         duration15Button.setOnClickListener { selectDuration(15) }
@@ -350,7 +350,7 @@ class HomeView @JvmOverloads constructor(
     fun bindSettings(settingsRepository: SettingsRepository) {
         settings = settingsRepository
         selectedDuration = settingsRepository.durationMinutes
-        selectedMode = settingsRepository.therapyMode
+        selectedMode = settingsRepository.experienceMode
         accentColor = settingsRepository.colorScheme.accentColor
         selectedColorScheme = settingsRepository.colorScheme
         darkMode = settingsRepository.darkMode
@@ -399,13 +399,13 @@ class HomeView @JvmOverloads constructor(
         updateDurationSelection()
     }
 
-    private fun selectMode(mode: TherapyMode) {
+    private fun selectMode(mode: ExperienceMode) {
         haptics.tick()
         selectedMode = mode
-        settings?.therapyMode = mode
+        settings?.experienceMode = mode
 
         // Update duration to mode default
-        val profile = TherapyProfiles.forMode(mode)
+        val profile = ExperienceProfiles.forMode(mode)
         selectedDuration = profile.defaultDurationMinutes
 
         updateModeSelection()
@@ -420,11 +420,11 @@ class HomeView @JvmOverloads constructor(
 
     private fun updateModeSelection() {
         val modeButtons = mapOf(
-            TherapyMode.NEUROSYNC to modeNeuroSyncButton,
-            TherapyMode.MEMORY_WRITE to modeMemoryButton,
-            TherapyMode.SLEEP_RAMP to modeSleepButton,
-            TherapyMode.MIGRAINE to modeMigraineButton,
-            TherapyMode.MOOD_LIFT to modeMoodLiftButton
+            ExperienceMode.NEUROSYNC to modeNeuroSyncButton,
+            ExperienceMode.MEMORY_WRITE to modeMemoryButton,
+            ExperienceMode.SLEEP_RAMP to modeSleepButton,
+            ExperienceMode.MIGRAINE to modeMigraineButton,
+            ExperienceMode.MOOD_LIFT to modeMoodLiftButton
         )
 
         // Get theme-aware colors for unselected state
@@ -446,11 +446,11 @@ class HomeView @JvmOverloads constructor(
 
         // Update description
         modeDescriptionText.text = when (selectedMode) {
-            TherapyMode.NEUROSYNC -> context.getString(R.string.mode_neurosync_description)
-            TherapyMode.MEMORY_WRITE -> context.getString(R.string.mode_memory_description)
-            TherapyMode.SLEEP_RAMP -> context.getString(R.string.mode_sleep_description)
-            TherapyMode.MIGRAINE -> context.getString(R.string.mode_migraine_description)
-            TherapyMode.MOOD_LIFT -> context.getString(R.string.mode_mood_lift_description)
+            ExperienceMode.NEUROSYNC -> context.getString(R.string.mode_neurosync_description)
+            ExperienceMode.MEMORY_WRITE -> context.getString(R.string.mode_memory_description)
+            ExperienceMode.SLEEP_RAMP -> context.getString(R.string.mode_sleep_description)
+            ExperienceMode.MIGRAINE -> context.getString(R.string.mode_migraine_description)
+            ExperienceMode.MOOD_LIFT -> context.getString(R.string.mode_mood_lift_description)
         }
 
         updateXrealWarning()
@@ -490,7 +490,7 @@ class HomeView @JvmOverloads constructor(
     }
 
     private fun updateLoadTextVisibility() {
-        val shouldShow = selectedMode == TherapyMode.MEMORY_WRITE
+        val shouldShow = selectedMode == ExperienceMode.MEMORY_WRITE
         loadTextRow.visibility = if (shouldShow) View.VISIBLE else View.GONE
         updateRsvpSpeedVisibility()
     }

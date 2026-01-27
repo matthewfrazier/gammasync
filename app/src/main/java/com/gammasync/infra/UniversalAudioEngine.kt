@@ -6,13 +6,13 @@ import android.media.AudioTrack
 import android.media.VolumeShaper
 import android.util.Log
 import com.gammasync.domain.UniversalOscillator
-import com.gammasync.domain.therapy.AudioMode
-import com.gammasync.domain.therapy.NoiseType
-import com.gammasync.domain.therapy.TherapyProfile
+import com.gammasync.domain.experience.AudioMode
+import com.gammasync.domain.experience.NoiseType
+import com.gammasync.domain.experience.ExperienceProfile
 import kotlin.math.abs
 
 /**
- * Universal audio engine supporting multiple therapy profiles.
+ * Universal audio engine supporting multiple experience profiles.
  *
  * Extends the capabilities of GammaAudioEngine with:
  * - Stereo AudioTrack support (for binaural beats)
@@ -40,7 +40,7 @@ class UniversalAudioEngine(
     private var volumeShaper: VolumeShaper? = null
 
     // Current profile
-    private var currentProfile: TherapyProfile? = null
+    private var currentProfile: ExperienceProfile? = null
 
     @Volatile
     private var isPlaying = false
@@ -147,7 +147,7 @@ class UniversalAudioEngine(
      * @param amplitude Volume from 0.0 to 1.0
      * @param noiseEnabled Whether to play background noise (default true)
      */
-    fun start(profile: TherapyProfile, amplitude: Double = 0.5, noiseEnabled: Boolean = true) {
+    fun start(profile: ExperienceProfile, amplitude: Double = 0.5, noiseEnabled: Boolean = true) {
         if (isPlaying) return
 
         currentProfile = profile
@@ -254,10 +254,10 @@ class UniversalAudioEngine(
      */
     fun start(amplitude: Double = 0.5) {
         // Use default NeuroSync profile
-        start(com.gammasync.domain.therapy.TherapyProfiles.NEUROSYNC, amplitude)
+        start(com.gammasync.domain.experience.ExperienceProfiles.NEUROSYNC, amplitude)
     }
 
-    private fun fillBuffer(buffer: ShortArray, profile: TherapyProfile, amplitude: Double) {
+    private fun fillBuffer(buffer: ShortArray, profile: ExperienceProfile, amplitude: Double) {
         val noiseAmplitude = DEFAULT_NOISE_AMPLITUDE
         val effectiveNoiseType = if (noiseEnabled) profile.noiseType else NoiseType.NONE
 

@@ -42,7 +42,7 @@ Before ANY `installDebug`, verify:
 
 ## Project Overview
 
-GammaSync is an Android application delivering Gamma Entrainment Using Sensory stimuli (GENUS) - synchronized 40Hz audio-visual therapy. The app requires sub-millisecond A/V synchronization and 120Hz display output.
+GammaSync is an Android application delivering Gamma Entrainment Using Sensory stimuli (GENUS) - synchronized 40Hz audio-visual experiences. The app requires sub-millisecond A/V synchronization and 120Hz display output.
 
 **Target Platform:** Android 12+ (API 31+)
 **Hardware Requirements:** 120Hz/144Hz OLED display, XREAL Air glasses support
@@ -74,7 +74,7 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
 The audio hardware clock is the single source of truth for timing - this is critical for precise synchronization:
 
-- **Master (Audio):** `GammaAudioEngine` wraps `AudioTrack` consuming samples at 48kHz. This dictates "Therapy Time."
+- **Master (Audio):** `GammaAudioEngine` wraps `AudioTrack` consuming samples at 48kHz. This dictates "Experience Time."
 - **Slave (Video):** `GammaRenderer` queries the audio engine for current 40Hz phase (0.0-1.0) and renders that exact color. Never uses `System.nanoTime()`.
 
 ### Layer Separation
