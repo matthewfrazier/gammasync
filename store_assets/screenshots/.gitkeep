@@ -1,0 +1,19 @@
+# Play Store Screenshots
+
+Screenshots for Google Play Store listing will be saved here.
+
+Run `scripts/capture_screenshots.sh` to capture required screenshots.
+
+## Requirements
+
+- Minimum 2 screenshots, maximum 8
+- Phone: 1080x1920 (16:9) or 1080x2400 (19.5:9)
+- PNG or JPEG format
+- Show key app features
+
+## Recommended Screenshots
+
+1. Home screen with mode selection
+2. Settings screen showing customization
+3. Active session with controls visible
+4. Reading material selection (for Learning mode)
