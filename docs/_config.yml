@@ -1,0 +1,21 @@
+# GitHub Pages configuration for CogniHertz documentation
+
+# Site settings
+title: CogniHertz
+description: Gamma-Frequency Sensory Stimulation - Experimental Exploration Tool
+baseurl: "/gammasync"
+url: "https://matthewfrazier.github.io"
+
+# Build settings
+theme: jekyll-theme-minimal
+markdown: kramdown
+
+# Exclude from processing
+exclude:
+  - CLAUDE_CODE_GITHUB_ACTIONS.md
+  - CLAUDE_CODE_SUBAGENTS.md
+  - ENGINEERING_BLUEPRINT.md
+  - RECENT_FIXES.md
+  - CI_ARTIFACTS.md
+  - FIREBASE_SETUP.md
+  - mcp-proposal.md
