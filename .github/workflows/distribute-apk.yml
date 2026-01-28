@@ -97,13 +97,13 @@ jobs:
             const stats = fs.statSync(apkPath);
             const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
 
-            const comment = `## 📱 Test Build Ready
+            const comment = `##  Test Build Ready
 
             **Version:** \`${{ steps.version.outputs.version_name }}\`
             **Commit:** \`${{ steps.version.outputs.commit_sha }}\`
             **Size:** ${fileSizeMB} MB
 
-            ### 🔗 Installation Options
+            ###  Installation Options
 
             #### Option 1: Direct Download (Easiest for Phone)
             1. Download APK from GitHub Releases (will be available after merge to main)
@@ -125,19 +125,19 @@ jobs:
             4. Extract ZIP and transfer APK to phone
             5. Install APK (may need to enable "Install from Unknown Sources")
 
-            ### 📝 Release Notes
+            ###  Release Notes
             \`\`\`
             ${{ steps.notes.outputs.notes }}
             \`\`\`
 
-            ### ✅ Testing Checklist
+            ###  Testing Checklist
             - [ ] App launches successfully
             - [ ] Changed functionality works as expected
             - [ ] No crashes or UI issues
             - [ ] Performance is acceptable
 
             ---
-            💡 **Tip:** After this PR merges, a prerelease will be created at [Releases](${{ github.server_url }}/${{ github.repository }}/releases) with a direct download link.`;
+             **Tip:** After this PR merges, a prerelease will be created at [Releases](${{ github.server_url }}/${{ github.repository }}/releases) with a direct download link.`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,

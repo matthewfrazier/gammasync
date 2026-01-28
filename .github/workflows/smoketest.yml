@@ -71,13 +71,13 @@ jobs:
             const stats = fs.statSync(apkPath);
             const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
 
-            const comment = `## 📱 Debug APK Ready
+            const comment = `## Debug APK Ready
 
             **Build:** \`${{ github.sha }}\`
             **Size:** ${fileSizeMB} MB
 
             ### Download
-            [⬇️ Download APK from Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            [Download APK from Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
             ### Install via ADB
             \`\`\`bash

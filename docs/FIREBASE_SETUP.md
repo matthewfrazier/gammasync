@@ -4,11 +4,11 @@ Firebase App Distribution is the easiest way to distribute test builds to your p
 
 ## Benefits
 
-- 📱 **Direct mobile access** - Install via browser or Firebase app on phone
-- 📧 **Email notifications** - Get notified when new builds are available
-- 📊 **Build tracking** - See who installed which version
-- 🔒 **Access control** - Invite-only distribution to testers
-- 📝 **Release notes** - Automatically includes commit messages
+-  **Direct mobile access** - Install via browser or Firebase app on phone
+-  **Email notifications** - Get notified when new builds are available
+-  **Build tracking** - See who installed which version
+-  **Access control** - Invite-only distribution to testers
+-  **Release notes** - Automatically includes commit messages
 
 ## Quick Setup (5 minutes)
 
@@ -136,21 +136,21 @@ If Firebase setup seems too complex, the `distribute-apk.yml` workflow automatic
 5. Install APK
 
 This works immediately without any setup, but:
-- ❌ No automatic notifications
-- ❌ Manual process (must visit Releases page)
-- ✅ Simple, no external service needed
-- ✅ Direct download links work on phone browser
+-  No automatic notifications
+-  Manual process (must visit Releases page)
+-  Simple, no external service needed
+-  Direct download links work on phone browser
 
 ## Comparison
 
 | Feature | Firebase | GitHub Releases | GitHub Artifacts |
 |---------|----------|-----------------|------------------|
-| Phone browser download | ✅ Yes | ✅ Yes | ❌ No (requires login + desktop) |
-| Automatic notifications | ✅ Yes | ❌ No | ❌ No |
-| Easy to find | ✅ App shows all builds | ⚠️ Must browse Releases | ❌ Must browse Actions runs |
-| Setup complexity | ⚠️ 5 minutes | ✅ None (auto-enabled) | ✅ None (auto-enabled) |
-| Cost | ✅ Free (generous quota) | ✅ Free | ✅ Free |
-| Tester management | ✅ Built-in | ❌ Manual | ❌ Manual |
+| Phone browser download |  Yes |  Yes |  No (requires login + desktop) |
+| Automatic notifications |  Yes |  No |  No |
+| Easy to find |  App shows all builds |  Must browse Releases |  Must browse Actions runs |
+| Setup complexity |  5 minutes |  None (auto-enabled) |  None (auto-enabled) |
+| Cost |  Free (generous quota) |  Free |  Free |
+| Tester management |  Built-in |  Manual |  Manual |
 
 ## Recommendation
 
