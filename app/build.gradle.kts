@@ -3,8 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 android {
     namespace = "com.gammasync"
     compileSdk = 34
@@ -34,16 +32,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
